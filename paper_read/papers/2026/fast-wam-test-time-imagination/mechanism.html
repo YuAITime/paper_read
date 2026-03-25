@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast-WAM 核心机制详解 | 为什么推理时不需要生成视频？</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+        .step-card { @apply bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700; }
+        .token-box { @apply inline-block px-2 py-1 rounded text-xs font-mono m-0.5; }
+        .token-video { @apply bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300; }
+        .token-action { @apply bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300; }
+        .token-mask { @apply bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="index.html" class="text-gray-600 hover:text-blue-600"><i class="fas fa-arrow-left mr-2"></i>返回报告</a>
+            <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold">核心机制</span>
+        </div>
+    </nav>
+
+    <main class="pt-14">
+        <!-- Hero -->
+        <div class="bg-gradient-to-br from-indigo-600 to-purple-600 text-white py-12">
+            <div class="max-w-3xl mx-auto px-6">
+                <h1 class="text-3xl font-bold mb-4">为什么推理时不需要生成视频？</h1>
+                <p class="text-lg text-white/90">Fast-WAM 训练-测试解耦机制直观解读</p>
+            </div>
+        </div>
+
+        <div class="max-w-3xl mx-auto px-6 py-8 space-y-6">
+            <!-- 问题引入 -->
+            <section class="step-card">
+                <h2 class="text-lg font-bold mb-3 text-red-600"><i class="fas fa-question-circle mr-2"></i>传统WAM的问题</h2>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">
+                    传统的 World Action Model（如 UniPi, Motus）在<strong>推理时</strong>需要：
+                </p>
+                <div class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 space-y-2">
+                    <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center">1</span> 输入当前画面</div>
+                    <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center">2</span> <strong class="text-amber-600">生成未来视频（50-100步去噪，耗时~500ms）</strong></div>
+                    <div class="flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center">3</span> 基于生成的视频预测动作</div>
+                </div>
+            </section>
+
+            <!-- Fast-WAM的洞察 -->
+            <section class="step-card border-2 border-green-400">
+                <h2 class="text-lg font-bold mb-3 text-green-600"><i class="fas fa-lightbulb mr-2"></i>Fast-WAM的核心洞察</h2>
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-4">
+                    <p class="text-green-800 dark:text-green-200 font-medium">
+                        "我们真的需要在<strong>每一次推理</strong>时重新'想象'未来吗？<br>
+                        还是这种'想象能力'可以在<strong>训练时</strong>学会？"
+                    </p>
+                </div>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-start gap-2"><span class="text-green-500">✓</span> <strong>训练时</strong>：通过预测视频学习物理规律</li>
+                    <li class="flex items-start gap-2"><span class="text-green-500">✓</span> <strong>训练后</strong>：模型已"内化"这些知识</li>
+                    <li class="flex items-start gap-2"><span class="text-green-500">✓</span> <strong>推理时</strong>：直接预测动作，不用重新"想象"</li>
+                </ul>
+            </section>
+
+            <!-- Mask机制（核心） -->
+            <section class="step-card">
+                <h2 class="text-lg font-bold mb-3 text-purple-600"><i class="fas fa-mask mr-2"></i>如何实现？Mask机制</h2>
+                
+                <!-- 训练时 -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
+                    <h3 class="font-bold text-blue-800 mb-2">训练时：Joint Mask</h3>
+                    <div class="bg-white dark:bg-gray-800 rounded p-3 mb-2">
+                        <div class="flex flex-wrap justify-center">
+                            <span class="token-box token-video">V₁</span>
+                            <span class="token-box token-video">V₂</span>
+                            <span class="token-box token-video">V₃</span>
+                            <span class="token-box token-mask">V₄?</span>
+                            <span class="token-box token-mask">V₅?</span>
+                            <span class="token-box token-action">A₁</span>
+                            <span class="token-box token-action">A₂</span>
+                            <span class="token-box token-mask">A₃?</span>
+                            <span class="token-box token-mask">A₄?</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-blue-700">同时预测<strong>视频</strong>和<strong>动作</strong>（用<span class="token-mask" style="padding:2px 4px">?</span>标记需要预测的部分）</p>
+                </div>
+
+                <!-- 推理时 -->
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-2 border-green-400">
+                    <h3 class="font-bold text-green-800 mb-2">推理时：Action Mask ⭐ 关键创新</h3>
+                    <div class="bg-white dark:bg-gray-800 rounded p-3 mb-2">
+                        <div class="flex flex-wrap justify-center">
+                            <span class="token-box token-video">V₁</span>
+                            <span class="token-box token-video">V₂</span>
+                            <span class="token-box token-video">V₃</span>
+                            <span class="token-box bg-red-100 text-red-800">—</span>
+                            <span class="token-box bg-red-100 text-red-800">—</span>
+                            <span class="token-box token-action">A₁</span>
+                            <span class="token-box token-action">A₂</span>
+                            <span class="token-box token-mask">A₃?</span>
+                            <span class="token-box token-mask">A₄?</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-green-700">
+                        <strong>视频部分</strong>：输入当前观察，不预测未来<br>
+                        <strong>动作部分</strong>：只预测接下来的动作<br>
+                        <span class="bg-amber-200 dark:bg-amber-700 px-1 rounded">跳过了50-100步视频去噪，速度提升4倍！</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- 类比 -->
+            <section class="step-card">
+                <h2 class="text-lg font-bold mb-3"><i class="fas fa-chess mr-2"></i>一个类比</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                        <h4 class="font-bold text-gray-700 mb-2">传统WAM</h4>
+                        <p class="text-sm text-gray-600">像每次下棋前都要在脑子里<strong>完整模拟整盘棋</strong>的棋手</p>
+                    </div>
+                    <div class="bg-green-100 dark:bg-green-900/30 rounded-lg p-4">
+                        <h4 class="font-bold text-green-700 mb-2">Fast-WAM</h4>
+                        <p class="text-sm text-green-700">像<strong>内化棋理</strong>的棋手，凭直觉直接落子</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 为什么性能不下降 -->
+            <section class="step-card">
+                <h2 class="text-lg font-bold mb-3"><i class="fas fa-chart-line mr-2"></i>为什么性能不下降？</h2>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">1</div>
+                        <p><strong>知识已内化：</strong>训练时的视频预测让模型学会了物理规律，编码在参数中</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">2</div>
+                        <p><strong>共享注意力：</strong>视频分支和动作分支共享Transformer层，互相增强</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded bg-green-100 text-green-600 flex items-center justify-center shrink-0">3</div>
+                        <p><strong>实验证明：</strong>有视频训练 91.8% vs 无视频 77%，提升来自训练阶段</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 总结 -->
+            <section class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">总结</h2>
+                <ul class="space-y-2 text-white/90">
+                    <li>• 传统WAM推理时需要<strong>显式生成视频</strong>（耗时）</li>
+                    <li>• Fast-WAM通过<strong>训练时学习</strong>，推理时直接跳过</li>
+                    <li>• 通过<strong>不同的Mask设计</strong>实现解耦</li>
+                    <li>• 结果：<strong>4倍加速</strong>，性能保持（91.8% vs 92.2%）</li>
+                </ul>
+            </section>
+
+            <!-- 参考图表 -->
+            <section class="step-card">
+                <h2 class="text-lg font-bold mb-3">论文原图参考</h2>
+                <img src="https://arxiv.org/html/2603.16666v2/x1.png" class="w-full rounded-lg border mb-2">
+                <p class="text-xs text-gray-500">Figure 1: 三种WAM范式对比</p>
+            </section>
+
+            <div class="text-center">
+                <a href="index.html" class="text-blue-600 hover:underline">查看完整万字深度分析报告 →</a>
+            </div>
+
+            <footer class="text-center text-sm text-gray-500 pt-8">
+                Fast-WAM 核心机制详解 | arXiv: 2603.16666
+            </footer>
+        </div>
+    </main>
+</body>
+</html>
