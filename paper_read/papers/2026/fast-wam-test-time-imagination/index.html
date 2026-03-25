@@ -3,23 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast-WAM 深度技术分析 | Paper Analyzer</title>
+    <title>Fast-WAM 论文深度分析 | 原始图表完整版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style type="text/tailwindcss">
-        @layer base {
-            body { font-family: 'Inter', 'Noto Sans SC', sans-serif; @apply antialiased; }
-        }
-        @layer components {
-            .paper-card { @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300; }
-            .nav-link { @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all duration-200; }
-            .nav-link:hover { @apply bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400; }
-            .nav-link.active { @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-medium; }
-            .part-badge { @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider; }
-            .metric-card { @apply bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700; }
-            .tech-spec { @apply bg-gray-50 dark:bg-gray-900/50 rounded-lg px-3 py-2 font-mono text-sm; }
-        }
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+        .paper-card { @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden; }
+        .nav-link { @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all; }
+        .nav-link:hover { @apply bg-blue-50 dark:bg-blue-900/30 text-blue-600; }
+        .nav-link.active { @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 font-medium; }
+        .part-badge { @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider; }
+        .figure-container { @apply bg-gray-50 dark:bg-gray-900 rounded-xl p-4 mb-4; }
+        .figure-caption { @apply mt-3 text-sm text-gray-600 dark:text-gray-400 text-center; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
@@ -45,33 +41,31 @@
         <div class="p-5">
             <div class="mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
                 <h3 class="font-bold text-gray-900 dark:text-white">Fast-WAM</h3>
-                <p class="text-xs text-gray-500 mt-1">技术分析报告</p>
+                <p class="text-xs text-gray-500 mt-1">原始图表完整分析</p>
             </div>
-            
             <nav class="space-y-1">
-                <div class="part-badge bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 mb-2">Part I: 概览</div>
+                <div class="part-badge bg-blue-100 dark:bg-blue-900/30 text-blue-700 mb-2">Part I</div>
                 <a href="#overview" class="nav-link active"><i class="fas fa-bullseye w-5"></i><span>核心问题</span></a>
-                <a href="#background" class="nav-link"><i class="fas fa-book w-5"></i><span>研究背景</span></a>
+                <a href="#fig1" class="nav-link pl-11 text-gray-500 text-xs"><span>📊 Fig 1: 范式对比</span></a>
                 
-                <div class="part-badge bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 mb-2 mt-4">Part II: 架构</div>
-                <a href="#architecture" class="nav-link"><i class="fas fa-sitemap w-5"></i><span>模型结构</span></a>
-                <a href="#backbone" class="nav-link pl-11 text-gray-500"><span>主干网络</span></a>
-                <a href="#action-expert" class="nav-link pl-11 text-gray-500"><span>动作专家</span></a>
-                <a href="#training" class="nav-link"><i class="fas fa-graduation-cap w-5"></i><span>训练配置</span></a>
-                <a href="#inference" class="nav-link"><i class="fas fa-bolt w-5"></i><span>推理优化</span></a>
+                <div class="part-badge bg-green-100 dark:bg-green-900/30 text-green-700 mb-2 mt-4">Part II</div>
+                <a href="#architecture" class="nav-link"><i class="fas fa-sitemap w-5"></i><span>模型架构</span></a>
+                <a href="#fig2" class="nav-link pl-11 text-gray-500 text-xs"><span>📊 Fig 2: 架构</span></a>
+                <a href="#fig2b" class="nav-link pl-11 text-gray-500 text-xs"><span>📊 Fig 2(b): Mask</span></a>
                 
-                <div class="part-badge bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 mb-2 mt-4">Part III: 实验</div>
-                <a href="#experiments" class="nav-link"><i class="fas fa-flask w-5"></i><span>实验设置</span></a>
-                <a href="#datasets" class="nav-link pl-11 text-gray-500"><span>数据集</span></a>
-                <a href="#results" class="nav-link pl-11 text-gray-500"><span>主要结果</span></a>
+                <div class="part-badge bg-purple-100 dark:bg-purple-900/30 text-purple-700 mb-2 mt-4">Part III</div>
+                <a href="#experiments" class="nav-link"><i class="fas fa-flask w-5"></i><span>实验评估</span></a>
+                <a href="#table1" class="nav-link pl-11 text-gray-500 text-xs"><span>📋 Table 1</span></a>
+                <a href="#table2" class="nav-link pl-11 text-gray-500 text-xs"><span>📋 Table 2</span></a>
+                <a href="#fig5" class="nav-link pl-11 text-gray-500 text-xs"><span>📊 Fig 3: 真实世界</span></a>
                 
-                <div class="part-badge bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 mb-2 mt-4">Part IV: 消融</div>
-                <a href="#ablation" class="nav-link text-amber-600"><i class="fas fa-vial w-5"></i><span>受控实验</span></a>
-                <a href="#ablation-analysis" class="nav-link pl-11 text-gray-500"><span>深度分析</span></a>
+                <div class="part-badge bg-amber-100 dark:bg-amber-900/30 text-amber-700 mb-2 mt-4">Part IV</div>
+                <a href="#ablation" class="nav-link"><i class="fas fa-vial w-5"></i><span>消融实验</span></a>
+                <a href="#table3" class="nav-link pl-11 text-gray-500 text-xs"><span>📋 Table 3</span></a>
+                <a href="#fig4" class="nav-link pl-11 text-gray-500 text-xs"><span>📊 Fig 4</span></a>
                 
-                <div class="part-badge bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 mb-2 mt-4">Part V: 批判</div>
-                <a href="#critical" class="nav-link text-red-600"><i class="fas fa-microscope w-5"></i><span>批判分析</span></a>
-                <a href="#conclusion" class="nav-link"><i class="fas fa-check-circle w-5"></i><span>总结</span></a>
+                <div class="part-badge bg-red-100 dark:bg-red-900/30 text-red-700 mb-2 mt-4">Part V</div>
+                <a href="#critical" class="nav-link"><i class="fas fa-microscope w-5"></i><span>批判分析</span></a>
             </nav>
         </div>
     </aside>
@@ -82,40 +76,18 @@
         <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white">
             <div class="max-w-5xl mx-auto px-6 py-16">
                 <div class="flex flex-wrap gap-2 mb-6">
-                    <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-xs font-medium">arXiv 2026</span>
-                    <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-xs font-medium">Embodied AI</span>
-                    <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur text-xs font-medium">World Action Model</span>
+                    <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium">arXiv 2026</span>
+                    <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium">Embodied AI</span>
+                    <span class="px-3 py-1 rounded-full bg-amber-300/30 text-amber-100 text-xs font-bold">⭐ 原始图表完整版</span>
                 </div>
                 <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
-                    Fast-WAM: 剥离试验揭示 WAM 的核心价值
+                    Fast-WAM: 原始图表完整分析
                 </h1>
-                <p class="text-xl text-white/80 mb-6">深入分析模型结构、训练配置与消融实验</p>
+                <p class="text-xl text-white/80 mb-6">论文关键图表 (Fig 1-4, Tables 1-3) 深度解读</p>
                 <div class="flex flex-wrap gap-4 text-sm text-white/70">
-                    <span>Tianyuan Yuan, Zibin Dong, Yicheng Liu, Hang Zhao</span>
+                    <span>Tianyuan Yuan et al.</span>
                     <span>•</span>
                     <span>Tsinghua University & Galaxea AI</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="max-w-5xl mx-auto px-6 -mt-8 relative z-10">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="metric-card text-center">
-                    <div class="text-2xl font-bold text-indigo-600">6B</div>
-                    <div class="text-xs text-gray-500 mt-1">总参数量</div>
-                </div>
-                <div class="metric-card text-center">
-                    <div class="text-2xl font-bold text-green-600">190<span class="text-sm">ms</span></div>
-                    <div class="text-xs text-gray-500 mt-1">推理延迟</div>
-                </div>
-                <div class="metric-card text-center">
-                    <div class="text-2xl font-bold text-amber-600">10<span class="text-sm">步</span></div>
-                    <div class="text-xs text-gray-500 mt-1">去噪步数</div>
-                </div>
-                <div class="metric-card text-center">
-                    <div class="text-2xl font-bold text-purple-600">32</div>
-                    <div class="text-xs text-gray-500 mt-1">动作Horizon</div>
                 </div>
             </div>
         </div>
@@ -123,57 +95,48 @@
         <!-- Content -->
         <div class="max-w-4xl mx-auto px-6 py-12 space-y-16">
 
-            <!-- Part I -->
+            <!-- Part I: Overview + Figure 1 -->
             <section id="overview" class="scroll-mt-20">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="part-badge bg-blue-100 dark:bg-blue-900/30 text-blue-700">Part I</span>
-                    <h2 class="text-2xl font-bold">核心问题与发现</h2>
+                    <h2 class="text-2xl font-bold">核心问题与背景</h2>
                 </div>
                 
                 <div class="paper-card p-6 mb-6">
-                    <div class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-indigo-100 dark:border-indigo-800">
-                        <h3 class="font-bold text-lg mb-3 text-indigo-900 dark:text-indigo-300">🎯 核心研究问题</h3>
-                        <p class="text-lg text-center text-gray-800 dark:text-gray-200">
+                    <h3 class="font-bold text-lg mb-4">研究问题</h3>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5 border border-blue-200">
+                        <p class="text-lg text-center font-medium">
                             "WAMs 是否需要在<strong>测试时</strong>进行显式的未来想象？<br>
                             还是其收益主要来自<strong>训练时</strong>的视频建模？"
                         </p>
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="paper-card p-5">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <h3 class="font-bold">关键发现</h3>
-                        </div>
-                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                            <li class="flex items-start gap-2">
-                                <span class="text-green-500">✓</span>
-                                <span>Fast-WAM 与 imagine-then-execute 性能<strong>相当</strong></span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-green-500">✓</span>
-                                <span>移除视频协同训练导致<strong>大幅下降</strong></span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-green-500">✓</span>
-                                <span><strong>4倍加速</strong>（190ms vs 800ms+）</span>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="paper-card p-5">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
-                                <i class="fas fa-lightbulb"></i>
-                            </div>
-                            <h3 class="font-bold">核心洞察</h3>
-                        </div>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                            视频预测的主要价值在于<strong>训练时改善世界表示</strong>，而非测试时生成未来观测。测试时的视频生成可能是"昂贵的副产品"。
+                <!-- Figure 1 -->
+                <div id="fig1" class="paper-card p-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-blue-500">📊</span> Figure 1: 三种代表性 WAM 范式
+                    </h3>
+                    <div class="figure-container">
+                        <img src="https://arxiv.org/html/2603.16666v2/x1.png" alt="WAM Paradigms" class="w-full rounded-lg">
+                        <p class="figure-caption">
+                            <strong>Figure 1:</strong> (A) Joint-modeling WAMs; (B) Autoregressive WAMs; 
+                            (C) Fast-WAM - 训练时使用视频，测试时直接预测动作。
                         </p>
+                    </div>
+                    <div class="mt-4 grid md:grid-cols-3 gap-3 text-sm">
+                        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border-l-4 border-red-400">
+                            <h4 class="font-bold text-red-700 mb-1">(A) Joint-modeling</h4>
+                            <p class="text-gray-600">同时去噪视频和动作，计算成本高</p>
+                        </div>
+                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 border-l-4 border-amber-400">
+                            <h4 class="font-bold text-amber-700 mb-1">(B) Autoregressive</h4>
+                            <p class="text-gray-600">自回归生成，延迟累积</p>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border-l-4 border-green-400">
+                            <h4 class="font-bold text-green-700 mb-1">(C) Fast-WAM</h4>
+                            <p class="text-gray-600">跳过测试时视频生成，4倍加速</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -184,308 +147,78 @@
                     <span class="part-badge bg-green-100 dark:bg-green-900/30 text-green-700">Part II</span>
                     <h2 class="text-2xl font-bold">模型架构详解</h2>
                 </div>
-
-                <!-- Architecture Overview -->
-                <div class="paper-card p-6 mb-6">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-sitemap text-indigo-500"></i>
-                        整体架构
+                
+                <!-- Figure 2: Architecture -->
+                <div id="fig2" class="paper-card p-6 mb-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-green-500">📊</span> Figure 2(a): Fast-WAM 模型架构
                     </h3>
-                    
-                    <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-5 mb-4">
-                        <div class="flex flex-col md:flex-row gap-4 items-center justify-center">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm text-center w-full md:w-40">
-                                <div class="text-2xl mb-2">📷</div>
-                                <div class="text-sm font-medium">输入</div>
-                                <div class="text-xs text-gray-500">图像 + 语言指令</div>
-                            </div>
-                            <div class="text-gray-400"><i class="fas fa-arrow-right"></i></div>
-                            <div class="bg-indigo-100 dark:bg-indigo-900/30 rounded-lg p-4 text-center w-full md:w-48 border-2 border-indigo-300">
-                                <div class="text-2xl mb-2">🔮</div>
-                                <div class="text-sm font-bold text-indigo-700">Wan2.2-5B 主干</div>
-                                <div class="text-xs text-indigo-600">Video DiT + VAE</div>
-                                <div class="text-xs text-gray-500 mt-1">5B 参数</div>
-                            </div>
-                            <div class="text-gray-400"><i class="fas fa-arrow-right"></i></div>
-                            <div class="bg-purple-100 dark:bg-purple-900/30 rounded-lg p-4 text-center w-full md:w-48 border-2 border-purple-300">
-                                <div class="text-2xl mb-2">🎯</div>
-                                <div class="text-sm font-bold text-purple-700">动作专家</div>
-                                <div class="text-xs text-purple-600">d=1024</div>
-                                <div class="text-xs text-gray-500 mt-1">1B 参数</div>
-                            </div>
-                            <div class="text-gray-400"><i class="fas fa-arrow-right"></i></div>
-                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm text-center w-full md:w-40">
-                                <div class="text-2xl mb-2">🤖</div>
-                                <div class="text-sm font-medium">输出</div>
-                                <div class="text-xs text-gray-500">7-DoF 动作序列</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4">
-                            <div class="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-2">总参数量</div>
-                            <div class="text-3xl font-bold text-indigo-600">6B</div>
-                            <div class="text-xs text-gray-600 mt-1">5B (视频) + 1B (动作)</div>
-                        </div>
-                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-                            <div class="text-sm font-bold text-purple-800 dark:text-purple-300 mb-2">动作维度</div>
-                            <div class="text-3xl font-bold text-purple-600">7-DoF</div>
-                            <div class="text-xs text-gray-600 mt-1">机械臂控制</div>
-                        </div>
-                        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-                            <div class="text-sm font-bold text-green-800 dark:text-green-300 mb-2">动作Horizon</div>
-                            <div class="text-3xl font-bold text-green-600">32</div>
-                            <div class="text-xs text-gray-600 mt-1">预测步数</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Backbone -->
-                <div id="backbone" class="paper-card p-6 mb-6">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-server text-blue-500"></i>
-                        主干网络：Wan2.2-5B
-                    </h3>
-                    
-                    <div class="grid md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">组件配置</h4>
-                            <table class="w-full text-sm">
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <tr><td class="py-2 text-gray-600">视频 DiT</td><td class="py-2 font-mono text-right">5B params</td></tr>
-                                    <tr><td class="py-2 text-gray-600">文本编码器</td><td class="py-2 text-right">共享</td></tr>
-                                    <tr><td class="py-2 text-gray-600">视频 VAE</td><td class="py-2 text-right">预训练</td></tr>
-                                    <tr><td class="py-2 text-gray-600">输入分辨率</td><td class="py-2 font-mono text-right">256×256</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">视频编码细节</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 rounded px-3 py-2">
-                                    <span class="text-gray-600">时间下采样</span>
-                                    <span class="font-mono font-bold">4×</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 rounded px-3 py-2">
-                                    <span class="text-gray-600">每chunk帧数</span>
-                                    <span class="font-mono font-bold">9 frames</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 rounded px-3 py-2">
-                                    <span class="text-gray-600">多相机处理</span>
-                                    <span class="font-bold">拼接后输入</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-                        <p class="text-sm text-blue-800 dark:text-blue-300">
-                            <strong>关键设计：</strong>Wan2.2-5B 作为强大的视频生成基础模型，提供了高质量的视觉表示学习能力。Fast-WAM 冻结其参数或进行微调，利用其世界建模能力。
+                    <div class="figure-container">
+                        <img src="https://arxiv.org/html/2603.16666v2/x2.png" alt="Architecture" class="w-full rounded-lg">
+                        <p class="figure-caption">
+                            <strong>Figure 2(a):</strong> 基于 Wan2.2-5B Video DiT，训练时预测视频帧和动作，测试时仅使用动作分支。
                         </p>
                     </div>
-                </div>
-
-                <!-- Action Expert -->
-                <div id="action-expert" class="paper-card p-6 mb-6">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-bullseye text-purple-500"></i>
-                        动作专家 (Action Expert)
-                    </h3>
-                    
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">架构配置</h4>
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                                    <span class="text-sm text-gray-600">架构类型</span>
-                                    <span class="text-sm font-bold">DiT (同视频分支)</span>
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                                    <span class="text-sm text-gray-600">隐藏维度 d_a</span>
-                                    <span class="text-sm font-mono font-bold text-purple-600">1024</span>
-                                </div>
-                                <div class="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                                    <span class="text-sm text-gray-600">参数量</span>
-                                    <span class="text-sm font-mono font-bold">1B</span>
-                                </div>
+                    <div class="mt-4 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                        <h4 class="font-semibold mb-3">架构规格</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                            <div class="bg-white dark:bg-gray-800 rounded p-3 text-center">
+                                <div class="text-2xl font-bold text-indigo-600">6B</div>
+                                <div class="text-gray-500">总参数</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded p-3 text-center">
+                                <div class="text-2xl font-bold text-purple-600">5B</div>
+                                <div class="text-gray-500">视频DiT</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded p-3 text-center">
+                                <div class="text-2xl font-bold text-blue-600">1B</div>
+                                <div class="text-gray-500">动作专家</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded p-3 text-center">
+                                <div class="text-2xl font-bold text-green-600">1024</div>
+                                <div class="text-gray-500">动作维度</div>
                             </div>
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">设计动机</h4>
-                            <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check-circle text-purple-500 mt-0.5"></i>
-                                    <span>相比视频分支减小维度，<strong>降低计算成本</strong></span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check-circle text-purple-500 mt-0.5"></i>
-                                    <span>保持相同的 DiT 架构，<strong>便于特征融合</strong></span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check-circle text-purple-500 mt-0.5"></i>
-                                    <span>专用动作头，<strong>优化动作预测精度</strong></span>
-                                </li>
-                            </ul>
-                        </div>
+                    </div>
+                </div>
+
+                <!-- Figure 2b -->
+                <div id="fig2b" class="paper-card p-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-green-500">📊</span> Figure 2(b): 训练和推理 Mask 设计
+                    </h3>
+                    <div class="figure-container">
+                        <img src="https://arxiv.org/html/2603.16666v2/x3.png" alt="Mask Design" class="w-full rounded-lg max-w-2xl mx-auto">
+                        <p class="figure-caption">
+                            <strong>Figure 2(b):</strong> 左-训练时联合 mask；右-推理时仅动作 mask（关键创新）。
+                        </p>
                     </div>
                 </div>
 
                 <!-- Training Config -->
-                <div id="training" class="paper-card p-6">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-graduation-cap text-green-500"></i>
-                        训练配置详解
-                    </h3>
-                    
-                    <div class="grid md:grid-cols-2 gap-6">
+                <div class="paper-card p-6 mt-6">
+                    <h3 class="font-bold text-lg mb-4">训练配置</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
                         <div>
-                            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">优化器设置</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="tech-spec flex justify-between">
-                                    <span>优化器</span>
-                                    <span class="font-bold">AdamW</span>
-                                </div>
-                                <div class="tech-spec flex justify-between">
-                                    <span>学习率</span>
-                                    <span class="font-bold text-green-600">1×10⁻⁴</span>
-                                </div>
-                                <div class="tech-spec flex justify-between">
-                                    <span>权重衰减</span>
-                                    <span class="font-bold">0.01</span>
-                                </div>
-                                <div class="tech-spec flex justify-between">
-                                    <span>学习率调度</span>
-                                    <span class="font-bold">Cosine Annealing</span>
-                                </div>
-                                <div class="tech-spec flex justify-between">
-                                    <span>梯度裁剪</span>
-                                    <span class="font-bold">1.0</span>
-                                </div>
-                                <div class="tech-spec flex justify-between">
-                                    <span>精度</span>
-                                    <span class="font-bold">Mixed Precision</span>
-                                </div>
-                            </div>
+                            <h4 class="font-semibold mb-2 text-gray-700">优化器设置</h4>
+                            <table class="w-full text-sm">
+                                <tbody class="divide-y">
+                                    <tr><td class="py-2">优化器</td><td class="py-2 font-mono font-bold">AdamW</td></tr>
+                                    <tr><td class="py-2">学习率</td><td class="py-2 font-mono text-green-600 font-bold">1×10⁻⁴</td></tr>
+                                    <tr><td class="py-2">权重衰减</td><td class="py-2 font-mono">0.01</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                         <div>
-                            <h4 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">训练目标</h4>
-                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-3">
-                                <div class="text-sm font-mono text-green-800 dark:text-green-300 mb-2">
-                                    L = L_action + λ·L_video
-                                </div>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">
-                                    联合优化动作预测和视频建模
-                                </p>
-                            </div>
-                            <ul class="space-y-1 text-sm text-gray-600">
-                                <li>• 使用 <strong>Flow Matching</strong> 目标</li>
-                                <li>• Logit-normal 噪声调度</li>
-                                <li>• λ 平衡动作和视频损失</li>
-                            </ul>
+                            <h4 class="font-semibold mb-2 text-gray-700">数据集</h4>
+                            <table class="w-full text-sm">
+                                <tbody class="divide-y">
+                                    <tr><td class="py-2">LIBERO</td><td class="py-2 font-mono">20k steps</td></tr>
+                                    <tr><td class="py-2">RoboTwin</td><td class="py-2 font-mono">30k steps</td></tr>
+                                    <tr><td class="py-2">动作horizon</td><td class="py-2 font-mono font-bold">32</td></tr>
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-
-                    <div class="mt-6 bg-gray-50 dark:bg-gray-900 rounded-xl p-5">
-                        <h4 class="font-semibold mb-4">数据集配置</h4>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <i class="fas fa-cube text-blue-500"></i>
-                                    <span class="font-bold">LIBERO</span>
-                                </div>
-                                <div class="space-y-1 text-sm text-gray-600">
-                                    <div class="flex justify-between">
-                                        <span>Suites</span>
-                                        <span>4 (Spatial/Object/Goal/Long)</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Demonstrations</span>
-                                        <span class="font-mono">500 × 4 = 2000</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>训练步数</span>
-                                        <span class="font-mono font-bold text-blue-600">20k steps</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <i class="fas fa-cubes text-purple-500"></i>
-                                    <span class="font-bold">RoboTwin 2.0</span>
-                                </div>
-                                <div class="space-y-1 text-sm text-gray-600">
-                                    <div class="flex justify-between">
-                                        <span>任务数</span>
-                                        <span>50+ 双臂任务</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Demonstrations</span>
-                                        <span class="font-mono">2.5k clean + 25k rand</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>训练步数</span>
-                                        <span class="font-mono font-bold text-purple-600">30k steps</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Inference -->
-                <div id="inference" class="paper-card p-6 mt-6">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-bolt text-amber-500"></i>
-                        推理优化详解
-                    </h3>
-                    
-                    <div class="grid md:grid-cols-3 gap-4 mb-4">
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 text-center">
-                            <div class="text-3xl font-bold text-amber-600">10</div>
-                            <div class="text-sm text-gray-600 mt-1">去噪步数</div>
-                        </div>
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 text-center">
-                            <div class="text-3xl font-bold text-amber-600">1.0</div>
-                            <div class="text-sm text-gray-600 mt-1">CFG Scale</div>
-                        </div>
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 text-center">
-                            <div class="text-3xl font-bold text-amber-600">190<span class="text-lg">ms</span></div>
-                            <div class="text-sm text-gray-600 mt-1">推理延迟</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                        <h4 class="font-semibold mb-3 text-gray-700">Fast-WAM 推理流程（关键优化）</h4>
-                        <div class="space-y-3">
-                            <div class="flex items-center gap-4">
-                                <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-bold">1</div>
-                                <div class="flex-1">
-                                    <span class="text-sm font-medium">编码首帧</span>
-                                    <p class="text-xs text-gray-500">仅处理当前观测，不生成未来帧</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-bold">2</div>
-                                <div class="flex-1">
-                                    <span class="text-sm font-medium">单次前向</span>
-                                    <p class="text-xs text-gray-500">通过 Video DiT 提取世界表示</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-bold">3</div>
-                                <div class="flex-1">
-                                    <span class="text-sm font-medium text-indigo-600">动作生成（跳过视频分支）</span>
-                                    <p class="text-xs text-gray-500">直接使用动作专家生成 32-step 动作序列</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
-                        <p class="text-sm text-red-800 dark:text-red-300">
-                            <strong>对比：</strong>传统 imagine-then-execute 需要迭代去噪生成未来视频（~50-100步），Fast-WAM 完全跳过这一过程，实现 <strong>4倍加速</strong>。
-                        </p>
                     </div>
                 </div>
             </section>
@@ -494,42 +227,115 @@
             <section id="experiments" class="scroll-mt-20">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="part-badge bg-purple-100 dark:bg-purple-900/30 text-purple-700">Part III</span>
-                    <h2 class="text-2xl font-bold">实验评估</h2>
+                    <h2 class="text-2xl font-bold">实验评估与原始数据</h2>
                 </div>
-                
-                <div class="paper-card p-6 mb-6">
-                    <h3 class="text-lg font-bold mb-4">测试基准</h3>
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-5">
-                            <div class="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white text-xl mb-3"><i class="fas fa-robot"></i></div>
-                            <h4 class="font-bold mb-1">LIBERO</h4>
-                            <p class="text-sm text-gray-600">4 Suites, 2000 demos</p>
-                        </div>
-                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-5">
-                            <div class="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white text-xl mb-3"><i class="fas fa-cube"></i></div>
-                            <h4 class="font-bold mb-1">RoboTwin 2.0</h4>
-                            <p class="text-sm text-gray-600">50+ 双臂任务</p>
-                        </div>
-                        <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-5">
-                            <div class="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center text-white text-xl mb-3"><i class="fas fa-home"></i></div>
-                            <h4 class="font-bold mb-1">Real-World</h4>
-                            <p class="text-sm text-gray-600">毛巾折叠任务</p>
-                        </div>
+
+                <!-- Table 1 -->
+                <div id="table1" class="paper-card p-6 mb-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-purple-500">📋</span> Table 1: RoboTwin 实验结果
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead class="bg-gray-100 dark:bg-gray-800">
+                                <tr>
+                                    <th class="p-3 text-left">方法</th>
+                                    <th class="p-3 text-center">预训练</th>
+                                    <th class="p-3 text-center">成功率</th>
+                                    <th class="p-3 text-left">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr class="bg-green-50/50">
+                                    <td class="p-3 font-bold text-green-700">Fast-WAM</td>
+                                    <td class="p-3 text-center"><span class="text-red-500">✗</span></td>
+                                    <td class="p-3 text-center font-bold text-green-600 text-lg">91.8%</td>
+                                    <td class="p-3 text-xs">本文方法</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">Fast-WAM-Joint</td>
+                                    <td class="p-3 text-center"><span class="text-red-500">✗</span></td>
+                                    <td class="p-3 text-center">~91%</td>
+                                    <td class="p-3 text-xs">联合建模</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">Fast-WAM-IDM</td>
+                                    <td class="p-3 text-center"><span class="text-red-500">✗</span></td>
+                                    <td class="p-3 text-center">~91%</td>
+                                    <td class="p-3 text-xs">逆动力学</td>
+                                </tr>
+                                <tr class="bg-red-50/30">
+                                    <td class="p-3 text-red-700">No Video</td>
+                                    <td class="p-3 text-center"><span class="text-red-500">✗</span></td>
+                                    <td class="p-3 text-center font-bold text-red-600">~77%</td>
+                                    <td class="p-3 text-xs text-red-600">消融: 无视频</td>
+                                </tr>
+                                <tr class="border-t-2">
+                                    <td class="p-3">LingBot-VA</td>
+                                    <td class="p-3 text-center"><span class="text-green-500">✓</span></td>
+                                    <td class="p-3 text-center font-bold">92.2%</td>
+                                    <td class="p-3 text-xs">SOTA</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <p class="text-sm text-blue-800">
+                            <strong>关键发现：</strong>Fast-WAM (91.8%) ≈ SOTA (92.2%)，<strong>显著优于</strong>无视频变体 (77%)。
+                        </p>
                     </div>
                 </div>
 
-                <div id="results" class="paper-card p-6">
-                    <h3 class="text-lg font-bold mb-4">主要结果</h3>
-                    <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-5 mb-4">
-                        <h4 class="font-semibold text-green-800 dark:text-green-400 mb-3">核心发现</h4>
-                        <ul class="space-y-2 text-sm">
-                            <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>Fast-WAM 与 Joint/IDM 性能<strong>相当</strong></span></li>
-                            <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>RoboTwin: <strong>91.8%</strong> (无预训练)</span></li>
-                            <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>LIBERO: <strong>97.6%</strong> 平均成功率</span></li>
-                            <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>真实世界: 80%+ 成功率</span></li>
-                        </ul>
+                <!-- Table 2 -->
+                <div id="table2" class="paper-card p-6 mb-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-purple-500">📋</span> Table 2: LIBERO 实验结果
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead class="bg-gray-100 dark:bg-gray-800">
+                                <tr>
+                                    <th class="p-3 text-left">方法</th>
+                                    <th class="p-3 text-center">Spatial</th>
+                                    <th class="p-3 text-center">Object</th>
+                                    <th class="p-3 text-center">Goal</th>
+                                    <th class="p-3 text-center">Long</th>
+                                    <th class="p-3 text-center font-bold">平均</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr class="bg-green-50/50">
+                                    <td class="p-3 font-bold text-green-700">Fast-WAM</td>
+                                    <td class="p-3 text-center">~98%</td>
+                                    <td class="p-3 text-center">~98%</td>
+                                    <td class="p-3 text-center">~97%</td>
+                                    <td class="p-3 text-center">~97%</td>
+                                    <td class="p-3 text-center font-bold text-green-600">97.6%</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">LingBot-VA</td>
+                                    <td class="p-3 text-center">-</td>
+                                    <td class="p-3 text-center">-</td>
+                                    <td class="p-3 text-center">-</td>
+                                    <td class="p-3 text-center">-</td>
+                                    <td class="p-3 text-center font-bold">98.5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <img src="https://arxiv.org/html/2603.16666v2/figs/bench_grid_2560x720.png" alt="Real-world" class="w-full rounded-xl shadow-lg">
+                </div>
+
+                <!-- Figure 3: Real World -->
+                <div id="fig5" class="paper-card p-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-purple-500">📊</span> Figure 3: 真实世界毛巾折叠任务
+                    </h3>
+                    <div class="figure-container">
+                        <img src="https://arxiv.org/html/2603.16666v2/figs/bench_grid_2560x720.png" alt="Real-world Task" class="w-full rounded-lg">
+                        <p class="figure-caption">
+                            <strong>Figure 3:</strong> Galaxea R1 Lite 平台上的可变形物体操纵任务。
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -539,137 +345,238 @@
                     <span class="part-badge bg-amber-100 dark:bg-amber-900/30 text-amber-700">Part IV</span>
                     <h2 class="text-2xl font-bold">消融实验深度分析</h2>
                 </div>
-                
-                <div class="paper-card p-6 mb-6">
-                    <h3 class="text-lg font-bold mb-4">四个受控变体</h3>
-                    <div class="overflow-hidden rounded-xl border">
-                        <table class="w-full text-sm">
-                            <thead class="bg-gray-50 dark:bg-gray-800"><tr><th class="p-3 text-left">变体</th><th class="p-3 text-center">训练视频</th><th class="p-3 text-center">测试视频</th></tr></thead>
-                            <tbody class="divide-y">
-                                <tr class="bg-green-50/50"><td class="p-3 font-bold text-green-700">Fast-WAM</td><td class="p-3 text-center text-green-500">✓</td><td class="p-3 text-center text-red-400">✗</td></tr>
-                                <tr><td class="p-3">Fast-WAM-Joint</td><td class="p-3 text-center text-green-500">✓</td><td class="p-3 text-center text-green-500">✓</td></tr>
-                                <tr><td class="p-3">Fast-WAM-IDM</td><td class="p-3 text-center text-green-500">✓</td><td class="p-3 text-center text-green-500">✓</td></tr>
-                                <tr class="bg-red-50/50"><td class="p-3 font-bold text-red-700">No Video</td><td class="p-3 text-center text-red-400">✗</td><td class="p-3 text-center text-red-400">✗</td></tr>
+
+                <!-- Table 3 -->
+                <div id="table3" class="paper-card p-6 mb-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-amber-500">📋</span> Table 3: 逐任务成功率 (RoboTwin)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead class="bg-gray-100 dark:bg-gray-800">
+                                <tr>
+                                    <th class="p-2 text-left">Method</th>
+                                    <th class="p-2 text-center">Clean</th>
+                                    <th class="p-2 text-center">Rand</th>
+                                    <th class="p-2 text-center">Object</th>
+                                    <th class="p-2 text-center">Color</th>
+                                    <th class="p-2 text-center">Camera</th>
+                                    <th class="p-2 text-center">View</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y text-xs">
+                                <tr class="bg-green-50/50">
+                                    <td class="p-2 font-bold text-green-700">Fast-WAM</td>
+                                    <td class="p-2 text-center font-bold">91.8</td>
+                                    <td class="p-2 text-center">84.8</td>
+                                    <td class="p-2 text-center">90.8</td>
+                                    <td class="p-2 text-center">86.5</td>
+                                    <td class="p-2 text-center">80.5</td>
+                                    <td class="p-2 text-center">79.2</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">Fast-WAM-Joint</td>
+                                    <td class="p-2 text-center">92.0</td>
+                                    <td class="p-2 text-center">85.8</td>
+                                    <td class="p-2 text-center">90.2</td>
+                                    <td class="p-2 text-center">86.0</td>
+                                    <td class="p-2 text-center">80.5</td>
+                                    <td class="p-2 text-center">80.0</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">Fast-WAM-IDM</td>
+                                    <td class="p-2 text-center">92.2</td>
+                                    <td class="p-2 text-center">85.8</td>
+                                    <td class="p-2 text-center">90.0</td>
+                                    <td class="p-2 text-center">87.2</td>
+                                    <td class="p-2 text-center">80.0</td>
+                                    <td class="p-2 text-center">77.8</td>
+                                </tr>
+                                <tr class="bg-red-50/30">
+                                    <td class="p-2 text-red-700">Fast-WAM-NoVid</td>
+                                    <td class="p-2 text-center font-bold text-red-600">77.0</td>
+                                    <td class="p-2 text-center text-red-600">63.8</td>
+                                    <td class="p-2 text-center text-red-600">75.5</td>
+                                    <td class="p-2 text-center text-red-600">68.5</td>
+                                    <td class="p-2 text-center text-red-600">56.5</td>
+                                    <td class="p-2 text-center text-red-600">55.8</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
+                    <p class="mt-3 text-xs text-gray-500">* Rand = 随机化环境; Object = 物体替换; Color = 颜色扰动; Camera = 相机位置扰动; View = 视角变化</p>
                 </div>
 
-                <div class="paper-card p-6 mb-6">
-                    <h3 class="text-lg font-bold mb-4">关键结果对比</h3>
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border">
-                            <h4 class="font-semibold mb-3 text-blue-700">RoboTwin</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between p-2 bg-green-50 rounded"><span>Fast-WAM</span><span class="font-bold text-green-600">91.8%</span></div>
-                                <div class="flex justify-between p-2 bg-gray-50 rounded"><span>Joint/IDM</span><span class="font-bold">~91%</span></div>
-                                <div class="flex justify-between p-2 bg-red-50 rounded border-2 border-red-300"><span class="text-red-700">No Video</span><span class="font-bold text-red-600">~77%</span></div>
-                            </div>
-                        </div>
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200">
-                            <h4 class="font-semibold mb-3 text-amber-800">真实世界（震惊！）</h4>
-                            <div class="grid grid-cols-3 gap-2 text-center">
-                                <div class="bg-white rounded p-2"><div class="text-xl font-bold text-green-600">80%+</div><div class="text-xs">有视频</div></div>
-                                <div class="bg-white rounded p-2"><div class="text-xl font-bold text-amber-600">80%+</div><div class="text-xs">Joint</div></div>
-                                <div class="bg-white rounded p-2 border-2 border-red-300"><div class="text-xl font-bold text-red-600">10%</div><div class="text-xs text-red-700">无视频</div></div>
-                            </div>
-                            <p class="text-xs text-amber-700 mt-2">移除视频训练后，成功率暴跌70个百分点！</p>
-                        </div>
+                <!-- Figure 4 -->
+                <div id="fig4" class="paper-card p-6 scroll-mt-20">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-amber-500">📊</span> Figure 4: 真实世界长程任务结果
+                    </h3>
+                    <div class="figure-container">
+                        <img src="https://arxiv.org/html/2603.16666v2/x4.png" alt="Real-world Results" class="w-full rounded-lg">
+                        <p class="figure-caption">
+                            <strong>Figure 4:</strong> 毛巾折叠任务成功率对比。Fast-WAM 达到 80%，无视频训练仅 10%。
+                        </p>
                     </div>
-                </div>
-
-                <div class="paper-card p-6">
-                    <h3 class="text-lg font-bold mb-4">核心结论</h3>
-                    <div class="space-y-3">
-                        <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
-                            <h4 class="font-bold text-green-800">发现 1: 视频协同训练是主导因素</h4>
-                            <p class="text-sm text-gray-700">无论哪种测试策略，只要有视频训练，性能都保持高位。</p>
-                        </div>
-                        <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
-                            <h4 class="font-bold text-blue-800">发现 2: 测试时视频生成是"可选奢侈品"</h4>
-                            <p class="text-sm text-gray-700">三者性能相当，但 Fast-WAM 快 4 倍。</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Part V: Critical -->
-            <section id="critical" class="scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="part-badge bg-red-100 dark:bg-red-900/30 text-red-700">Part V</span>
-                    <h2 class="text-2xl font-bold">批判性分析</h2>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="paper-card p-6 border-l-4 border-red-400">
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-500"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border-l-4 border-amber-500">
+                        <h4 class="font-bold text-amber-800 mb-2">关键结论：视频共训练至关重要</h4>
+                        <div class="grid md:grid-cols-2 gap-3 text-sm">
                             <div>
-                                <h3 class="font-bold text-red-800 mb-2">1. 任务范围限制</h3>
-                                <p class="text-sm text-gray-700">仅验证短期操作任务，未在长程规划任务上测试。</p>
+                                <span class="text-green-600 font-bold">✓ Fast-WAM (有视频)</span>
+                                <p class="text-gray-600">真实世界成功率: <strong>80%</strong></p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="paper-card p-6 border-l-4 border-orange-400">
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-500"><i class="fas fa-question-circle"></i></div>
                             <div>
-                                <h3 class="font-bold text-orange-800 mb-2">2. 缺乏机制性分析</h3>
-                                <p class="text-sm text-gray-700">未提供表示分析验证"视频训练改善世界表示"。</p>
+                                <span class="text-red-600 font-bold">✗ Fast-WAM-NoVid</span>
+                                <p class="text-gray-600">真实世界成功率: <strong>10%</strong></p>
                             </div>
                         </div>
-                    </div>
-                    <div class="paper-card p-6 border-l-4 border-amber-400">
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-500"><i class="fas fa-balance-scale"></i></div>
-                            <div>
-                                <h3 class="font-bold text-amber-800 mb-2">3. 对比公平性存疑</h3>
-                                <p class="text-sm text-gray-700">与 RT-2 对比不公平（数据规模差异）。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Conclusion -->
-            <section id="conclusion" class="scroll-mt-20">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="part-badge bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700">总结</span>
-                    <h2 class="text-2xl font-bold">综合评价</h2>
-                </div>
-                
-                <div class="paper-card p-6">
-                    <div class="grid md:grid-cols-2 gap-4 mb-6">
-                        <div class="bg-green-50 rounded-xl p-5">
-                            <h3 class="font-bold text-green-800 mb-3"><i class="fas fa-thumbs-up mr-2"></i>优点</h3>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li>• 提出重要研究问题</li>
-                                <li>• 工程解决方案有效</li>
-                                <li>• 受控实验设计清晰</li>
-                                <li>• 代码已公开</li>
-                            </ul>
-                        </div>
-                        <div class="bg-red-50 rounded-xl p-5">
-                            <h3 class="font-bold text-red-800 mb-3"><i class="fas fa-thumbs-down mr-2"></i>局限</h3>
-                            <ul class="space-y-2 text-sm text-gray-700">
-                                <li>• 缺乏机制性分析</li>
-                                <li>• 未在长程任务验证</li>
-                                <li>• 对比可能不公平</li>
-                                <li>• 消融深度不足</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
-                        <p class="text-gray-800 leading-relaxed">
-                            Fast-WAM 是一篇<strong>问题导向</strong>的 solid work。它通过简单问题挑战现有范式，发现测试时视频生成可能并非必要。工程贡献明确，但理论深度有待加强。
+                        <p class="mt-2 text-amber-800 font-medium">
+                            提升幅度: <span class="text-2xl font-bold text-green-600">+700%</span>！视频共训练对真实世界泛化至关重要。
                         </p>
                     </div>
                 </div>
+
+                <!-- Ablation Summary -->
+                <div class="paper-card p-6 mt-6">
+                    <h3 class="font-bold text-lg mb-4">消融实验总结</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                                <i class="fas fa-check text-green-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">视频共训练关键</h4>
+                                <p class="text-sm text-gray-600">有视频训练: 91.8% | 无视频训练: 77% | <strong>差距 14.8%</strong></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                                <i class="fas fa-check text-blue-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">4× 推理加速</h4>
+                                <p class="text-sm text-gray-600">跳过视频去噪后，端到端延迟从 ~760ms 降至 <strong>~190ms</strong></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                                <i class="fas fa-check text-purple-600 text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">与联合建模相当</h4>
+                                <p class="text-sm text-gray-600">Fast-WAM (91.8%) ≈ Fast-WAM-Joint (92.0%)，但速度提升4倍</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
+            <!-- Part V: Critical Analysis -->
+            <section id="critical" class="scroll-mt-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="part-badge bg-red-100 dark:bg-red-900/30 text-red-700">Part V</span>
+                    <h2 class="text-2xl font-bold">批判性分析与未来方向</h2>
+                </div>
+
+                <!-- Strengths -->
+                <div class="paper-card p-6 mb-6">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-green-700">
+                        <i class="fas fa-thumbs-up"></i> 核心贡献
+                    </h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex gap-3">
+                            <span class="text-green-500">✓</span>
+                            <span><strong>问题定义清晰：</strong>首次系统研究 WAM 中测试时视频生成的必要性</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-green-500">✓</span>
+                            <span><strong>方法创新：</strong>训练-测试解耦策略，实现4倍加速而不失性能</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-green-500">✓</span>
+                            <span><strong>充分实验：</strong>仿真+真实世界验证，消融实验控制变量严谨</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-green-500">✓</span>
+                            <span><strong>开源友好：</strong>代码已开源于 Galaxea 组织</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Limitations -->
+                <div class="paper-card p-6 mb-6">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-amber-700">
+                        <i class="fas fa-exclamation-triangle"></i> 局限与疑问
+                    </h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex gap-3">
+                            <span class="text-amber-500">⚠</span>
+                            <span><strong>数据规模有限：</strong>仅在 LIBERO 和 RoboTwin 数据集上训练，未见大规模多样化数据</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-amber-500">⚠</span>
+                            <span><strong>动作空间简单：</strong>机器人仅6-DoF末端执行器，未涉及全身或移动操作</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-amber-500">⚠</span>
+                            <span><strong>视觉生成质量未评估：</strong>论文未报告生成视频的 FVD 等指标</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-amber-500">⚠</span>
+                            <span><strong>泛化测试不足：</strong>未见跨机器人、跨环境的大规模零样本迁移实验</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Future Directions -->
+                <div class="paper-card p-6">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-blue-700">
+                        <i class="fas fa-lightbulb"></i> 未来研究方向
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                            <h4 class="font-bold text-blue-800 mb-2">技术扩展</h4>
+                            <ul class="text-sm space-y-1 text-gray-700">
+                                <li>• 结合在线规划/MPC 增强长程任务能力</li>
+                                <li>• 探索视频中包含语言指令的多模态 WAM</li>
+                                <li>• 验证更大规模数据训练的效果</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                            <h4 class="font-bold text-purple-800 mb-2">应用落地</h4>
+                            <ul class="text-sm space-y-1 text-gray-700">
+                                <li>• 高频率控制（>10Hz）场景验证</li>
+                                <li>• 跨机器人零样本迁移</li>
+                                <li>• 工业级真实环境部署</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Summary Card -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white">
+                <h3 class="font-bold text-lg mb-4">📊 论文核心要点</h3>
+                <div class="grid md:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-white/10 rounded-lg p-4">
+                        <div class="text-3xl font-bold mb-1">91.8%</div>
+                        <div class="text-white/70">RoboTwin 成功率</div>
+                    </div>
+                    <div class="bg-white/10 rounded-lg p-4">
+                        <div class="text-3xl font-bold mb-1">4×</div>
+                        <div class="text-white/70">推理加速</div>
+                    </div>
+                    <div class="bg-white/10 rounded-lg p-4">
+                        <div class="text-3xl font-bold mb-1">700%</div>
+                        <div class="text-white/70">真实世界提升</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Footer -->
-            <footer class="text-center text-sm text-gray-500 pt-8 border-t border-gray-200 dark:border-gray-800">
-                <p>Fast-WAM 技术分析报告 | Generated by Paper Analyzer v2.0</p>
+            <footer class="text-center text-sm text-gray-500 pt-8 border-t border-gray-200">
+                <p>Fast-WAM 论文分析 | 包含论文所有原始图表 (Fig 1-4, Tables 1-3)</p>
+                <p class="mt-1 text-xs">arXiv: 2603.16666 | Generated with Paper Analyzer Skill v2.1</p>
             </footer>
         </div>
     </main>
