@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast-WAM Token拼接与共享机制深度解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+        .step-card { @apply bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700; }
+        .token { @apply inline-flex items-center justify-center px-2 py-1 rounded text-xs font-mono m-0.5; }
+        .token-v { @apply bg-blue-100 text-blue-800 border border-blue-300; }
+        .token-a { @apply bg-green-100 text-green-800 border border-green-300; }
+        .token-p { @apply bg-gray-100 text-gray-600 border border-gray-300; }
+        .attention-line { @apply absolute bg-indigo-400/30 rounded-full; }
+        .layer-box { @apply border-2 border-indigo-300 rounded-lg p-3 bg-indigo-50 dark:bg-indigo-900/20; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="mechanism.html" class="text-gray-600 hover:text-blue-600"><i class="fas fa-arrow-left mr-2"></i>返回机制概览</a>
+            <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-bold">深度技术解析</span>
+        </div>
+    </nav>
+
+    <main class="pt-14">
+        <div class="bg-gradient-to-br from-red-600 via-orange-600 to-amber-600 text-white py-12">
+            <div class="max-w-4xl mx-auto px-6">
+                <h1 class="text-3xl font-bold mb-4">Token拼接与共享机制深度解析</h1>
+                <p class="text-lg text-white/90">视频token和动作token究竟如何拼接？共享参数是什么意思？</p>
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 py-8 space-y-8">
+            
+            <!-- 问题重述 -->
+            <section class="step-card border-2 border-red-300">
+                <h2 class="text-lg font-bold mb-3 text-red-600"><i class="fas fa-question-circle mr-2"></i>核心疑问</h2>
+                <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 space-y-2">
+                    <p>1. 视频token和动作token是<strong>怎么拼接</strong>的？直接拼在一起吗？</p>
+                    <p>2. "共享参数"到底是什么意思？是共享Transformer层吗？</p>
+                    <p>3. 训练时注意力机制怎么处理这种混合序列？</p>
+                    <p>4. 损失函数怎么同时计算视频和动作的loss？</p>
+                </div>
+            </section>
+
+            <!-- 1. Token序列的具体构成 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 text-indigo-600"><i class="fas fa-layer-group mr-2"></i>1. 输入序列的具体构成</h2>
+                
+                <div class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4">
+                    <p class="text-sm text-gray-600 mb-2">假设：</p>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                        <li>• 输入帧数：2帧（VAE编码后每帧有N个token）</li>
+                        <li>• 预测未来：2帧视频 + 4个动作</li>
+                        <li>• 每帧视频：假设16×16 = 256个patch token（实际可能更多）</li>
+                        <li>• 每个动作：32维向量（论文中32个时间步 × 32维）</li>
+                    </ul>
+                </div>
+
+                <h3 class="font-bold mb-3">训练时的完整序列（简化示意）：</h3>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                    <div class="text-xs text-gray-500 mb-2">位置编码: 0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;255&nbsp;&nbsp;256&nbsp;&nbsp;257&nbsp;&nbsp;...&nbsp;&nbsp;511&nbsp;&nbsp;512&nbsp;&nbsp;513&nbsp;&nbsp;514&nbsp;&nbsp;515</div>
+                    <div class="flex flex-wrap">
+                        <!-- 第1帧视频 -->
+                        <span class="token token-v">v₁</span>
+                        <span class="token token-v">v₂</span>
+                        <span class="token token-v">v₃</span>
+                        <span class="token token-p">...</span>
+                        <span class="token token-v">v₂₅₆</span>
+                        <!-- 第2帧视频 -->
+                        <span class="token token-v">v₂₅₇</span>
+                        <span class="token token-v">v₂₅₈</span>
+                        <span class="token token-p">...</span>
+                        <span class="token token-v">v₅₁₂</span>
+                        <!-- 第1个动作 -->
+                        <span class="token token-a">a₁</span>
+                        <!-- 第2个动作 -->
+                        <span class="token token-a">a₂</span>
+                        <!-- 第3个动作 -->
+                        <span class="token token-a">a₃</span>
+                        <!-- 第4个动作 -->
+                        <span class="token token-a">a₄</span>
+                    </div>
+                    <div class="flex text-xs mt-2">
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded mr-1">视频帧1 (256 tokens)</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded mr-1">视频帧2 (256 tokens)</span>
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded">动作序列 (4 tokens)</span>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 mt-4 border border-amber-300">
+                    <p class="text-amber-800 dark:text-amber-200">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>关键：</strong>视频token和动作token确实是在<strong>同一个序列</strong>中拼接的！
+                        它们共享相同的位置编码空间，一起输入Transformer。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 2. 共享参数详解 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 text-purple-600"><i class="fas fa-project-diagram mr-2"></i>2. "共享参数"到底是什么意思？</h2>
+
+                <h3 class="font-bold mb-3 text-gray-700">架构图示意：</h3>
+                
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    <!-- 输入 -->
+                    <div class="flex justify-center mb-4">
+                        <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 text-center">
+                            <div class="text-sm font-bold text-blue-800">输入序列</div>
+                            <div class="text-xs text-blue-600">视频token + 动作token</div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center text-gray-400 mb-2"><i class="fas fa-arrow-down"></i></div>
+                    
+                    <!-- Embedding层 -->
+                    <div class="flex justify-center mb-4">
+                        <div class="bg-gray-200 dark:bg-gray-700 rounded-lg p-3 text-center w-64">
+                            <div class="text-sm font-bold">Token Embedding</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400">共享同一个Embedding矩阵</div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center text-gray-400 mb-2"><i class="fas fa-arrow-down"></i></div>
+                    
+                    <!-- Transformer Layers -->
+                    <div class="flex justify-center mb-4">
+                        <div class="layer-box w-80">
+                            <div class="text-sm font-bold text-indigo-800 mb-2 text-center">Transformer Layers (5B参数)</div>
+                            <div class="text-xs text-indigo-600 space-y-1">
+                                <div>• Self-Attention (Q, K, V投影矩阵)</div>
+                                <div>• Feed-Forward Network</div>
+                                <div>• LayerNorm</div>
+                                <div class="font-bold text-red-600 mt-2">⬇ 所有token共享这些参数！</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center text-gray-400 mb-2"><i class="fas fa-arrow-down"></i></div>
+                    
+                    <!-- 输出头 -->
+                    <div class="flex justify-center gap-4">
+                        <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 text-center">
+                            <div class="text-sm font-bold text-blue-800">视频输出头</div>
+                            <div class="text-xs text-blue-600">预测视频token</div>
+                        </div>
+                        <div class="bg-green-100 dark:bg-green-900/30 rounded-lg p-3 text-center">
+                            <div class="text-sm font-bold text-green-800">动作输出头</div>
+                            <div class="text-xs text-green-600">预测动作token</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                        <h4 class="font-bold text-purple-800 mb-2">共享什么？</h4>
+                        <ul class="text-sm space-y-1 text-purple-700">
+                            <li>✓ <strong>Token Embedding</strong>：同一个矩阵把token ID映射到向量</li>
+                            <li>✓ <strong>所有Transformer层</strong>：Self-Attention和FFN参数完全共享</li>
+                            <li>✓ <strong>位置编码</strong>：视频和动作使用同一套位置编码</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                        <h4 class="font-bold text-green-800 mb-2">不共享什么？</h4>
+                        <ul class="text-sm space-y-1 text-green-700">
+                            <li>✗ <strong>输出头</strong>：视频和动作有各自的输出投影矩阵（Action Expert）</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 注意力机制的行为 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 text-orange-600"><i class="fas fa-eye mr-2"></i>3. 训练时注意力机制如何处理混合序列？</h2>
+
+                <p class="text-gray-700 mb-4">这是最关键的部分！注意力机制让<strong>视频token和动作token互相影响</strong>：</p>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-orange-300">
+                    <h3 class="font-bold mb-3 text-center">Self-Attention 可视化</h3>
+                    
+                    <!-- 简化的注意力矩阵 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-2 border"></th>
+                                    <th class="p-2 border bg-blue-100">V₁</th>
+                                    <th class="p-2 border bg-blue-100">V₂</th>
+                                    <th class="p-2 border bg-blue-100">V₃</th>
+                                    <th class="p-2 border bg-green-100">A₁</th>
+                                    <th class="p-2 border bg-green-100">A₂</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-2 border bg-blue-100 font-bold">V₁</td>
+                                    <td class="p-2 border bg-orange-200">💪</td>
+                                    <td class="p-2 border bg-orange-100">⚡</td>
+                                    <td class="p-2 border bg-orange-100">⚡</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border bg-blue-100 font-bold">V₂</td>
+                                    <td class="p-2 border bg-orange-100">⚡</td>
+                                    <td class="p-2 border bg-orange-200">💪</td>
+                                    <td class="p-2 border bg-orange-100">⚡</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border bg-green-100 font-bold">A₁</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-orange-200">💪</td>
+                                    <td class="p-2 border bg-orange-100">⚡</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border bg-green-100 font-bold">A₂</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-yellow-100">✨</td>
+                                    <td class="p-2 border bg-orange-100">⚡</td>
+                                    <td class="p-2 border bg-orange-200">💪</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-3 text-xs">
+                        <span class="px-2 py-1 bg-orange-200 rounded">💪 强注意力</span>
+                        <span class="px-2 py-1 bg-orange-100 rounded">⚡ 视频-视频交互</span>
+                        <span class="px-2 py-1 bg-yellow-100 rounded">✨ 视频-动作交叉</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4">
+                    <h4 class="font-bold text-indigo-800 mb-2">这意味着什么？</h4>
+                    <ul class="text-sm space-y-2 text-indigo-700">
+                        <li>• <strong>动作token可以看到所有视频token</strong> → 动作预测基于完整的视觉理解</li>
+                        <li>• <strong>视频token也可以看到动作token</strong> → 视频预测考虑了动作意图</li>
+                        <li>• <strong>两者在同一个表示空间中交互</strong> → 学习统一的"世界+动作"表示</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 4. 损失函数 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 text-green-600"><i class="fas fa-calculator mr-2"></i>4. 损失函数如何计算？</h2>
+
+                <div class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4">
+                    <h3 class="font-bold mb-2">联合损失函数：</h3>
+                    <div class="bg-white dark:bg-gray-800 rounded p-3 font-mono text-center text-lg">
+                        L<sub>total</sub> = λ<sub>video</sub> · L<sub>video</sub> + λ<sub>action</sub> · L<sub>action</sub>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <h4 class="font-bold text-blue-800 mb-2">L<sub>video</sub> 视频损失</h4>
+                        <ul class="text-sm space-y-1 text-blue-700">
+                            <li>• 计算预测的video token与真实video的MSE</li>
+                            <li>• 只作用于被mask的未来视频位置</li>
+                            <li>• 使用VAE的latent space计算</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                        <h4 class="font-bold text-green-800 mb-2">L<sub>action</sub> 动作损失</h4>
+                        <ul class="text-sm space-y-1 text-green-700">
+                            <li>• 计算预测的动作与真实动作的MSE</li>
+                            <li>• 只作用于被mask的未来动作位置</li>
+                            <li>• 通常在关节空间计算</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 mt-4 border border-amber-300">
+                    <h4 class="font-bold text-amber-800 mb-2">梯度如何传播？</h4>
+                    <div class="space-y-2 text-sm text-amber-700">
+                        <p><strong>L<sub>video</sub>的梯度</strong> → 反向传播到视频输出头 → 传播到共享Transformer层</p>
+                        <p><strong>L<sub>action</sub>的梯度</strong> → 反向传播到动作输出头 → 传播到<strong>同一个</strong>共享Transformer层</p>
+                        <p class="font-bold text-red-600 mt-2">→ 两个损失都更新共享参数，实现联合学习！</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 推理时的变化 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 text-red-600"><i class="fas fa-bolt mr-2"></i>5. 推理时发生了什么变化？</h2>
+
+                <div class="comparison-grid grid md:grid-cols-2 gap-4">
+                    <!-- 训练时 -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border-2 border-blue-400">
+                        <h3 class="font-bold text-blue-800 mb-3">训练时</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="token token-v">V</span>
+                                <span>输入：当前视频</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="token token-mask">?</span>
+                                <span>预测：未来视频（必需！）</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="token token-mask">?</span>
+                                <span>预测：未来动作</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 推理时 -->
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-2 border-green-400">
+                        <h3 class="font-bold text-green-800 mb-3">推理时 ⭐</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="token token-v">V</span>
+                                <span>输入：当前视频</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="token bg-red-100 text-red-800">—</span>
+                                <span class="text-red-600 font-bold">跳过：不预测视频！</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="token token-mask">?</span>
+                                <span>预测：未来动作</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4 mt-4">
+                    <h4 class="font-bold text-indigo-800 mb-2">为什么可以跳过？</h4>
+                    <p class="text-sm text-indigo-700">
+                        因为训练时<strong>视频预测的梯度已经更新了共享Transformer层</strong>，
+                        这些层现在"知道"世界的物理规律。推理时，动作预测可以直接利用这些知识，
+                        不需要再显式地预测视频来"复习"物理规律。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 总结 -->
+            <section class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">总结</h2>
+                <div class="space-y-3 text-white/90">
+                    <p>1. <strong>Token拼接</strong>：视频和动作token在同一个序列中，共享位置编码</p>
+                    <p>2. <strong>共享参数</strong>：Embedding层和所有Transformer层完全共享</p>
+                    <p>3. <strong>注意力交互</strong>：视频和动作token通过Self-Attention互相影响</p>
+                    <p>4. <strong>联合损失</strong>：两个loss都反向传播到共享参数，实现联合训练</p>
+                    <p>5. <strong>推理加速</strong>：共享参数已内化知识，可以跳过视频预测</p>
+                </div>
+            </section>
+
+            <div class="text-center space-y-2">
+                <a href="mechanism.html" class="block text-blue-600 hover:underline">← 返回机制概览</a>
+                <a href="index.html" class="block text-gray-600 hover:underline">查看完整万字报告</a>
+            </div>
+
+            <footer class="text-center text-sm text-gray-500 pt-8">
+                Fast-WAM Token机制深度解析 | arXiv: 2603.16666
+            </footer>
+        </div>
+    </main>
+</body>
+</html>
+HTMLEOF
+
+# 推送
+cd /workspace/luoqy1@xiaopeng.com/code/paper_read && git add papers/2026/fast-wam-test-time-imagination/token_mechanism.html && git commit -m "docs: Add deep dive into token concatenation and parameter sharing
+
+Explain:
+1. How video and action tokens are concatenated in the sequence
+2. What 'shared parameters' actually means (Embedding + Transformer layers)
+3. How attention mechanism processes mixed sequences
+4. How loss functions work for joint training
+5. Why inference can skip video prediction" && git push origin main
+
+echo "=== 完成 ==="
