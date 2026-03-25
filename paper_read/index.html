@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文深度分析 | LeWorldModel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+        .section-anchor { scroll-margin-top: 80px; }
+        .tech-card { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .formula-box { background: #f8fafc; border-left: 4px solid #3b82f6; }
+        .dark .formula-box { background: #1e293b; }
+        .highlight { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <nav class="fixed top-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <h1 class="text-lg font-bold text-blue-600">📄 Paper Analyzer</h1>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-500">arXiv: 2603.19312</span>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">🌓</button>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="fixed left-0 top-16 w-64 h-full bg-white dark:bg-gray-800 shadow-lg overflow-y-auto hidden lg:block">
+        <div class="p-4">
+            <h3 class="font-semibold mb-4 text-gray-700 dark:text-gray-300">目录</h3>
+            <ul class="space-y-2 text-sm">
+                <li><a href="#overview" class="text-blue-600 hover:underline block py-1">1. 论文概览</a></li>
+                <li><a href="#background" class="text-blue-600 hover:underline block py-1">2. 研究背景</a></li>
+                <li><a href="#method" class="text-blue-600 hover:underline block py-1">3. 方法详解</a></li>
+                <li><a href="#experiments" class="text-blue-600 hover:underline block py-1">4. 实验分析</a></li>
+                <li><a href="#innovation" class="text-blue-600 hover:underline block py-1">5. 创新点评析</a></li>
+                <li><a href="#resources" class="text-blue-600 hover:underline block py-1">6. 相关资源</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="lg:ml-64 pt-20 pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            
+            <header class="mb-12 text-center">
+                <div class="inline-block px-4 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm mb-4 font-medium">
+                    arXiv 2026 • World Model • JEPA
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+                    LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels
+                </h1>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-2">
+                    Lucas Maes, Quentin Le Lidec, Damien Scieur, <span class="font-bold text-blue-600">Yann LeCun</span>, Randall Balestriero
+                </p>
+                <p class="text-sm text-gray-500 mb-4">Published: March 13, 2026 • Meta AI Research (FAIR)</p>
+                
+                <div class="flex justify-center gap-2 flex-wrap">
+                    <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium">World Model</span>
+                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">JEPA</span>
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-sm font-medium">Self-Supervised</span>
+                    <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium">Representation Learning</span>
+                </div>
+            </header>
+
+            <section id="overview" class="section-anchor mb-12">
+                <div class="tech-card rounded-2xl p-6 text-white shadow-lg">
+                    <h2 class="text-xl font-bold mb-4">🎯 核心贡献</h2>
+                    <ul class="space-y-3 text-sm md:text-base">
+                        <li class="flex items-start">
+                            <span class="mr-3 text-yellow-300 text-xl shrink-0">✓</span>
+                            <span><strong>首个稳定端到端训练的JEPA</strong>：LeWorldModel (LeWM) 是第一个能够从原始像素稳定端到端训练的联合嵌入预测架构，无需预训练编码器、EMA或辅助监督</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 text-yellow-300 text-xl shrink-0">✓</span>
+                            <span><strong>极简损失函数设计</strong>：仅使用两个损失项（下一嵌入预测损失 + 高斯分布正则化），可调超参数从6个减少到1个</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 text-yellow-300 text-xl shrink-0">✓</span>
+                            <span><strong>高效推理速度</strong>：在单GPU上训练仅需数小时，规划速度比基于基础模型的世界模型快48倍</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-3 text-yellow-300 text-xl shrink-0">✓</span>
+                            <span><strong>可解释的潜在空间</strong>：通过探测物理量证明潜在空间编码了有意义的物理结构，能可靠检测物理上不可行事件</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                        <p class="text-3xl font-bold text-blue-600">~15M</p>
+                        <p class="text-sm text-gray-500">参数量</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                        <p class="text-3xl font-bold text-green-600">48×</p>
+                        <p class="text-sm text-gray-500">推理加速</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                        <p class="text-3xl font-bold text-purple-600">2</p>
+                        <p class="text-sm text-gray-500">损失函数项</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                        <p class="text-3xl font-bold text-orange-600">1→6</p>
+                        <p class="text-sm text-gray-500">超参数减少</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="background" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-2 border-gray-200 dark:border-gray-700">2. 研究背景</h2>
+                
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">2.1 世界模型与JEPA</h3>
+                <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+                    世界模型（World Models）是智能体理解和预测环境动态的核心组件，在强化学习、自动驾驶、机器人控制等领域具有关键作用。Joint Embedding Predictive Architectures (JEPAs) 作为一种有前景的框架，能够在紧凑的潜在空间中学习世界模型，避免了生成模型在高维像素空间中的计算开销。
+                </p>
+                <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+                    与生成式方法（如基于像素的下一帧预测）不同，JEPA 专注于预测潜在表示，使模型能够忽略与任务无关的像素级细节，学习更抽象、更鲁棒的表示。这一范式由 Yann LeCun 等人大力推广，被认为是实现人类级智能的关键路径之一。
+                </p>
+
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">2.2 现有方法的核心问题</h3>
+                <div class="highlight rounded-lg p-4 mb-4">
+                    <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                        <li><strong>表征崩溃（Representation Collapse）</strong>：编码器可能学习退化表示，将所有输入映射到相同的潜在向量</li>
+                        <li><strong>复杂的多项损失函数</strong>：现有方法通常需要6个或更多的损失项，超参数调优极其困难</li>
+                        <li><strong>依赖指数移动平均（EMA）</strong>：增加内存开销和实现复杂度</li>
+                        <li><strong>需要预训练编码器</strong>：限制端到端学习的能力</li>
+                        <li><strong>辅助监督需求</strong>：某些方法需要额外的监督信号</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">2.3 研究动机</h3>
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    本研究的核心问题是：<strong>是否有可能设计一个简单、稳定的JEPA，仅使用最少的损失项就能从原始像素端到端训练？</strong> LeWM 的设计目标是完全端到端训练、极简损失函数、高效训练推理，以及学习具有物理意义的潜在表示。
+                </p>
+            </section>
+
+            <section id="method" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-2 border-gray-200 dark:border-gray-700">3. 方法详解</h2>
+                
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">3.1 整体架构</h3>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5 mb-4">
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><strong>编码器 f</strong>：将输入图像 x 映射到潜在表示 z = f(x)</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><strong>预测器 g</strong>：给定当前潜在表示 z_t 和动作 a_t，预测下一时刻潜在表示 ẑ_{t+1} = g(z_t, a_t)</p>
+                    <p class="text-gray-700 dark:text-gray-300"><strong>解码器（可选）</strong>：用于可视化或下游任务</p>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">3.2 双损失函数设计</h3>
+                
+                <div class="formula-box rounded-lg p-4 mb-4">
+                    <p class="font-semibold mb-2 text-gray-800 dark:text-gray-200">损失函数 1：下一嵌入预测损失</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2 text-sm">要求预测器准确预测下一时刻的潜在表示：</p>
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded text-center font-mono text-lg">
+                        L<sub>pred</sub> = || ẑ<sub>t+1</sub> − z<sub>t+1</sub> ||<sup>2</sup>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-2">其中 ẑ<sub>t+1</sub> = g(z_t, a_t) 是预测值，z<sub>t+1</sub> = f(x<sub>t+1</sub>) 是目标值</p>
+                </div>
+
+                <div class="formula-box rounded-lg p-4 mb-4">
+                    <p class="font-semibold mb-2 text-gray-800 dark:text-gray-200">损失函数 2：高斯分布正则化</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2 text-sm">防止表征崩溃的关键，强制潜在表示服从标准高斯分布：</p>
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded text-center font-mono text-lg">
+                        L<sub>gauss</sub> = KL( q(z) || N(0, I) )
+                    </div>
+                    <p class="text-gray-500 text-sm mt-2">其中 q(z) 是编码器输出的潜在分布，KL 表示 KL 散度</p>
+                </div>
+
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+                    <p class="font-semibold text-green-800 dark:text-green-300 mb-2">💡 设计洞察</p>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">
+                        高斯正则化既防止了所有潜在向量 collapse 到同一点（需要保持方差），又避免了过于分散（需要保持均值为0）。这种约束与预测任务形成了自然的平衡。
+                    </p>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">3.3 方法对比</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-700">
+                                <th class="p-3 rounded-tl-lg">方法</th>
+                                <th class="p-3 text-center">损失项</th>
+                                <th class="p-3 text-center">EMA</th>
+                                <th class="p-3 text-center">预训练</th>
+                                <th class="p-3 text-center rounded-tr-lg">端到端</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tr><td class="p-3">I-JEPA</td><td class="p-3 text-center">3+</td><td class="p-3 text-center text-red-500">✗</td><td class="p-3 text-center text-red-500">✗</td><td class="p-3 text-center text-green-500">✓</td></tr>
+                            <tr><td class="p-3">MC-JEPA</td><td class="p-3 text-center">6+</td><td class="p-3 text-center text-green-500">✓</td><td class="p-3 text-center text-red-500">✗</td><td class="p-3 text-center text-red-500">✗</td></tr>
+                            <tr><td class="p-3">Denoising JEPA</td><td class="p-3 text-center">4+</td><td class="p-3 text-center text-green-500">✓</td><td class="p-3 text-center text-green-500">✓</td><td class="p-3 text-center text-red-500">✗</td></tr>
+                            <tr class="bg-blue-50 dark:bg-blue-900/20 font-bold"><td class="p-3">LeWM (本文)</td><td class="p-3 text-center text-blue-600">2</td><td class="p-3 text-center text-green-500">✗</td><td class="p-3 text-center text-green-500">✗</td><td class="p-3 text-center text-green-500">✓</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="experiments" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-2 border-gray-200 dark:border-gray-700">4. 实验分析</h2>
+                
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">4.1 实验设置</h3>
+                <p class="mb-4 text-gray-700 dark:text-gray-300">
+                    作者在多样化的 2D 和 3D 控制任务上评估 LeWM，包括 Atari 游戏、2D 物理模拟、MuJoCo 连续控制任务，涵盖从简单到高维视觉输入的各种场景。
+                </p>
+
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">4.2 主要结果</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2">训练效率</h4>
+                        <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>• 单 GPU 训练仅需数小时</li>
+                            <li>• ~15M 参数，轻量级架构</li>
+                            <li>• 无需预训练，端到端学习</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">推理性能</h4>
+                        <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>• 规划速度提升 <strong>48×</strong></li>
+                            <li>• 与基础模型世界模型竞争</li>
+                            <li>• 低延迟实时控制</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">4.3 潜在空间可解释性</h3>
+                <div class="highlight rounded-lg p-4">
+                    <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                        <li><strong>物理量探测</strong>：从潜在表示中能够线性解码出位置、速度、加速度等物理量</li>
+                        <li><strong>Surprise 评估</strong>：模型能够可靠检测物理上不可行的事件（如物体瞬间移动）</li>
+                        <li><strong>因果推理</strong>：潜在空间支持干预和反事实推理</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="innovation" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-2 border-gray-200 dark:border-gray-700">5. 创新点评析</h2>
+                
+                <div class="space-y-4">
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <p class="font-semibold text-gray-800 dark:text-gray-200 mb-2">极简主义设计哲学</p>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">
+                            LeWM 的核心创新在于证明了"简单可以战胜复杂"。研究者们长期认为需要复杂的损失组合才能稳定训练 JEPA，而 LeWM 用两个损失项就实现了同样的效果，这对整个领域具有范式转变的意义。
+                        </p>
+                    </div>
+                    <div class="border-l-4 border-purple-500 pl-4">
+                        <p class="font-semibold text-gray-800 dark:text-gray-200 mb-2">高斯正则化的理论洞察</p>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">
+                            将潜在分布约束到高斯分布作为 JEPA 稳定训练的关键机制是一个新颖的洞察。这种设计避免了表示崩溃，同时保持了潜在空间的表达能力。
+                        </p>
+                    </div>
+                    <div class="border-l-4 border-green-500 pl-4">
+                        <p class="font-semibold text-gray-800 dark:text-gray-200 mb-2">实用性与效率的平衡</p>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">
+                            LeWM 不仅在理论上优雅，在实践上也极具吸引力。48 倍的推理加速使其适用于实时应用，而单 GPU 训练的可行性降低了研究门槛。
+                        </p>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 mt-6 text-gray-800 dark:text-gray-200">与 LeCun JEPA 愿景的关系</h3>
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    作为 Yann LeCun 参与的工作，LeWM 可以被视为对 JEPA 架构长期探索的集大成者。LeCun 一直在推动自监督学习作为实现人类级 AI 的路径，而 LeWM 证明了这一愿景在实践中的可行性。
+                </p>
+            </section>
+
+            <section id="resources" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-2 border-gray-200 dark:border-gray-700">6. 相关资源</h2>
+                
+                <div class="space-y-4">
+                    <a href="https://arxiv.org/pdf/2603.19312.pdf" target="_blank" class="flex items-center p-4 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 transition">
+                        <span class="text-3xl mr-4">📄</span>
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">论文 PDF</p>
+                            <p class="text-sm text-gray-500">arXiv: 2603.19312</p>
+                        </div>
+                    </a>
+
+                    <a href="https://arxiv.org/abs/2603.19312" target="_blank" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 transition">
+                        <span class="text-3xl mr-4">🌐</span>
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">arXiv 页面</p>
+                            <p class="text-sm text-gray-500">查看论文详情和引用</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <h3 class="font-semibold mb-2 text-gray-800 dark:text-gray-200">📚 推荐阅读</h3>
+                    <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                        <li>• <strong>I-JEPA</strong>: Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture (LeCun et al., 2023)</li>
+                        <li>• <strong>MC-JEPA</strong>: Learning World Models with Joint Embeddings (2024)</li>
+                        <li>• <strong>A Path Towards Autonomous Machine Intelligence</strong>: LeCun 的立场论文</li>
+                    </ul>
+                </div>
+            </section>
+
+            <footer class="text-center text-sm text-gray-500 mt-12 pb-8">
+                <p>Generated by Paper Analyzer • 2025-03-25</p>
+                <p class="mt-1">Analyzed by AI Assistant</p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body>
+</html>
