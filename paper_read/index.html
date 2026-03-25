@@ -31,7 +31,7 @@
                 <div class="flex items-center gap-4">
                     <div class="hidden md:flex items-center gap-2 text-sm text-gray-500">
                         <i class="fas fa-database"></i>
-                        <span>1 papers</span>
+                        <span>2 papers</span>
                     </div>
                     <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 transition">
                         <i class="fas fa-moon dark:hidden"></i>
@@ -47,7 +47,7 @@
         <!-- Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-                <div class="text-2xl font-bold text-blue-600">1</div>
+                <div class="text-2xl font-bold text-blue-600">2</div>
                 <div class="text-sm text-gray-500">Total Papers</div>
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
@@ -55,12 +55,12 @@
                 <div class="text-sm text-gray-500">Latest Year</div>
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-                <div class="text-2xl font-bold text-green-600">JEPA</div>
+                <div class="text-2xl font-bold text-green-600">WAM</div>
                 <div class="text-sm text-gray-500">Focus Area</div>
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-                <div class="text-2xl font-bold text-orange-600">5</div>
-                <div class="text-sm text-gray-500">Authors</div>
+                <div class="text-2xl font-bold text-orange-600">5-Part</div>
+                <div class="text-sm text-gray-500">Analysis Standard</div>
             </div>
         </div>
 
@@ -80,6 +80,7 @@
                         <option>All Categories</option>
                         <option>World Model</option>
                         <option>JEPA</option>
+                        <option>WAM</option>
                     </select>
                 </div>
             </div>
@@ -91,10 +92,42 @@
             <section>
                 <div class="flex items-center gap-3 mb-4">
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">2026</h2>
-                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm">1 paper</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm">2 papers</span>
                 </div>
                 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Fast-WAM -->
+                    <a href="papers/2026/fast-wam-test-time-imagination/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
+                        <div class="h-32 bg-gradient-to-br from-green-500 via-teal-500 to-blue-500 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-4xl">⚡</span>
+                            </div>
+                            <div class="absolute top-3 right-3">
+                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">arXiv</span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs text-gray-500">2603.16666</span>
+                                <span class="text-gray-300">•</span>
+                                <span class="text-xs text-gray-500">Mar 2026</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">Fast-WAM: Do World Action Models Need Test-time Future Imagination?</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                <span class="text-gray-700">Tianyuan Yuan</span> et al. (Tsinghua)
+                            </p>
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                <span class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-xs">WAM</span>
+                                <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs">Embodied AI</span>
+                                <span class="px-2 py-0.5 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded text-xs">Video Generation</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                <span><i class="far fa-image mr-1"></i> 9 figures</span>
+                                <span class="text-blue-600 font-medium">Read →</span>
+                            </div>
+                        </div>
+                    </a>
+
                     <!-- LeWorldModel -->
                     <a href="papers/2026/leworldmodel-stable-end-to-end-jepa/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
                         <div class="h-32 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 relative">
@@ -128,16 +161,6 @@
                 </div>
             </section>
         </div>
-
-        <!-- Empty State (hidden when papers exist) -->
-        <div class="hidden text-center py-16">
-            <div class="text-6xl mb-4">📭</div>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">No papers yet</h3>
-            <p class="text-gray-500 mb-4">Start by analyzing your first paper</p>
-            <button class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                <i class="fas fa-plus mr-2"></i>Add Paper
-            </button>
-        </div>
     </main>
 
     <!-- Footer -->
@@ -145,9 +168,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 <p class="text-sm text-gray-500">
-                    Generated by <span class="font-medium">Paper Analyzer</span> 
+                    Generated by <span class="font-medium">Paper Analyzer v2.0</span> 
                     <span class="text-gray-300 mx-2">|</span> 
-                    Updated: 2025-03-25
+                    5-Part Analysis Standard
                 </p>
                 <div class="flex items-center gap-4">
                     <a href="https://github.com/YuAITime/paper_read" target="_blank" class="text-gray-400 hover:text-gray-600 transition">
@@ -159,16 +182,9 @@
     </footer>
 
     <script>
-        // Dark mode detection
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
         }
-
-        // Search functionality (placeholder)
-        document.querySelector('input[type="text"]').addEventListener('input', function(e) {
-            // Implement search logic here
-            console.log('Searching:', e.target.value);
-        });
     </script>
 </body>
 </html>
