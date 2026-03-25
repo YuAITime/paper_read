@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast-WAM Attention机制详解 | Bidirectional vs Autoregressive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .attention-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
+        .att-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; border-radius: 2px; }
+        .att-allowed { background-color: #10b981; color: white; }
+        .att-masked { background-color: #ef4444; color: white; }
+        .att-diagonal { background-color: #f59e0b; color: white; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="token_mechanism.html" class="text-gray-600 hover:text-blue-600"><i class="fas fa-arrow-left mr-2"></i>返回Token机制</a>
+            <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-bold">Attention机制</span>
+        </div>
+    </nav>
+
+    <main class="pt-14">
+        <div class="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 text-white py-12">
+            <div class="max-w-4xl mx-auto px-6">
+                <h1 class="text-3xl font-bold mb-4">Attention机制详解</h1>
+                <p class="text-lg text-white/90">Bidirectional vs Autoregressive: Fast-WAM用的是哪一种？</p>
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 py-8 space-y-8">
+            
+            <!-- 核心回答 -->
+            <section class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-2 border-purple-400">
+                <h2 class="text-xl font-bold mb-4 text-purple-600"><i class="fas fa-check-circle mr-2"></i>核心答案</h2>
+                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                    <p class="text-lg text-purple-800 dark:text-purple-200">
+                        <strong>Fast-WAM使用的是 Bidirectional Attention（双向注意力）！</strong>
+                    </p>
+                    <p class="text-purple-700 dark:text-purple-300 mt-2">
+                        不是GPT那种只能看前面的Autoregressive Attention，
+                        而是类似BERT的Masked Attention，被mask的位置才需要预测。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 对比三种Attention -->
+            <section class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                <h2 class="text-xl font-bold mb-4">三种Attention机制对比</h2>
+                
+                <div class="grid md:grid-cols-3 gap-4">
+                    <!-- Full Attention -->
+                    <div class="border-2 border-gray-300 rounded-lg p-4">
+                        <h3 class="font-bold text-center mb-3">1. Full Attention</h3>
+                        <p class="text-xs text-gray-600 mb-2 text-center">(BERT-style)</p>
+                        <div class="attention-grid mb-2" id="full-att"></div>
+                        <p class="text-xs text-center text-gray-500">每个token可以看到所有其他token</p>
+                    </div>
+
+                    <!-- Causal Attention -->
+                    <div class="border-2 border-blue-400 rounded-lg p-4">
+                        <h3 class="font-bold text-center mb-3 text-blue-700">2. Causal Attention</h3>
+                        <p class="text-xs text-blue-600 mb-2 text-center">(GPT-style / AR)</p>
+                        <div class="attention-grid mb-2" id="causal-att"></div>
+                        <p class="text-xs text-center text-gray-500">只能看到前面的token</p>
+                    </div>
+
+                    <!-- Masked Attention -->
+                    <div class="border-2 border-purple-500 rounded-lg p-4 bg-purple-50 dark:bg-purple-900/20">
+                        <h3 class="font-bold text-center mb-3 text-purple-700">3. Masked Attention ⭐</h3>
+                        <p class="text-xs text-purple-600 mb-2 text-center">(Fast-WAM / Diffusion)</p>
+                        <div class="attention-grid mb-2" id="masked-att"></div>
+                        <p class="text-xs text-center text-gray-500">双向可见，但只预测masked位置</p>
+                    </div>
+                </div>
+
+                <script>
+                    // Full Attention - all green
+                    const fullGrid = document.getElementById('full-att');
+                    for (let i = 0; i < 36; i++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'att-cell att-allowed';
+                        cell.textContent = '✓';
+                        fullGrid.appendChild(cell);
+                    }
+
+                    // Causal Attention - lower triangle
+                    const causalGrid = document.getElementById('causal-att');
+                    for (let i = 0; i < 6; i++) {
+                        for (let j = 0; j < 6; j++) {
+                            const cell = document.createElement('div');
+                            if (j <= i) {
+                                cell.className = 'att-cell att-allowed';
+                                cell.textContent = '✓';
+                            } else {
+                                cell.className = 'att-cell att-masked';
+                                cell.textContent = '✗';
+                            }
+                            causalGrid.appendChild(cell);
+                        }
+                    }
+
+                    // Masked Attention - specific positions masked
+                    const maskedGrid = document.getElementById('masked-att');
+                    const maskedPositions = [3, 4, 5, 9, 10, 11, 15, 16, 17, 21, 22, 23, 27, 28, 29, 33, 34, 35];
+                    for (let i = 0; i < 36; i++) {
+                        const cell = document.createElement('div');
+                        if (maskedPositions.includes(i)) {
+                            cell.className = 'att-cell att-masked';
+                            cell.textContent = '?';
+                        } else {
+                            cell.className = 'att-cell att-allowed';
+                            cell.textContent = '✓';
+                        }
+                        maskedGrid.appendChild(cell);
+                    }
+                </script>
+            </section>
+
+            <!-- Fast-WAM的具体实现 -->
+            <section class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                <h2 class="text-xl font-bold mb-4 text-indigo-600">Fast-WAM的具体实现</h2>
+
+                <div class="space-y-6">
+                    <!-- 训练时 -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-300">
+                        <h3 class="font-bold text-blue-800 mb-3">训练时：Masked Bidirectional Attention</h3>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded p-3 mb-3 font-mono text-sm">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span>输入序列:</span>
+                                <span class="px-2 py-0.5 bg-blue-100 rounded text-xs">V1 V2</span>
+                                <span class="px-2 py-0.5 bg-amber-100 rounded text-xs">[MASK] [MASK]</span>
+                                <span class="px-2 py-0.5 bg-green-100 rounded text-xs">A1</span>
+                                <span class="px-2 py-0.5 bg-amber-100 rounded text-xs">[MASK]</span>
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                V1,V2: 已知视频 | [MASK]: 需要预测 | A1: 已知动作
+                            </div>
+                        </div>
+
+                        <ul class="text-sm space-y-2 text-blue-700">
+                            <li>• <strong>Bidirectional</strong>: 所有token可以互相看到（包括A1可以看到V1,V2）</li>
+                            <li>• <strong>Masked</strong>: 只对[MASK]位置计算loss，其他位置不计算</li>
+                            <li>• <strong>Diffusion</strong>: 在噪声空间进行，不是token空间</li>
+                        </ul>
+                    </div>
+
+                    <!-- 推理时 -->
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-2 border-green-400">
+                        <h3 class="font-bold text-green-800 mb-3">推理时：Action-Only Masking ⭐</h3>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded p-3 mb-3 font-mono text-sm">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span>输入序列:</span>
+                                <span class="px-2 py-0.5 bg-blue-100 rounded text-xs">V1 V2</span>
+                                <span class="px-2 py-0.5 bg-red-100 rounded text-xs">—</span>
+                                <span class="px-2 py-0.5 bg-green-100 rounded text-xs">A1</span>
+                                <span class="px-2 py-0.5 bg-amber-100 rounded text-xs">[MASK]</span>
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                V1,V2: 当前观察 | —: 跳过不预测 | A1: 历史动作 | [MASK]: 预测下一步动作
+                            </div>
+                        </div>
+
+                        <ul class="text-sm space-y-2 text-green-700">
+                            <li>• <strong>仍然是Bidirectional</strong>: A1和[MASK]可以看到V1,V2</li>
+                            <li>• <strong>但不预测视频</strong>: 视频位置的[MASK]被移除，不需要去噪步骤</li>
+                            <li>• <strong>加速来源</strong>: 减少了需要预测的token数量</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 与Autoregressive WAM的区别 -->
+            <section class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                <h2 class="text-xl font-bold mb-4 text-red-600">与Autoregressive WAM的关键区别</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100 dark:bg-gray-800">
+                            <tr>
+                                <th class="p-3 text-left">特性</th>
+                                <th class="p-3 text-center text-red-700">Autoregressive WAM<br><span class="text-xs font-normal">(RoboDreamer)</span></th>
+                                <th class="p-3 text-center text-purple-700">Fast-WAM<br><span class="text-xs font-normal">(本文)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr>
+                                <td class="p-3">Attention类型</td>
+                                <td class="p-3 text-center bg-red-50"><strong>Causal</strong><br>只能看前面</td>
+                                <td class="p-3 text-center bg-purple-50"><strong>Bidirectional</strong><br>可以看到全部</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">生成方式</td>
+                                <td class="p-3 text-center">先生成视频step1<br>→ 再step2 → ...</td>
+                                <td class="p-3 text-center">所有masked位置<br>同时去噪</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">延迟来源</td>
+                                <td class="p-3 text-center">视频生成步数 × 每步耗时<br>+ 动作预测</td>
+                                <td class="p-3 text-center">仅需动作预测<br>视频步数=0</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">训练方式</td>
+                                <td class="p-3 text-center">Next token prediction</td>
+                                <td class="p-3 text-center">Masked token prediction<br>(类似BERT)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 为什么用Bidirectional -->
+            <section class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                <h2 class="text-xl font-bold mb-4 text-green-600">为什么Diffusion用Bidirectional？</h2>
+
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded bg-green-100 text-green-600 flex items-center justify-center shrink-0">1</div>
+                        <div>
+                            <h4 class="font-bold">去噪需要全局上下文</h4>
+                            <p class="text-sm text-gray-600">在扩散过程中，模型需要看到整个噪声序列来决定如何去噪，不能只依赖前面的信息。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded bg-green-100 text-green-600 flex items-center justify-center shrink-0">2</div>
+                        <div>
+                            <h4 class="font-bold">并行去噪效率更高</h4>
+                            <p class="text-sm text-gray-600">Bidirectional attention允许模型在一次forward中处理所有位置，而不是逐个生成。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded bg-green-100 text-green-600 flex items-center justify-center shrink-0">3</div>
+                        <div>
+                            <h4 class="font-bold">视频+动作的联合建模</h4>
+                            <p class="text-sm text-gray-600">视频token和动作token需要充分交互，双向attention让信息流更自由。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 总结 -->
+            <section class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">总结</h2>
+                <div class="space-y-3 text-white/90">
+                    <p>1. <strong>Fast-WAM使用的是Bidirectional Attention</strong>，不是Causal/Autoregressive</p>
+                    <p>2. 通过<strong>Mask</strong>控制哪些位置需要预测，而不是通过attention限制</p>
+                    <p>3. 类似BERT的Masked Language Modeling，但在噪声空间（Diffusion）</p>
+                    <p>4. 这种设计让视频和动作可以<strong>充分交互</strong>，同时保持生成能力</p>
+                    <p>5. 推理时跳过视频预测，只需对动作位置去噪，实现加速</p>
+                </div>
+            </section>
+
+            <div class="text-center">
+                <a href="token_mechanism.html" class="text-blue-600 hover:underline">← 返回Token机制</a>
+            </div>
+
+            <footer class="text-center text-sm text-gray-500 pt-8">
+                Fast-WAM Attention机制详解 | arXiv: 2603.16666
+            </footer>
+        </div>
+    </main>
+</body>
+</html>
+HTMLEOF
+
+cd /workspace/luoqy1@xiaopeng.com/code/paper_read && git add papers/2026/fast-wam-test-time-imagination/attention_mechanism.html && git commit -m "docs: Clarify bidirectional vs autoregressive attention in Fast-WAM
+
+Add detailed explanation:
+1. Fast-WAM uses Bidirectional Attention (not autoregressive)
+2. Visual comparison of Full/Causal/Masked attention patterns
+3. How masked bidirectional attention works in diffusion
+4. Key differences from autoregressive WAMs like RoboDreamer
+5. Why diffusion uses bidirectional attention" && git push origin main
+
+echo "=== 完成 ==="
