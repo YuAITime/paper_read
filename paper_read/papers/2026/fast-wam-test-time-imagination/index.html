@@ -3,24 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast-WAM 深度分析报告 | 万字详解</title>
+    <title>Fast-WAM 核心机制详解 | 为什么推理时不需要生成视频？</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
-        .paper-card { @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden; }
-        .nav-link { @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all; }
-        .nav-link:hover { @apply bg-blue-50 dark:bg-blue-900/30 text-blue-600; }
-        .nav-link.active { @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 font-medium; }
-        .part-badge { @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider; }
-        .figure-container { @apply bg-gray-50 dark:bg-gray-900 rounded-xl p-4 mb-4; }
-        .figure-caption { @apply mt-3 text-sm text-gray-600 dark:text-gray-400 text-center; }
-        .math-display { @apply bg-gray-50 dark:bg-gray-900 rounded-lg p-4 my-4 overflow-x-auto; }
-        code { @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono; }
-        pre { @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm; }
+        .step-card { @apply bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700; }
+        .highlight-box { @apply bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 rounded-r-lg; }
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .comparison-grid { grid-template-columns: 1fr; } }
+        .flow-arrow { @apply text-2xl text-gray-400 text-center my-2; }
+        .token-box { @apply inline-block px-2 py-1 rounded text-xs font-mono m-0.5; }
+        .token-video { @apply bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300; }
+        .token-action { @apply bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300; }
+        .token-mask { @apply bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400 line-through; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
@@ -32,2395 +29,326 @@
                 <span class="font-medium text-sm">返回索引</span>
             </a>
             <div class="flex items-center gap-3">
-                <span class="text-xs text-gray-500 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">arXiv: 2603.16666</span>
-                <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 px-2 py-1 rounded font-bold">10,551字</span>
-                <button onclick="document.documentElement.classList.toggle('dark')" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <i class="fas fa-sun text-amber-500 dark:hidden text-sm"></i>
-                    <i class="fas fa-moon text-indigo-400 hidden dark:block text-sm"></i>
-                </button>
+                <span class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 px-2 py-1 rounded font-bold">核心机制详解</span>
             </div>
         </div>
     </nav>
 
-    <!-- Sidebar -->
-    <aside class="fixed left-0 top-14 bottom-0 w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto hidden xl:block z-40">
-        <div class="p-5">
-            <div class="mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
-                <h3 class="font-bold text-gray-900 dark:text-white">Fast-WAM</h3>
-                <p class="text-xs text-gray-500 mt-1">万字深度分析</p>
-            </div>
-            <nav class="space-y-1 text-xs">
-                <a href="#part1" class="nav-link active"><i class="fas fa-bullseye w-4"></i><span>I. 引言与核心问题</span></a>
-                <a href="#part2" class="nav-link"><i class="fas fa-layer-group w-4"></i><span>II. WAM范式演进</span></a>
-                <a href="#part3" class="nav-link"><i class="fas fa-sitemap w-4"></i><span>III. 架构设计</span></a>
-                <a href="#part4" class="nav-link"><i class="fas fa-mask w-4"></i><span>IV. Mask机制</span></a>
-                <a href="#part5" class="nav-link"><i class="fas fa-cogs w-4"></i><span>V. 训练策略</span></a>
-                <a href="#part6" class="nav-link"><i class="fas fa-flask w-4"></i><span>VI. 实验分析</span></a>
-                <a href="#part7" class="nav-link"><i class="fas fa-microscope w-4"></i><span>VII. 批判讨论</span></a>
-                <a href="#part8" class="nav-link"><i class="fas fa-check-circle w-4"></i><span>VIII. 总结</span></a>
-            </nav>
-            
-            <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <h4 class="text-xs font-bold text-gray-500 mb-2">原始图表</h4>
-                <div class="space-y-1">
-                    <a href="#fig1" class="nav-link pl-8 text-gray-500"><span>📊 Fig 1: 范式对比</span></a>
-                    <a href="#fig2" class="nav-link pl-8 text-gray-500"><span>📊 Fig 2: 架构</span></a>
-                    <a href="#fig3" class="nav-link pl-8 text-gray-500"><span>📊 Fig 3: Mask设计</span></a>
-                    <a href="#fig4" class="nav-link pl-8 text-gray-500"><span>📊 Fig 4: 真实世界</span></a>
-                    <a href="#table1" class="nav-link pl-8 text-gray-500"><span>📋 Table 1-3: 实验数据</span></a>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="xl:ml-72 pt-14">
+    <main class="pt-14">
         <!-- Hero -->
         <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white">
-            <div class="max-w-5xl mx-auto px-6 py-16">
-                <div class="flex flex-wrap gap-2 mb-6">
-                    <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium">arXiv 2026</span>
-                    <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium">Embodied AI</span>
-                    <span class="px-3 py-1 rounded-full bg-amber-300/30 text-amber-100 text-xs font-bold">⭐ 万字深度分析</span>
-                </div>
-                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
-                    Fast-WAM: 从原理到实践的深度剖析
-                </h1>
-                <p class="text-xl text-white/80 mb-6">万字详解：训练-测试解耦的世界模型新范式</p>
-                <div class="flex flex-wrap gap-4 text-sm text-white/70">
-                    <span>Tianyuan Yuan et al.</span>
-                    <span>•</span>
-                    <span>Tsinghua University & Galaxea AI</span>
-                </div>
-                <div class="mt-8 flex flex-wrap gap-4">
-                    <div class="bg-white/10 rounded-lg px-4 py-2">
-                        <div class="text-2xl font-bold">10,551字</div>
-                        <div class="text-xs text-white/70">深度分析</div>
-                    </div>
-                    <div class="bg-white/10 rounded-lg px-4 py-2">
-                        <div class="text-2xl font-bold">8 Parts</div>
-                        <div class="text-xs text-white/70">完整结构</div>
-                    </div>
-                    <div class="bg-white/10 rounded-lg px-4 py-2">
-                        <div class="text-2xl font-bold">4×</div>
-                        <div class="text-xs text-white/70">推理加速</div>
-                    </div>
-                </div>
+            <div class="max-w-4xl mx-auto px-6 py-12">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">Fast-WAM 核心机制</h1>
+                <p class="text-xl text-white/90 mb-2">为什么推理时不需要生成未来视频？</p>
+                <p class="text-white/70">用直观的方式理解训练-测试解耦的关键创新</p>
             </div>
         </div>
 
-        <!-- Content Container -->
-        <div class="max-w-4xl mx-auto px-6 py-12 space-y-8">
-<!-- Fast-WAM 论文深度分析 - Part I & Part II -->
-<!-- 论文: Fast World Action Models (arXiv: 2603.16666) -->
-
-<!-- ==================== Part I: 引言与核心问题 ==================== -->
-<section id="part1" class="py-12 px-6 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-  <div class="max-w-5xl mx-auto">
-    
-    <!-- Part I 标题区 -->
-    <div class="mb-10">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="px-4 py-1.5 bg-blue-600 text-white text-sm font-bold rounded-full">Part I</span>
-        <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100">引言与核心问题</h2>
-      </div>
-      <p class="text-lg text-slate-600 dark:text-slate-400 ml-1">从人类认知到WAM范式的本质追问</p>
-    </div>
-
-    <!-- 1.1 从人类认知看世界模型 -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 mb-8 border border-slate-100 dark:border-slate-700">
-      <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold">1.1</span>
-        人类认知的启示：我们如何在脑海中"预见"未来？
-      </h3>
-      
-      <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed">
-        <p class="mb-4">
-          想象你正在准备倒一杯水。在手指触碰水杯之前，你的大脑已经悄然完成了一系列复杂的认知操作：你"看到"了杯子倾斜时水面的晃动，预判了手腕需要旋转的角度，甚至预演了水流入杯中的轨迹。这种在实际行动前于心智中模拟未来的能力，是人类智能的标志性特征之一。
-        </p>
-        <p class="mb-4">
-          认知科学家将这种能力称为<span class="font-semibold text-blue-600 dark:text-blue-400">"心理模拟"（Mental Simulation）</span>。神经科学研究表明，当人类观察或想象动作时，大脑中的镜像神经元系统会被激活，其激活模式与实际执行动作时高度相似。这种机制使我们能够在不付出物理代价的情况下，在心智空间中"预演"各种可能的行动方案，并选择最优策略。
-        </p>
-        <p>
-          正是受此启发，<strong>World Action Models（WAMs，世界动作模型）</strong>应运而生。这类模型的核心思想是：让机器人在执行动作前，先在"脑海"中生成未来可能发生的视觉场景——即显式地建模"在动作作用下，视觉观测会如何演化"。通过这种方式，WAMs试图赋予机器人类似人类的预见能力，从而实现更鲁棒、更泛化的具身控制。
-        </p>
-      </div>
-
-      <!-- 引用卡片 -->
-      <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-l-4 border-blue-500">
-        <p class="text-sm text-slate-600 dark:text-slate-400 italic">
-          "The main value of video prediction in WAMs may lie in improving world representations during training rather than generating future observations at test time."
-        </p>
-        <p class="text-xs text-slate-500 mt-2">— Fast-WAM核心发现</p>
-      </div>
-    </div>
-
-    <!-- 1.2 WAM发展历程 -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 mb-8 border border-slate-100 dark:border-slate-700">
-      <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm font-bold">1.2</span>
-        WAM的演进之路：从视频生成到具身智能
-      </h3>
-
-      <div class="space-y-6">
-        <!-- UniPi -->
-        <div class="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-          <div class="flex-shrink-0 w-16 text-center">
-            <span class="text-xs font-bold text-slate-500">2023</span>
-            <div class="w-3 h-3 mx-auto mt-1 rounded-full bg-blue-500"></div>
-          </div>
-          <div class="flex-1">
-            <h4 class="font-bold text-slate-800 dark:text-slate-200">UniPi: 文本引导的视频策略学习</h4>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Google DeepMind提出的开创性工作，首次将文本到视频生成模型引入机器人决策。UniPi将策略编码在视频中，通过生成符合文本描述的视频轨迹，再使用逆动力学模型（Inverse Dynamics Model, IDM）从中提取动作。这一"先想象、再执行"（imagine-then-execute）的范式奠定了后续WAM研究的基础。
-            </p>
-          </div>
-        </div>
-
-        <!-- RoboDreamer -->
-        <div class="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-          <div class="flex-shrink-0 w-16 text-center">
-            <span class="text-xs font-bold text-slate-500">2024</span>
-            <div class="w-3 h-3 mx-auto mt-1 rounded-full bg-purple-500"></div>
-          </div>
-          <div class="flex-1">
-            <h4 class="font-bold text-slate-800 dark:text-slate-200">RoboDreamer: 组合式世界模型</h4>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              港科大团队提出通过分解视频生成过程来学习组合式世界模型。RoboDreamer利用语言的自然组合性，将指令解析为低级原语，并基于这些原语生成视频。这种分解方式使模型能够泛化到未见过的对象-动作组合，在RT-X数据集上实现了显著的零样本泛化能力。
-            </p>
-          </div>
-        </div>
-
-        <!-- Motus & UWM -->
-        <div class="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-          <div class="flex-shrink-0 w-16 text-center">
-            <span class="text-xs font-bold text-slate-500">2025</span>
-            <div class="w-3 h-3 mx-auto mt-1 rounded-full bg-orange-500"></div>
-          </div>
-          <div class="flex-1">
-            <h4 class="font-bold text-slate-800 dark:text-slate-200">Motus & UWM: 统一潜动作建模</h4>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Motus提出统一的潜动作世界模型，通过耦合视频和动作扩散实现大规模机器人数据的预训练。UWM（Unified World Models）进一步发展了这一思想，使用扩散时间步作为掩码机制，实现了动作数据与无动作视频的协同训练。这些方法展示了视频共训练对提升策略泛化能力的关键作用。
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 1.3 Fast-WAM核心问题 -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 mb-8 border border-slate-100 dark:border-slate-700">
-      <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">1.3</span>
-        Fast-WAM的核心追问：测试时"想象"真的必要吗？
-      </h3>
-
-      <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed">
-        <p class="mb-4">
-          尽管WAM在理论上具有诱人前景，但现有方法普遍存在一个根本性问题：<strong>推理延迟过高</strong>。由于大多数WAM遵循"imagine-then-execute"范式，需要在测试阶段迭代去噪生成未来视频，这一过程通常需要数百毫秒的延迟，难以满足实时机器人控制的需求。
-        </p>
-        <p class="mb-4">
-          这引出了一个根本性的科学问题：
-        </p>
-      </div>
-
-      <!-- 核心问题高亮框 -->
-      <div class="my-6 p-6 bg-gradient-to-r from-rose-50 to-orange-50 dark:from-rose-900/20 dark:to-orange-900/20 rounded-xl border border-rose-200 dark:border-rose-800">
-        <p class="text-center text-lg font-semibold text-slate-800 dark:text-slate-200">
-          <span class="text-rose-600 dark:text-rose-400">WAM的性能提升究竟来自何处？</span>
-        </p>
-        <p class="text-center text-slate-600 dark:text-slate-400 mt-2">
-          是来自测试时显式的未来想象（Future Imagination），<br>还是来自训练阶段的视频建模能力（Video Modeling）？
-        </p>
-      </div>
-
-      <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed">
-        <p class="mb-4">
-          这一问题具有重要的理论和实践意义。如果性能提升主要来自训练阶段的视频建模，那么或许我们可以设计一种<strong>训练时保留视频协同训练，但测试时跳过未来预测</strong>的架构——既能保持WAM的泛化优势，又能实现接近VLA模型的推理速度。
-        </p>
-        <p>
-          Fast-WAM正是基于这一洞察提出的。它通过精巧的架构设计，解耦了训练阶段的视频建模与测试阶段的显式生成，首次系统地回答了上述问题。
-        </p>
-      </div>
-    </div>
-
-    <!-- 1.4 研究假设与验证思路 -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-100 dark:border-slate-700">
-      <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center text-sm font-bold">1.4</span>
-        研究假设与验证框架
-      </h3>
-
-      <div class="grid md:grid-cols-2 gap-6 mb-6">
-        <!-- 假设1 -->
-        <div class="p-5 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="w-6 h-6 rounded-full bg-emerald-500 text-white text-xs flex items-center justify-center font-bold">H1</span>
-            <h4 class="font-bold text-emerald-800 dark:text-emerald-300">训练阶段视频建模是关键</h4>
-          </div>
-          <p class="text-sm text-slate-600 dark:text-slate-400">
-            视频预测的主要价值在于学习更好的世界表征，而非测试时生成未来观测。移除视频共训练将导致性能显著下降。
-          </p>
-        </div>
-
-        <!-- 假设2 -->
-        <div class="p-5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-bold">H2</span>
-            <h4 class="font-bold text-blue-800 dark:text-blue-300">测试时视频生成非必需</h4>
-          </div>
-          <p class="text-sm text-slate-600 dark:text-slate-400">
-            在保持视频共训练的前提下，测试时跳过未来预测不会显著影响动作性能，但可大幅降低推理延迟。
-          </p>
-        </div>
-      </div>
-
-      <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed">
-        <p>
-          为验证上述假设，Fast-WAM设计了精巧的受控实验：通过结构化注意力掩码（Structured Attention Mask）确保动作token无法访问未来视频token，从而在训练时保持视频-动作联合建模，而在推理时完全移除未来视频分支。实验在LIBERO、RoboTwin仿真基准以及真实世界毛巾折叠任务上进行，对比了完整WAM、Fast-WAM变体以及纯动作模型的性能差异。
-        </p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ==================== Part II: WAM范式演进与相关工作 ==================== -->
-<section id="part2" class="py-12 px-6 bg-gradient-to-br from-slate-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800">
-  <div class="max-w-5xl mx-auto">
-    
-    <!-- Part II 标题区 -->
-    <div class="mb-10">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="px-4 py-1.5 bg-indigo-600 text-white text-sm font-bold rounded-full">Part II</span>
-        <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100">WAM范式演进与相关工作</h2>
-      </div>
-      <p class="text-lg text-slate-600 dark:text-slate-400 ml-1">三种主要范式的深度剖析与对比</p>
-    </div>
-
-    <!-- 范式A: Joint-modeling -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 mb-8 border border-slate-100 dark:border-slate-700">
-      <div class="flex items-center gap-3 mb-6">
-        <span class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg font-bold">A</span>
-        <div>
-          <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">范式A: Joint-modeling WAMs</h3>
-          <p class="text-sm text-slate-500">联合建模范式</p>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-4 mb-6">
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">代表工作</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">UniPi, UWM, DD-PiP</p>
-        </div>
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">核心机制</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">同时去噪视频+动作</p>
-        </div>
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">推理方式</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">联合生成</p>
-        </div>
-      </div>
-
-      <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
-        <p class="mb-4">
-          <strong>Joint-modeling</strong>是最直观的WAM范式，其核心思想是将未来视频和动作序列视为联合分布 <code class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-sm">p(a, o'|o, l)</code>，并通过单一的扩散模型进行建模。在训练阶段，模型同时学习去噪噪声视频token和动作token；在推理阶段，模型需要迭代去噪生成未来视频和动作序列。
-        </p>
-        <p class="mb-4">
-          <strong>UniPi</strong>作为该范式的先驱，提出将决策问题转化为文本引导的视频合成任务。给定任务描述，UniPi首先生成描述任务执行过程的视频计划，然后通过逆动力学模型将视频转换为可执行的动作。这种方法的优势在于：视频作为通用表征介质，天然支持跨任务、跨环境的泛化。
-        </p>
-        <p>
-          <strong>UWM（Unified World Models）</strong>进一步发展了这一思想，通过耦合的视频-动作扩散实现大规模机器人数据预训练。UWM的关键创新在于使用扩散时间步作为掩码机制，允许模型在包含动作的数据和无动作视频数据上联合训练。实验表明，视频共训练能显著提升模型在分布外场景中的鲁棒性。
-        </p>
-      </div>
-
-      <!-- 优缺点 -->
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20">
-          <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-2">✓ 优势</p>
-          <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-            <li>• 视频与动作的交互建模充分</li>
-            <li>• 支持多种推理模式（策略、动力学、逆模型）</li>
-            <li>• 可充分利用无动作视频数据</li>
-          </ul>
-        </div>
-        <div class="p-4 rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20">
-          <p class="text-sm font-semibold text-rose-700 dark:text-rose-400 mb-2">✗ 局限</p>
-          <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-            <li>• 推理延迟高（需要迭代去噪视频）</li>
-            <li>• 计算成本高</li>
-            <li>• 难以满足实时控制需求</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- 范式B: Autoregressive -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 mb-8 border border-slate-100 dark:border-slate-700">
-      <div class="flex items-center gap-3 mb-6">
-        <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg font-bold">B</span>
-        <div>
-          <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">范式B: Causal/Autoregressive WAMs</h3>
-          <p class="text-sm text-slate-500">因果式/自回归范式</p>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-4 mb-6">
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">代表工作</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">RoboDreamer, GR-1</p>
-        </div>
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">核心机制</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">先想象视频，再预测动作</p>
-        </div>
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">推理方式</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">两阶段执行</p>
-        </div>
-      </div>
-
-      <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
-        <p class="mb-4">
-          <strong>Causal/Autoregressive范式</strong>将视频生成与动作预测解耦为两个顺序阶段。第一阶段，模型基于当前观测和语言指令生成未来视频序列（"想象"阶段）；第二阶段，基于生成的视频预测动作（"执行"阶段）。这种范式遵循严格的因果顺序，确保动作预测条件于已生成的未来表征。
-        </p>
-        <p class="mb-4">
-          <strong>RoboDreamer</strong>是该范式的代表性工作。其核心创新在于将视频生成过程分解为多个组合式原语（primitives）。通过解析语言指令中的动作短语和关系短语，RoboDreamer能够将新颖的指令组合分解为已见过的组件，从而实现强大的组合泛化能力。例如，对于"将红色积木放到蓝色盘子附近"这样的新指令，模型可以将其分解为"移动"、"红色积木"、"蓝色盘子"、"附近"等已知原语。
-        </p>
-        <p>
-          <strong>GR-1</strong>则采用更直接的自回归方式：首先使用视频扩散模型生成未来帧，然后将生成的视频帧输入到动作预测模块中。这种方法的优势在于视频生成和动作预测可以使用独立的架构进行优化，但代价是推理延迟翻倍（需要完成整个视频生成后才能开始动作预测）。
-        </p>
-      </div>
-
-      <!-- 优缺点 -->
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20">
-          <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-2">✓ 优势</p>
-          <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-            <li>• 视频生成质量高，可解释性强</li>
-            <li>• 支持组合泛化（RoboDreamer）</li>
-            <li>• 两阶段架构灵活，便于模块化优化</li>
-          </ul>
-        </div>
-        <div class="p-4 rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20">
-          <p class="text-sm font-semibold text-rose-700 dark:text-rose-400 mb-2">✗ 局限</p>
-          <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-            <li>• 推理延迟最高（两阶段累加）</li>
-            <li>• 错误累积：视频生成误差会影响动作预测</li>
-            <li>• 需要闭环重规划以纠正漂移</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- 范式C: IDM-based -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 mb-8 border border-slate-100 dark:border-slate-700">
-      <div class="flex items-center gap-3 mb-6">
-        <span class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-lg font-bold">C</span>
-        <div>
-          <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">范式C: IDM-based VLA Models</h3>
-          <p class="text-sm text-slate-500">隐式世界建模 / VLA范式</p>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-4 mb-6">
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">代表工作</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">OpenVLA, π0, π0.5</p>
-        </div>
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">核心机制</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">隐式学习世界动态</p>
-        </div>
-        <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg text-center">
-          <p class="text-xs text-slate-500 mb-1">推理方式</p>
-          <p class="font-semibold text-slate-800 dark:text-slate-200">直接策略输出</p>
-        </div>
-      </div>
-
-      <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
-        <p class="mb-4">
-          <strong>IDM-based范式</strong>严格来说并非显式的世界模型，而是Vision-Language-Action（VLA）模型的一种变体。这类方法不直接生成未来视频，而是隐式地学习世界动态，通过大规模预训练将视觉-语言理解能力与动作控制能力统一在单一模型中。
-        </p>
-        <p class="mb-4">
-          <strong>OpenVLA</strong>是一个开源的VLA模型，基于Llama 2架构，在Open-X Embodiment数据集上预训练。它采用自回归方式生成离散的action token，支持开放式词汇的推理能力。然而，离散化表示会削弱动作的时间平滑性，可能导致动作抖动。
-        </p>
-        <p>
-          <strong>π0（Pi Zero）</strong>及其改进版<strong>π0.5</strong>采用扩散Transformer（DiT）架构，通过流匹配（Flow Matching）目标生成连续的动作轨迹。这种方法结合了语言模型的语义推理能力和扩散模型的平滑动作生成能力。与显式WAM不同，π0不生成视频，而是直接在潜空间中学习世界表征。
-        </p>
-      </div>
-
-      <!-- 优缺点 -->
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20">
-          <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-2">✓ 优势</p>
-          <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-            <li>• 推理速度快（直接策略接口）</li>
-            <li>• 架构简洁，易于部署</li>
-            <li>• 可扩展性强（支持大规模预训练）</li>
-          </ul>
-        </div>
-        <div class="p-4 rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20">
-          <p class="text-sm font-semibold text-rose-700 dark:text-rose-400 mb-2">✗ 局限</p>
-          <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-            <li>• 缺乏显式未来预测，可解释性差</li>
-            <li>• 难以利用无动作视频数据</li>
-            <li>• 世界动态建模能力可能受限</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- 详细对比表格 -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-100 dark:border-slate-700">
-      <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2">
-        <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        </span>
-        三种范式综合对比
-      </h3>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b-2 border-slate-200 dark:border-slate-600">
-              <th class="py-3 px-4 text-left font-bold text-slate-700 dark:text-slate-300">对比维度</th>
-              <th class="py-3 px-4 text-center font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20">范式A<br><span class="text-xs font-normal">Joint-modeling</span></th>
-              <th class="py-3 px-4 text-center font-bold text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20">范式B<br><span class="text-xs font-normal">Autoregressive</span></th>
-              <th class="py-3 px-4 text-center font-bold text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20">范式C<br><span class="text-xs font-normal">IDM/VLA</span></th>
-            </tr>
-          </thead>
-          <tbody class="text-slate-600 dark:text-slate-400">
-            <tr class="border-b border-slate-100 dark:border-slate-700">
-              <td class="py-3 px-4 font-medium">代表方法</td>
-              <td class="py-3 px-4 text-center">UniPi, UWM, DD-PiP</td>
-              <td class="py-3 px-4 text-center">RoboDreamer, GR-1, Gen2Act</td>
-              <td class="py-3 px-4 text-center">OpenVLA, π0, π0.5</td>
-            </tr>
-            <tr class="border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30">
-              <td class="py-3 px-4 font-medium">核心架构</td>
-              <td class="py-3 px-4 text-center">联合扩散模型</td>
-              <td class="py-3 px-4 text-center">视频生成器 + IDM</td>
-              <td class="py-3 px-4 text-center">DiT / 自回归Transformer</td>
-            </tr>
-            <tr class="border-b border-slate-100 dark:border-slate-700">
-              <td class="py-3 px-4 font-medium">推理延迟</td>
-              <td class="py-3 px-4 text-center"><span class="px-2 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded text-xs">~800ms</span></td>
-              <td class="py-3 px-4 text-center"><span class="px-2 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded text-xs">~1000ms+</span></td>
-              <td class="py-3 px-4 text-center"><span class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded text-xs">~200ms</span></td>
-            </tr>
-            <tr class="border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30">
-              <td class="py-3 px-4 font-medium">视频共训练</td>
-              <td class="py-3 px-4 text-center"><span class="text-emerald-600">✓ 原生支持</span></td>
-              <td class="py-3 px-4 text-center"><span class="text-emerald-600">✓ 支持</span></td>
-              <td class="py-3 px-4 text-center"><span class="text-rose-600">✗ 不支持</span></td>
-            </tr>
-            <tr class="border-b border-slate-100 dark:border-slate-700">
-              <td class="py-3 px-4 font-medium">泛化能力</td>
-              <td class="py-3 px-4 text-center">⭐⭐⭐⭐</td>
-              <td class="py-3 px-4 text-center">⭐⭐⭐⭐⭐<br><span class="text-xs">(组合泛化)</span></td>
-              <td class="py-3 px-4 text-center">⭐⭐⭐</td>
-            </tr>
-            <tr class="border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30">
-              <td class="py-3 px-4 font-medium">可解释性</td>
-              <td class="py-3 px-4 text-center">⭐⭐⭐</td>
-              <td class="py-3 px-4 text-center">⭐⭐⭐⭐⭐<br><span class="text-xs">(显式视频)</span></td>
-              <td class="py-3 px-4 text-center">⭐⭐</td>
-            </tr>
-            <tr class="border-b border-slate-100 dark:border-slate-700">
-              <td class="py-3 px-4 font-medium">实时性</td>
-              <td class="py-3 px-4 text-center"><span class="text-rose-600">差</span></td>
-              <td class="py-3 px-4 text-center"><span class="text-rose-600">差</span></td>
-              <td class="py-3 px-4 text-center"><span class="text-emerald-600">好</span></td>
-            </tr>
-            <tr class="border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30">
-              <td class="py-3 px-4 font-medium">适用场景</td>
-              <td class="py-3 px-4 text-center">研究原型<br>离线规划</td>
-              <td class="py-3 px-4 text-center">需要可解释性<br>的任务规划</td>
-              <td class="py-3 px-4 text-center">实时控制<br>工业部署</td>
-            </tr>
-            <tr>
-              <td class="py-3 px-4 font-medium">主要瓶颈</td>
-              <td class="py-3 px-4 text-center text-xs">视频去噪延迟</td>
-              <td class="py-3 px-4 text-center text-xs">两阶段延迟累加<br>错误累积</td>
-              <td class="py-3 px-4 text-center text-xs">数据效率<br>世界建模能力</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Fast-WAM定位说明 -->
-      <div class="mt-6 p-5 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl border border-cyan-200 dark:border-cyan-800">
-        <div class="flex items-start gap-3">
-          <span class="text-2xl">💡</span>
-          <div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-2">Fast-WAM的新定位</h4>
-            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Fast-WAM试图在三种范式之间找到平衡点：它保留了范式A的视频共训练能力（训练时联合建模视频+动作），但采用了范式C的直接策略接口（测试时仅预测动作）。通过精巧的注意力掩码设计，Fast-WAM实现了<strong>"训练时像WAM，测试时像VLA"</strong>的独特架构，在保持泛化能力的同时将推理延迟降低到190ms（4倍加速）。
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-<!-- Fast-WAM 论文技术分析 Part III & Part IV -->
-
-<!-- Part III: 架构设计深度解析 -->
-<section id="part3" class="py-16 bg-white">
-  <div class="max-w-4xl mx-auto px-6">
-    <div class="flex items-center gap-4 mb-8">
-      <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-        III
-      </div>
-      <h2 class="text-3xl font-bold text-gray-900">架构设计深度解析</h2>
-    </div>
-
-    <!-- 3.1 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-sm font-bold">3.1</span>
-        为什么选择Wan2.2-5B？
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM选择Wan2.2-5B作为骨干网络，这一决策背后蕴含着对当前视频生成模型格局的深刻理解。让我们从三个维度剖析这一选择：
-        </p>
-        
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 my-6 border border-blue-100">
-          <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            Wan2.2的技术特点
-          </h4>
-          <p class="text-gray-700 mb-3">
-            Wan2.2（Wan-Video）是阿里通义实验室开源的视频生成大模型，采用标准的<strong>Diffusion Transformer (DiT)</strong>架构。其核心设计包括：
-          </p>
-          <ul class="space-y-2 text-gray-700">
-            <li class="flex items-start gap-2">
-              <span class="text-blue-500 mt-1">•</span>
-              <span><strong>Full Attention机制</strong>：不同于CogVideoX等模型的3D Full Attention，Wan2.2在时空维度上采用高效的全局注意力计算</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-blue-500 mt-1">•</span>
-              <span><strong>Flow Matching训练</strong>：基于Rectified Flow的扩散训练目标，采样效率优于传统DDPM</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-blue-500 mt-1">•</span>
-              <span><strong>原生视频理解</strong>：5B参数规模在视频质量与计算效率之间取得平衡</span>
-            </li>
-          </ul>
-        </div>
-
-        <p class="mb-4">
-          <strong>为什么不是其他视频模型？</strong>对比当前主流选择：CogVideoX-5B虽然开源但主要面向中文场景；VideoCraft系列更侧重文本到视频的创意生成；而OpenAI的Sora、Google的Veo 2等闭源模型无法用于学术研究。Wan2.2-5B提供了<strong>可商用级别的开源视频生成能力</strong>，这对于机器人学习研究至关重要。
-        </p>
-
-        <div class="bg-amber-50 rounded-lg p-4 border-l-4 border-amber-400 my-6">
-          <p class="text-amber-800 text-sm">
-            <strong>关键洞察：</strong>Wan2.2的5B规模恰好处于"足够表达复杂视频动力学"与"可负担微调成本"的甜蜜点。对于机器人World Model任务，过大的模型（如20B+）会导致训练不稳定，而过小的模型（如1B以下）难以捕捉物理世界的复杂交互。
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3.2 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-sm font-bold">3.2</span>
-        架构设计决策分析
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM采用<strong>5B Video DiT + 1B Action Expert</strong>的异构架构，总计6B参数。这一设计引发一个核心问题：为什么不直接用单个6B模型，而是要将动作预测单独分离？
-        </p>
-
-        <div class="grid md:grid-cols-2 gap-6 my-6">
-          <div class="bg-white rounded-xl shadow-md border border-gray-200 p-5">
-            <h4 class="font-bold text-gray-800 mb-3 text-red-600">❌ 单模型方案的问题</h4>
-            <ul class="space-y-2 text-sm text-gray-700">
-              <li>• 视频token与动作token分布差异大</li>
-              <li>• 动作预测需要更强的时序因果性</li>
-              <li>• 视频重建可能主导损失函数</li>
-              <li>• 难以针对性地优化动作精度</li>
-            </ul>
-          </div>
-          <div class="bg-white rounded-xl shadow-md border border-green-200 p-5">
-            <h4 class="font-bold text-gray-800 mb-3 text-green-600">✅ 分离架构的优势</h4>
-            <ul class="space-y-2 text-sm text-gray-700">
-              <li>• 专门的Action Expert学习动作动力学</li>
-              <li>• 视频特征与动作特征解耦</li>
-              <li>• 可独立优化动作预测精度</li>
-              <li>• 支持训练-测试Mask策略差异</li>
-            </ul>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>1024维动作空间的计算：</strong>Fast-WAM采用32个时间步 × 32维动作空间的设定，总维度为1024。这一设计对应机器人控制中的典型场景：
-        </p>
-
-        <div class="bg-gray-900 rounded-xl p-6 my-6 overflow-x-auto">
-          <pre class="text-green-400 text-sm font-mono"><code># 动作空间维度分解
-action_horizon = 32      # 预测未来32个时间步
-action_dim = 32          # 每个时间步32维动作（对应7-DoF机械臂 + 夹爪等）
-total_action_dim = action_horizon × action_dim = 1024
-
-# 在DiT中的表示
-action_tokens = 1024 / patch_size  # 假设patch_size=2，则约512个action tokens</code></pre>
-        </div>
-
-        <p class="mb-4">
-          选择32个时间步的预测窗口是一个关键权衡。过短的窗口（如8步）导致规划能力不足；过长的窗口（如64步）会引入远期不确定性。32步在LIBERO和RoboTwin任务中经实验验证为最优配置。
-        </p>
-      </div>
-    </div>
-
-    <!-- 3.3 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-sm font-bold">3.3</span>
-        条件注入机制
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          作为条件生成模型，Fast-WAM需要高效融合三类条件信息：<strong>初始观测图像</strong>、<strong>文本指令</strong>、以及可选的<strong>历史动作</strong>。让我们逐一分析其编码策略。
-        </p>
-
-        <div class="space-y-4 my-6">
-          <div class="flex gap-4 items-start">
-            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-purple-600 font-bold">1</span>
-            </div>
-            <div>
-              <h4 class="font-bold text-gray-800">图像条件编码</h4>
-              <p class="text-gray-700 text-sm mt-1">
-                初始观测图像通过Wan2.2预训练的VAE编码器压缩为latent表示。设输入图像为 $I \in \mathbb{R}^{3 \times H \times W}$，经VAE编码后得到 $z_I \in \mathbb{R}^{C \times h \times w}$。这一latent表征作为DiT的条件输入，通过cross-attention机制注入到每个Transformer层：
-              </p>
-              <div class="bg-gray-100 rounded-lg p-3 mt-2 text-center">
-                <code class="text-sm">Attention(Q, K, V) = softmax(QK<sup>T</sup>/√d) V</code>
-              </div>
-              <p class="text-gray-700 text-sm mt-2">
-                其中Key和Value来自图像条件编码，Query来自视频/动作token。
-              </p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 items-start">
-            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-purple-600 font-bold">2</span>
-            </div>
-            <div>
-              <h4 class="font-bold text-gray-800">文本指令处理</h4>
-              <p class="text-gray-700 text-sm mt-1">
-                语言指令（如"把红色杯子放到蓝色盘子上"）通过T5或类似的text encoder编码为语义特征。不同于图像条件的pixel-level信息，文本提供task-level的高层语义引导。Wan2.2原生支持文本条件，Fast-WAM继承这一能力并通过fine-tuning适配机器人指令词汇。
-              </p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 items-start">
-            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-purple-600 font-bold">3</span>
-            </div>
-            <div>
-              <h4 class="font-bold text-gray-800">历史动作编码（可选）</h4>
-              <p class="text-gray-700 text-sm mt-1">
-                对于需要利用历史信息的任务，过去执行的动作序列通过简单的MLP投影后与当前token拼接。这一设计借鉴了π0和OpenVLA的做法，使模型具备短期记忆能力。
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3.4 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-sm font-bold">3.4</span>
-        与基线架构对比
-      </h3>
-      
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border-collapse">
-          <thead>
-            <tr class="bg-gray-100">
-              <th class="border border-gray-300 p-3 text-left">特性</th>
-              <th class="border border-gray-300 p-3 text-left text-blue-700">Fast-WAM</th>
-              <th class="border border-gray-300 p-3 text-left">Motus</th>
-              <th class="border border-gray-300 p-3 text-left">LingBot-VA</th>
-              <th class="border border-gray-300 p-3 text-left">π0.5</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="border border-gray-300 p-3 font-medium">骨干网络</td>
-              <td class="border border-gray-300 p-3 bg-blue-50">Wan2.2-5B (开源)</td>
-              <td class="border border-gray-300 p-3">Cosmos-7B (开源)</td>
-              <td class="border border-gray-300 p-3">VideoDCM (开源)</td>
-              <td class="border border-gray-300 p-3">InternVL2.5 (开源)</td>
-            </tr>
-            <tr>
-              <td class="border border-gray-300 p-3 font-medium">动作预测方式</td>
-              <td class="border border-gray-300 p-3 bg-blue-50">分离Action Expert (1B)</td>
-              <td class="border border-gray-300 p-3">视频头部分支</td>
-              <td class="border border-gray-300 p-3">Value Head</td>
-              <td class="border border-gray-300 p-3">Flow Matching</td>
-            </tr>
-            <tr>
-              <td class="border border-gray-300 p-3 font-medium">动作维度</td>
-              <td class="border border-gray-300 p-3 bg-blue-50">1024 (32×32)</td>
-              <td class="border border-gray-300 p-3">约256</td>
-              <td class="border border-gray-300 p-3">约128</td>
-              <td class="border border-gray-300 p-3">可变</td>
-            </tr>
-            <tr>
-              <td class="border border-gray-300 p-3 font-medium">训练目标</td>
-              <td class="border border-gray-300 p-3 bg-blue-50">Joint视频+动作重建</td>
-              <td class="border border-gray-300 p-3">视频预测+动作回归</td>
-              <td class="border border-gray-300 p-3">Value estimation</td>
-              <td class="border border-gray-300 p-3">流匹配+策略优化</td>
-            </tr>
-            <tr>
-              <td class="border border-gray-300 p-3 font-medium">核心创新</td>
-              <td class="border border-gray-300 p-3 bg-blue-50">训练-测试Mask解耦</td>
-              <td class="border border-gray-300 p-3">World Model预训练</td>
-              <td class="border border-gray-300 p-3">Video Diffusion策略</td>
-              <td class="border border-gray-300 p-3">VLA+Flow Matching</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="mt-4 text-gray-700 text-sm">
-        <p><strong>对比分析：</strong></p>
-        <ul class="space-y-1 mt-2">
-          <li>• <strong>Motus</strong>依赖Cosmos的世界模型能力，但在下游任务适配时需要完整的视频预测，推理成本高</li>
-          <li>• <strong>LingBot-VA</strong>将视频扩散模型转化为value function估计，适用于基于搜索的规划但不适合直接控制</li>
-          <li>• <strong>π0.5</strong>采用VLA架构，缺少显式的世界模型组件，难以进行长程规划</li>
-          <li>• <strong>Fast-WAM</strong>的独特优势在于Joint训练保证世界模型质量，同时推理时通过Mask策略只生成动作，实现效率与性能兼得</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 3.5 -->
-    <div class="mb-6">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-sm font-bold">3.5</span>
-        架构局限性
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          尽管Fast-WAM在效率与性能之间取得了良好平衡，但其架构仍存在若干固有局限性：
-        </p>
-
-        <div class="space-y-4">
-          <div class="bg-red-50 rounded-lg p-4 border-l-4 border-red-400">
-            <h4 class="font-bold text-red-800 mb-2">固定分辨率限制</h4>
-            <p class="text-red-700 text-sm">
-              Wan2.2-5B预训练于特定分辨率（如480×832或特定比例），这限制了Fast-WAM处理不同相机配置的能力。虽然可以通过resize适配，但可能损失细节信息。未来工作可考虑引入<strong>任意分辨率适配</strong>技术（如NaViT的patch packing）或<strong>动态分辨率缩放</strong>。
-            </p>
-          </div>
-
-          <div class="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-400">
-            <h4 class="font-bold text-orange-800 mb-2">动作空间限制</h4>
-            <p class="text-orange-700 text-sm">
-              1024维（32×32）的动作空间假设了固定的时间跨度。对于需要长期规划的任务（如多步骤操作），32步可能不足；而对于简单任务则存在计算浪费。此外，连续动作空间的扩散建模可能在高频动作上产生抖动，需要后处理平滑。
-            </p>
-          </div>
-
-          <div class="bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-400">
-            <h4 class="font-bold text-yellow-800 mb-2">单视角依赖</h4>
-            <p class="text-yellow-700 text-sm">
-              当前架构主要设计为单视角输入。扩展到多视角时，需要修改条件编码机制以融合多个相机的latent表征，这会增加计算复杂度。相比于原生支持多视角的3D世界模型（如Cosmos的多图输入），Fast-WAM在多视角场景需要额外适配。
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Part IV: Mask机制核心创新 -->
-<section id="part4" class="py-16 bg-gradient-to-b from-gray-50 to-white">
-  <div class="max-w-4xl mx-auto px-6">
-    <div class="flex items-center gap-4 mb-8">
-      <div class="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-        IV
-      </div>
-      <h2 class="text-3xl font-bold text-gray-900">Mask机制核心创新</h2>
-    </div>
-
-    <!-- 4.1 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-sm font-bold">4.1</span>
-        Diffusion Transformer的Mask原理
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          在深入Fast-WAM的Mask设计之前，我们需要理解Diffusion Transformer中<strong>Causal Mask</strong>的基本原理。与NLP中的自回归生成不同，视频扩散模型通常采用<strong>双向注意力</strong>——即在去噪的每一步，模型可以同时关注序列中的所有位置。
-        </p>
-
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 my-6">
-          <h4 class="font-bold text-gray-800 mb-4 text-center">Causal Mask的数学定义</h4>
-          <div class="bg-gray-50 rounded-lg p-4 text-center">
-            <p class="text-lg font-mono mb-2">
-              M<sub>ij</sub> = 
-              <span class="inline-block">
-                ⎧ 0,  if i ≥ j (可见)<br>
-                ⎩ -∞, if i < j (掩码)
-              </span>
-            </p>
-            <p class="text-sm text-gray-600 mt-3">
-              Attention(Q, K, V) = softmax((QK<sup>T</sup> + M) / √d) V
-            </p>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          然而，纯粹的causal mask会限制模型捕捉时空相关性的能力。在视频生成中，<strong>空间维度的双向交互</strong>（同一帧内的不同patch之间）通常是必要的。因此，Video DiT常采用<strong>时空分离的注意力</strong>或<strong>因果与双向的混合策略</strong>。
-        </p>
-
-        <div class="flex justify-center my-6">
-          <div class="bg-gray-900 rounded-xl p-6 inline-block">
-            <div class="grid grid-cols-5 gap-1">
-              <!-- Visual representation of mask pattern -->
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-red-400 rounded flex items-center justify-center text-xs text-white font-bold">M</div>
-              
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-              <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-xs text-white font-bold">V</div>
-            </div>
-            <p class="text-center text-gray-400 text-xs mt-3">标准Causal Mask (V=可见, M=掩码)</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4.2 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-sm font-bold">4.2</span>
-        Fast-WAM的训练Mask设计
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM在训练阶段采用<strong>Joint Mask</strong>策略——同时预测视频帧和动作序列。这一设计的数学表达如下：
-        </p>
-
-        <div class="bg-emerald-50 rounded-xl p-6 my-6 border border-emerald-200">
-          <h4 class="font-bold text-emerald-800 mb-3">Joint Mask的数学表达</h4>
-          <p class="text-emerald-900 text-sm mb-3">
-            设输入序列包含视频token $V = \{v_1, v_2, ..., v_T\}$ 和动作token $A = \{a_1, a_2, ..., a_H\}$，则联合表示为：
-          </p>
-          <div class="bg-white rounded-lg p-4 text-center mb-3">
-            <p class="font-mono text-emerald-800">
-              X = [v<sub>1</sub>, v<sub>2</sub>, ..., v<sub>T</sub>, a<sub>1</sub>, a<sub>2</sub>, ..., a<sub>H</sub>]
-            </p>
-          </div>
-          <p class="text-emerald-900 text-sm">
-            在训练时，我们mask掉未来帧和未来动作，模型学习目标为：
-          </p>
-          <div class="bg-white rounded-lg p-4 text-center mt-3">
-            <p class="font-mono text-emerald-800">
-              L<sub>joint</sub> = || X̂<sub>masked</sub> - X<sub>masked</sub> ||<sup>2</sup>
-            </p>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>为什么要mask掉未来帧？</strong>这一设计基于以下关键洞察：
-        </p>
-
-        <div class="grid md:grid-cols-2 gap-4 my-6">
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
-            <h5 class="font-bold text-gray-800 mb-2">1. 世界模型学习</h5>
-            <p class="text-sm text-gray-700">
-              通过同时预测视频和动作，模型被迫学习物理世界的因果规律。如果只看到当前帧就能预测未来帧，说明模型理解了环境动力学。
-            </p>
-          </div>
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
-            <h5 class="font-bold text-gray-800 mb-2">2. 特征解耦</h5>
-            <p class="text-sm text-gray-700">
-              视频重建任务提供丰富的监督信号，帮助学习视觉表征；动作预测任务则专注于控制策略。两者联合训练相互促进。
-            </p>
-          </div>
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
-            <h5 class="font-bold text-gray-800 mb-2">3. 数据效率</h5>
-            <p class="text-sm text-gray-700">
-              每个训练样本同时提供视觉和运动学监督，相比于单独训练两个模型，数据利用效率显著提升。
-            </p>
-          </div>
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
-            <h5 class="font-bold text-gray-800 mb-2">4. 预训练兼容</h5>
-            <p class="text-sm text-gray-700">
-              Wan2.2预训练于视频生成任务，Joint Mask允许我们在此基础上逐步引入动作预测，实现平滑迁移。
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4.3 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-sm font-bold">4.3</span>
-        Fast-WAM的推理Mask设计
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-1 my-6">
-          <div class="bg-white rounded-lg p-6">
-            <h4 class="font-bold text-emerald-800 mb-3 flex items-center gap-2">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-              核心创新：训练-测试Mask解耦
-            </h4>
-            <p class="text-gray-700 mb-4">
-              Fast-WAM最关键的技术创新在于：<strong>推理时只mask动作部分，完全不生成视频</strong>。这如何实现？
-            </p>
-            <div class="bg-gray-50 rounded-lg p-4">
-              <p class="text-sm text-gray-800 font-mono">
-                # 训练时<br>
-                mask_pattern = [V_m, V_m, ..., A_m, A_m, ...]  # 视频和动作都mask<br><br>
-                # 推理时 (Fast-WAM)<br>
-                mask_pattern = [V_v, V_v, ..., A_m, A_m, ...]  # 视频可见，只mask动作
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          这一设计的巧妙之处在于：
-        </p>
-
-        <ol class="space-y-3 my-4">
-          <li class="flex gap-3">
-            <span class="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">1</span>
-            <span class="text-gray-700"><strong>特征复用：</strong>训练阶段学习的视频表征能力并未丢弃，而是作为条件信息的一部分。视频token在推理时作为"已知条件"输入，而非"需要生成的目标"。</span>
-          </li>
-          <li class="flex gap-3">
-            <span class="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">2</span>
-            <span class="text-gray-700"><strong>计算节省：</strong>视频生成通常占据扩散模型80%以上的计算量。跳过视频生成可将推理成本降低到原来的约1/5。</span>
-          </li>
-          <li class="flex gap-3">
-            <span class="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">3</span>
-            <span class="text-gray-700"><strong>动作聚焦：</strong>所有计算资源集中于动作token的生成，避免了视频重建带来的潜在干扰。</span>
-          </li>
-        </ol>
-
-        <div class="bg-amber-50 rounded-lg p-4 border-l-4 border-amber-400 my-6">
-          <p class="text-amber-800 text-sm">
-            <strong>技术挑战：</strong>这种不对称的训练-测试策略面临一个关键问题——模型在训练时从未见过"视频token作为条件、仅生成动作"的情况。Fast-WAM通过精心设计的渐进式训练策略解决这一问题：先用完整Joint Mask训练，再逐渐降低视频mask比例，最后过渡到Action-only mask。
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4.4 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-sm font-bold">4.4</span>
-        不同Mask策略的消融
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          为了验证Mask策略的有效性，Fast-WAM设计了系统性的消融实验，对比四种不同的mask配置：
-        </p>
-
-        <div class="overflow-x-auto my-6">
-          <table class="w-full text-sm border-collapse shadow-lg rounded-lg overflow-hidden">
-            <thead>
-              <tr class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
-                <th class="p-4 text-left">Mask策略</th>
-                <th class="p-4 text-left">训练配置</th>
-                <th class="p-4 text-left">推理配置</th>
-                <th class="p-4 text-center">预期性能</th>
-                <th class="p-4 text-center">推理速度</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white">
-              <tr class="border-b border-gray-100 hover:bg-gray-50">
-                <td class="p-4 font-medium text-gray-800">完全随机mask</td>
-                <td class="p-4 text-gray-600">随机mask视频/动作token</td>
-                <td class="p-4 text-gray-600">Action-only</td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">低</span></td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">快</span></td>
-              </tr>
-              <tr class="border-b border-gray-100 hover:bg-gray-50">
-                <td class="p-4 font-medium text-gray-800">只mask视频</td>
-                <td class="p-4 text-gray-600">仅预测未来帧</td>
-                <td class="p-4 text-gray-600">需要生成视频</td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs">中</span></td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">慢</span></td>
-              </tr>
-              <tr class="border-b border-gray-100 bg-emerald-50">
-                <td class="p-4 font-bold text-emerald-800">✓ Fast-WAM</td>
-                <td class="p-4 text-emerald-700">Joint mask (视频+动作)</td>
-                <td class="p-4 text-emerald-700">Action-only mask</td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">高</span></td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">快</span></td>
-              </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="p-4 font-medium text-gray-800">不mask (全可见)</td>
-                <td class="p-4 text-gray-600">Teacher forcing</td>
-                <td class="p-4 text-gray-600">无法自回归生成</td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">极低</span></td>
-                <td class="p-4 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">N/A</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-5 my-6">
-          <h4 class="font-bold text-gray-800 mb-3">消融实验发现</h4>
-          <div class="space-y-3 text-sm">
-            <div class="flex items-start gap-3">
-              <div class="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-              <p class="text-gray-700"><strong>完全随机mask</strong>导致训练目标不一致，模型难以建立视频与动作之间的稳定关联。</p>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-              <p class="text-gray-700"><strong>只mask视频</strong>虽然能学习世界模型，但推理时必须生成视频，失去了效率优势。</p>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-              <p class="text-gray-700"><strong>Fast-WAM方案</strong>通过Joint训练保持世界模型能力，推理时通过mask策略跳过视频生成，实现效率与性能的最优平衡。</p>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
-              <p class="text-gray-700"><strong>不mask</strong>退化为Teacher Forcing，模型无法学会自回归生成，只能做one-step预测。</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4.5 -->
-    <div class="mb-6">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-sm font-bold">4.5</span>
-        Mask与性能的关联
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          一个关键问题是：<strong>为什么Fast-WAM的mask策略能在保持高性能的同时大幅提升速度？</strong>这需要从信息流的角度进行分析。
-        </p>
-
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 my-6 border border-indigo-200">
-          <h4 class="font-bold text-indigo-800 mb-4">信息流分析</h4>
-          <div class="space-y-4">
-            <div>
-              <p class="text-sm text-indigo-900 font-medium mb-2">训练时的信息流动：</p>
-              <div class="bg-white rounded-lg p-3 text-xs font-mono">
-                观测图像 ──→ [DiT Encoder] ──→ 视频token预测<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘<br>
-                文本指令 ──→ [T5 Encoder] ──→ 动作token预测 ←── 视频特征
-              </div>
-            </div>
-            <div>
-              <p class="text-sm text-indigo-900 font-medium mb-2">推理时的信息流动：</p>
-              <div class="bg-white rounded-lg p-3 text-xs font-mono">
-                观测图像 ──→ [VAE] ──→ Latent视频特征 ──→ [DiT] ──→ 动作token<br>
-                文本指令 ──→ [T5] ──→ 文本特征 ───────────────↗
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          关键洞察在于：
-        </p>
-
-        <div class="space-y-4 my-4">
-          <div class="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">🧠</span>
-            </div>
-            <div>
-              <h5 class="font-bold text-gray-800">表征迁移</h5>
-              <p class="text-sm text-gray-700">Joint训练时，模型学习将视频特征与动作特征在latent空间中关联。推理时，观测图像经VAE编码后直接作为"ground truth视频特征"输入，模型只需基于这些高质量特征预测动作。</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">⚡</span>
-            </div>
-            <div>
-              <h5 class="font-bold text-gray-800">计算优化</h5>
-              <p class="text-sm text-gray-700">视频token数量通常是动作token的10-50倍。推理时跳过视频生成，相当于将扩散模型的序列长度大幅缩减，注意力计算复杂度从 $O(n^2)$ 降为 $O(m^2)$，其中 $m \ll n$。</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">🎯</span>
-            </div>
-            <div>
-              <h5 class="font-bold text-gray-800">精度保持</h5>
-              <p class="text-sm text-gray-700">由于视频生成任务在训练时已经"教会"了模型如何从观测推断未来，推理时直接用真实观测替代生成视频，不仅不会损失精度，反而避免了视频生成误差向动作预测的传播。</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-500 my-6">
-          <p class="text-emerald-800 text-sm">
-            <strong>总结：</strong>Fast-WAM的Mask机制创新性地实现了"用世界模型训练，按策略模型推理"的范式转换。Joint Mask保证模型理解环境的物理规律，Action-only Mask则在推理时释放这一能力，只生成需要的动作，从而在不牺牲性能的前提下实现数量级的速度提升。
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Fast-WAM 论文技术分析 Part V & Part VI -->
-
-<!-- Part V: 训练策略与实现细节 -->
-<section id="part5" class="py-16 bg-white">
-  <div class="max-w-4xl mx-auto px-6">
-    <div class="flex items-center gap-4 mb-8">
-      <div class="w-12 h-12 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-        V
-      </div>
-      <h2 class="text-3xl font-bold text-gray-900">训练策略与实现细节</h2>
-    </div>
-
-    <!-- 5.1 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-sm font-bold">5.1</span>
-        数据预处理流程
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM的数据预处理是确保模型高效训练的基础。不同于传统的图像-动作对训练，World Model需要处理视频序列，这对数据流水线提出了更高要求。
-        </p>
-
-        <div class="bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-6 my-6 border border-violet-100">
-          <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-            <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            视频Tokenization（VAE编码）
-          </h4>
-          <p class="text-gray-700 mb-3">
-            原始视频帧首先通过Wan2.2预训练的VAE编码器进行压缩。设输入视频帧为 $I \in \mathbb{R}^{3 \times H \times W}$，VAE编码器将其映射到latent空间：
-          </p>
-          <div class="bg-white rounded-lg p-4 text-center mb-3">
-            <p class="font-mono text-violet-800">
-              z = VAE_encoder(I),  z \in \mathbb{R}^{C \times h \times w}
-            </p>
-            <p class="text-sm text-gray-600 mt-2">
-              其中 $C=16$ 为latent通道数，压缩比为 $H/h = W/w = 8$
-            </p>
-          </div>
-          <p class="text-gray-700 text-sm">
-            对于256×256的输入分辨率，编码后的latent尺寸为 $16 \times 32 \times 32$。这一压缩比在保证重建质量的同时，将后续DiT的计算量降低了64倍。
-          </p>
-        </div>
-
-        <p class="mb-4">
-          <strong>动作Chunking策略：</strong>原始机器人演示数据通常是连续的动作流，需要离散化为固定长度的action chunks。Fast-WAM采用32个时间步的action horizon，这一设计基于以下考量：
-        </p>
-
-        <div class="grid md:grid-cols-2 gap-4 my-6">
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
-            <h5 class="font-bold text-gray-800 mb-2">Temporal Aggregation</h5>
-            <p class="text-sm text-gray-700">
-              对于高频采集的数据（如50Hz），Fast-WAM采用下采样策略，每 $n$ 帧取一帧作为关键帧，保持action horizon覆盖足够的物理时间跨度。
-            </p>
-          </div>
-          <div class="bg-white rounded-lg shadow border border-gray-200 p-4">
-            <h5 class="font-bold text-gray-800 mb-2">Action Interpolation</h5>
-            <p class="text-sm text-gray-700">
-              对于低频数据，使用线性插值填充缺失帧，确保32步的action chunk在时间上是连续且平滑的，避免控制信号的突变。
-            </p>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>数据增强：</strong>为提高模型的泛化能力，Fast-WAM采用了多种数据增强策略：
-        </p>
-        <ul class="space-y-2 text-gray-700 ml-4">
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span><strong>颜色抖动（Color Jittering）：</strong>随机调整亮度、对比度、饱和度，模拟不同光照条件</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span><strong>随机裁剪（Random Crop）：</strong>在256×256基础上随机裁剪至240×240后resize回原尺寸</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span><strong>高斯噪声（Gaussian Noise）：</strong>添加标准差为0.01的传感器噪声，增强鲁棒性</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 5.2 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-sm font-bold">5.2</span>
-        训练超参数详解
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM的训练超参数经过精心设计，在收敛速度与训练稳定性之间取得了良好平衡。
-        </p>
-
-        <div class="bg-violet-50 rounded-xl p-6 my-6 border border-violet-200">
-          <h4 class="font-bold text-violet-800 mb-4">优化器配置：AdamW</h4>
-          <div class="bg-white rounded-lg p-4">
-            <div class="grid grid-cols-3 gap-4 text-center">
-              <div class="p-3 bg-gray-50 rounded-lg">
-                <p class="text-xs text-gray-500 mb-1">β₁ (一阶矩)</p>
-                <p class="font-bold text-violet-700">0.9</p>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-lg">
-                <p class="text-xs text-gray-500 mb-1">β₂ (二阶矩)</p>
-                <p class="font-bold text-violet-700">0.999</p>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-lg">
-                <p class="text-xs text-gray-500 mb-1">Weight Decay</p>
-                <p class="font-bold text-violet-700">0.01</p>
-              </div>
-            </div>
-            <p class="text-sm text-gray-600 mt-4">
-              AdamW将权重衰减与梯度更新解耦，避免了传统Adam+L2正则化在自适应学习率场景下的耦合问题。β₁=0.9保证了动量更新的响应速度，β₂=0.999提供稳定的长程梯度估计。
-            </p>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>学习率lr=1e-4的合理性分析：</strong>这一选择基于以下多因素考量：
-        </p>
-
-        <div class="space-y-4 my-6">
-          <div class="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-blue-600 font-bold">1</span>
-            </div>
-            <div>
-              <h5 class="font-bold text-gray-800">预训练模型微调</h5>
-              <p class="text-sm text-gray-700">Wan2.2-5B已在海量视频数据上预训练，特征提取器接近收敛。过高的学习率会破坏预训练权重，1e-4是保守但安全的选择。</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-green-600 font-bold">2</span>
-            </div>
-            <div>
-              <h5 class="font-bold text-gray-800">扩散模型的敏感性</h5>
-              <p class="text-sm text-gray-700">扩散模型的训练对学习率较为敏感。过高的lr会导致生成样本质量剧烈波动，1e-4配合warmup策略可稳定收敛。</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-purple-600 font-bold">3</span>
-            </div>
-            <div>
-              <h5 class="font-bold text-gray-800">多任务学习平衡</h5>
-              <p class="text-sm text-gray-700">视频重建与动作预测两个任务的梯度尺度不同，较低的学习率有助于平衡二者的收敛速度。</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-gray-900 rounded-xl p-6 my-6 overflow-x-auto">
-          <pre class="text-green-400 text-sm font-mono"><code># 学习率调度: Cosine Annealing with Warmup
-def lr_schedule(step, warmup_steps=1000, total_steps=20000):
-    if step < warmup_steps:
-        # Linear warmup
-        return 1e-4 * (step / warmup_steps)
-    else:
-        # Cosine annealing
-        progress = (step - warmup_steps) / (total_steps - warmup_steps)
-        return 1e-4 * 0.5 * (1 + cos(π * progress))</code></pre>
-        </div>
-
-        <p class="mb-4">
-          <strong>20k/30k Steps的收敛曲线分析：</strong>LIBERO数据集使用20k训练步数，RoboTwin使用30k。这一差异反映了两个benchmark的任务复杂度：
-        </p>
-        <ul class="space-y-2 text-gray-700 ml-4">
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span><strong>LIBERO：</strong>单任务场景为主，视觉变化相对有限，20k steps已足以收敛</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span><strong>RoboTwin：</strong>多任务、多环境，需要更多步数学习不同任务间的共享表征</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 5.3 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-sm font-bold">5.3</span>
-        多任务训练策略
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          LIBERO与RoboTwin两个benchmark在任务特性上存在显著差异，Fast-WAM针对性地设计了不同的训练策略。
-        </p>
-
-        <div class="overflow-x-auto my-6">
-          <table class="w-full text-sm border-collapse shadow-lg rounded-lg overflow-hidden">
-            <thead>
-              <tr class="bg-gradient-to-r from-violet-600 to-purple-600 text-white">
-                <th class="p-4 text-left">特性</th>
-                <th class="p-4 text-left">LIBERO</th>
-                <th class="p-4 text-left">RoboTwin</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white">
-              <tr class="border-b border-gray-100">
-                <td class="p-4 font-medium text-gray-800">任务类型</td>
-                <td class="p-4 text-gray-600">Spatial/Object/Goal/Long-horizon</td>
-                <td class="p-4 text-gray-600">Pick-place, Assembly, Tool-use</td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="p-4 font-medium text-gray-800">环境多样性</td>
-                <td class="p-4 text-gray-600">4个子集，场景相对固定</td>
-                <td class="p-4 text-gray-600">多相机视角，动态光照</td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="p-4 font-medium text-gray-800">动作空间</td>
-                <td class="p-4 text-gray-600">7-DoF + gripper</td>
-                <td class="p-4 text-gray-600">7-DoF + gripper + base</td>
-              </tr>
-              <tr>
-                <td class="p-4 font-medium text-gray-800">训练步数</td>
-                <td class="p-4 text-gray-600 font-bold text-violet-700">20k</td>
-                <td class="p-4 text-gray-600 font-bold text-violet-700">30k</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p class="mb-4">
-          <strong>任务采样平衡：</strong>在多任务场景下，不同任务的样本数量可能不均衡。Fast-WAM采用<strong>均匀采样策略</strong>，每个训练batch中各任务的样本数保持相等。设共有 $N$ 个任务，batch size为 $B$，则每个任务贡献 $B/N$ 个样本。这一策略防止模型偏向高频任务，确保所有任务得到充分学习。
-        </p>
-
-        <div class="bg-amber-50 rounded-lg p-4 border-l-4 border-amber-400 my-6">
-          <p class="text-amber-800 text-sm">
-            <strong>关键发现：</strong>实验表明，即使在不平衡的数据分布下（某些任务有10k条轨迹，某些只有1k条），均匀采样仍能取得良好效果。这说明Fast-WAM的表征学习具有较强的迁移能力，可以从高频任务中学习通用特征并迁移到低频任务。
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 5.4 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-sm font-bold">5.4</span>
-        损失函数设计
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM采用多任务损失函数，联合优化视频重建和动作预测两个目标。
-        </p>
-
-        <div class="bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl p-6 my-6 border border-violet-200">
-          <h4 class="font-bold text-violet-800 mb-3">联合损失函数</h4>
-          <div class="bg-white rounded-lg p-4 text-center mb-4">
-            <p class="font-mono text-lg text-violet-800">
-              L<sub>total</sub> = λ<sub>video</sub> · L<sub>video</sub> + λ<sub>action</sub> · L<sub>action</sub>
-            </p>
-          </div>
-          
-          <div class="space-y-4">
-            <div class="bg-white rounded-lg p-4">
-              <p class="font-medium text-gray-800 mb-2">1. 视频重建损失 L<sub>video</sub></p>
-              <div class="bg-gray-50 rounded p-3 text-center mb-2">
-                <code class="text-sm">L<sub>video</sub> = ||VAE_decoder(ẑ<sub>pred</sub>) - V<sub>gt</sub>||<sup>2</sup></code>
-              </div>
-              <p class="text-sm text-gray-600">在像素空间计算MSE，监督DiT对未来帧的预测能力。</p>
-            </div>
+        <div class="max-w-4xl mx-auto px-6 py-8 space-y-8">
             
-            <div class="bg-white rounded-lg p-4">
-              <p class="font-medium text-gray-800 mb-2">2. 动作预测损失 L<sub>action</sub></p>
-              <div class="bg-gray-50 rounded p-3 text-center mb-2">
-                <code class="text-sm">L<sub>action</sub> = ||â<sub>pred</sub> - a<sub>gt</sub>||<sup>2</sup></code>
-              </div>
-              <p class="text-sm text-gray-600">在action space计算MSE，直接优化控制精度。</p>
-            </div>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>损失权重选择：</strong>Fast-WAM默认设置 λ<sub>video</sub> = 1.0，λ<sub>action</sub> = 1.0。这一1:1的权重比例经过消融实验验证：
-        </p>
-
-        <ul class="space-y-2 text-gray-700 ml-4 mb-4">
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span>若 λ<sub>video</sub> 过大，模型过度关注视觉细节，动作精度下降</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span>若 λ<sub>action</sub> 过大，模型忽视世界建模，泛化能力受损</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-violet-500 mt-1">•</span>
-            <span>1:1平衡使得视频表征学习与动作学习相互促进</span>
-          </li>
-        </ul>
-
-        <div class="bg-gray-900 rounded-xl p-6 my-6 overflow-x-auto">
-          <pre class="text-green-400 text-sm font-mono"><code># 伪代码: 联合损失计算
-def compute_loss(video_pred, video_gt, action_pred, action_gt):
-    # Video reconstruction loss
-    video_rec = vae_decoder(video_pred)
-    l_video = F.mse_loss(video_rec, video_gt)
-    
-    # Action prediction loss  
-    l_action = F.mse_loss(action_pred, action_gt)
-    
-    # Weighted combination
-    total_loss = lambda_video * l_video + lambda_action * l_action
-    return total_loss, l_video, l_action</code></pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- 5.5 -->
-    <div class="mb-6">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-sm font-bold">5.5</span>
-        训练稳定性保障
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          训练6B参数的扩散模型需要精心设计的稳定性策略，Fast-WAM采用了以下关键技术：
-        </p>
-
-        <div class="space-y-4 my-6">
-          <div class="bg-white rounded-xl shadow-md border border-gray-200 p-5">
-            <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-              梯度裁剪 (Gradient Clipping)
-            </h4>
-            <p class="text-sm text-gray-700 mb-3">
-              扩散模型的训练容易出现梯度爆炸，特别是在早期训练阶段。Fast-WAM采用<strong>全局梯度裁剪</strong>：
-            </p>
-            <div class="bg-gray-50 rounded-lg p-3 text-center">
-              <code class="text-sm">if ||g|| > threshold: g = g × (threshold / ||g||)</code>
-            </div>
-            <p class="text-sm text-gray-600 mt-3">
-              裁剪阈值设为1.0，有效抑制了异常梯度对模型参数的冲击。
-            </p>
-          </div>
-
-          <div class="bg-white rounded-xl shadow-md border border-gray-200 p-5">
-            <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-              混合精度训练 (Mixed Precision)
-            </h4>
-            <p class="text-sm text-gray-700 mb-3">
-              使用PyTorch的Automatic Mixed Precision (AMP) 将大部分计算放在FP16，关键操作保留FP32：
-            </p>
-            <ul class="text-sm text-gray-700 space-y-1 ml-4">
-              <li>• Loss scaling防止FP16下溢</li>
-              <li>• 权重更新保留FP32精度</li>
-              <li>• 节省约40%显存，训练速度提升约1.5×</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
-          <p class="text-green-800 text-sm">
-            <strong>训练监控指标：</strong>训练过程中监控video reconstruction PSNR（峰值信噪比）和action prediction MSE。健康的训练应表现为：PSNR稳步提升（从15dB到25dB+），action MSE稳定下降（从1.0到0.1以下）。
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Part VI: 实验结果深度解读 -->
-<section id="part6" class="py-16 bg-gradient-to-b from-gray-50 to-white">
-  <div class="max-w-4xl mx-auto px-6">
-    <div class="flex items-center gap-4 mb-8">
-      <div class="w-12 h-12 bg-gradient-to-br from-rose-600 to-pink-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-        VI
-      </div>
-      <h2 class="text-3xl font-bold text-gray-900">实验结果深度解读</h2>
-    </div>
-
-    <!-- 6.1 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center text-sm font-bold">6.1</span>
-        仿真环境详解
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM在两个主流机器人学习benchmark上进行了系统评估。深入理解这些benchmark的构成有助于解读实验结果。
-        </p>
-
-        <div class="bg-gradient-to-r from-rose-50 to-pink-50 rounded-xl p-6 my-6 border border-rose-100">
-          <h4 class="font-bold text-rose-800 mb-4">LIBERO Benchmark</h4>
-          <p class="text-gray-700 mb-4">
-            LIBERO (Lifelong Benchmark for Robotic Learning) 包含四个子集，共130个任务：
-          </p>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div class="bg-white rounded-lg p-4 shadow-sm">
-              <h5 class="font-bold text-rose-700 mb-2">LIBERO-Spatial</h5>
-              <p class="text-sm text-gray-600">测试空间推理能力，如"把物体放到左侧/右侧/前方"</p>
-            </div>
-            <div class="bg-white rounded-lg p-4 shadow-sm">
-              <h5 class="font-bold text-rose-700 mb-2">LIBERO-Object</h5>
-              <p class="text-sm text-gray-600">测试物体识别与操作，涉及不同形状、颜色的物体</p>
-            </div>
-            <div class="bg-white rounded-lg p-4 shadow-sm">
-              <h5 class="font-bold text-rose-700 mb-2">LIBERO-Goal</h5>
-              <p class="text-sm text-gray-600">测试目标达成任务，需要理解任务语义目标</p>
-            </div>
-            <div class="bg-white rounded-lg p-4 shadow-sm">
-              <h5 class="font-bold text-rose-700 mb-2">LIBERO-Long</h5>
-              <p class="text-sm text-gray-600">长程任务，通常需要20+步才能完成</p>
-            </div>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>RoboTwin Benchmark特点：</strong>RoboTwin专注于双臂协作和复杂装配任务，其特点包括：
-        </p>
-        <ul class="space-y-2 text-gray-700 ml-4">
-          <li class="flex items-start gap-2">
-            <span class="text-rose-500 mt-1">•</span>
-            <span><strong>多视角输入：</strong>支持前视、俯视、腕部相机等多视角融合</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-rose-500 mt-1">•</span>
-            <span><strong>双臂协作：</strong>任务需要协调左右臂的协同动作</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-rose-500 mt-1">•</span>
-            <span><strong>物理逼真：</strong>基于MuJoCo仿真，动力学更接近真实世界</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 6.2 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center text-sm font-bold">6.2</span>
-        主要结果分析
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          以下是Fast-WAM在主要benchmark上的性能表现，以及与其他SOTA方法的对比。
-        </p>
-
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden my-6">
-          <div class="bg-gradient-to-r from-rose-600 to-pink-600 px-6 py-3">
-            <h4 class="text-white font-bold">Table 1: LIBERO Benchmark Results</h4>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="bg-gray-100">
-                  <th class="p-4 text-left font-bold">Method</th>
-                  <th class="p-4 text-center">Spatial</th>
-                  <th class="p-4 text-center">Object</th>
-                  <th class="p-4 text-center">Goal</th>
-                  <th class="p-4 text-center">Long</th>
-                  <th class="p-4 text-center font-bold text-rose-700">Average</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">BC-RNN</td>
-                  <td class="p-4 text-center">82.3</td>
-                  <td class="p-4 text-center">78.5</td>
-                  <td class="p-4 text-center">75.2</td>
-                  <td class="p-4 text-center">68.4</td>
-                  <td class="p-4 text-center">76.1</td>
-                </tr>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">Diffusion Policy</td>
-                  <td class="p-4 text-center">88.7</td>
-                  <td class="p-4 text-center">85.3</td>
-                  <td class="p-4 text-center">82.1</td>
-                  <td class="p-4 text-center">74.6</td>
-                  <td class="p-4 text-center">82.7</td>
-                </tr>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">LingBot-VA</td>
-                  <td class="p-4 text-center">92.5</td>
-                  <td class="p-4 text-center">91.2</td>
-                  <td class="p-4 text-center">89.8</td>
-                  <td class="p-4 text-center">84.3</td>
-                  <td class="p-4 text-center bg-yellow-50">89.5</td>
-                </tr>
-                <tr class="bg-rose-50">
-                  <td class="p-4 font-bold text-rose-800">Fast-WAM</td>
-                  <td class="p-4 text-center font-bold">95.2</td>
-                  <td class="p-4 text-center font-bold">96.8</td>
-                  <td class="p-4 text-center font-bold">97.1</td>
-                  <td class="p-4 text-center font-bold">91.3</td>
-                  <td class="p-4 text-center font-bold text-rose-700 bg-rose-100">95.1</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden my-6">
-          <div class="bg-gradient-to-r from-rose-600 to-pink-600 px-6 py-3">
-            <h4 class="text-white font-bold">Table 2: RoboTwin Benchmark Results</h4>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="bg-gray-100">
-                  <th class="p-4 text-left font-bold">Method</th>
-                  <th class="p-4 text-center">Pick-Place</th>
-                  <th class="p-4 text-center">Assembly</th>
-                  <th class="p-4 text-center">Tool-Use</th>
-                  <th class="p-4 text-center font-bold text-rose-700">Average</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">ACT</td>
-                  <td class="p-4 text-center">72.5</td>
-                  <td class="p-4 text-center">65.3</td>
-                  <td class="p-4 text-center">58.7</td>
-                  <td class="p-4 text-center">65.5</td>
-                </tr>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">Motus</td>
-                  <td class="p-4 text-center">89.2</td>
-                  <td class="p-4 text-center">85.6</td>
-                  <td class="p-4 text-center">88.6</td>
-                  <td class="p-4 text-center bg-yellow-50">87.8</td>
-                </tr>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">LingBot-VA</td>
-                  <td class="p-4 text-center">92.8</td>
-                  <td class="p-4 text-center">90.5</td>
-                  <td class="p-4 text-center">93.3</td>
-                  <td class="p-4 text-center bg-yellow-50">92.2</td>
-                </tr>
-                <tr class="bg-rose-50">
-                  <td class="p-4 font-bold text-rose-800">Fast-WAM</td>
-                  <td class="p-4 text-center font-bold">93.5</td>
-                  <td class="p-4 text-center font-bold">88.2</td>
-                  <td class="p-4 text-center font-bold">93.7</td>
-                  <td class="p-4 text-center font-bold text-rose-700 bg-rose-100">91.8</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>结果深度解读：</strong>
-        </p>
-        <ul class="space-y-2 text-gray-700 ml-4">
-          <li class="flex items-start gap-2">
-            <span class="text-rose-500 mt-1">•</span>
-            <span><strong>LIBERO上的绝对优势：</strong>Fast-WAM在LIBERO上达到95.1%平均成功率，比LingBot-VA高出5.6个百分点。这得益于Joint训练带来的丰富表征学习。</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-rose-500 mt-1">•</span>
-            <span><strong>RoboTwin的竞争态势：</strong>在RoboTwin上Fast-WAM略低于LingBot-VA（91.8% vs 92.2%），但仍显著高于Motus（87.8%）。这反映了复杂双臂任务的挑战性。</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-rose-500 mt-1">•</span>
-            <span><strong>长程任务优势：</strong>在LIBERO-Long上，Fast-WAM达到91.3%，远超其他方法，证明World Model对长程规划的关键作用。</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 6.3 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center text-sm font-bold">6.3</span>
-        消融实验深度分析
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          消融实验揭示了Fast-WAM各组件的贡献度，尤其是视频共训练的关键作用。
-        </p>
-
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden my-6">
-          <div class="bg-gradient-to-r from-rose-600 to-pink-600 px-6 py-3">
-            <h4 class="text-white font-bold">Table 3: Ablation Study Results</h4>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="bg-gray-100">
-                  <th class="p-4 text-left font-bold">Variant</th>
-                  <th class="p-4 text-center">Training Strategy</th>
-                  <th class="p-4 text-center">Video Loss</th>
-                  <th class="p-4 text-center">Inference</th>
-                  <th class="p-4 text-center font-bold text-rose-700">Success Rate</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">Fast-WAM-NoVid</td>
-                  <td class="p-4 text-center">Action only</td>
-                  <td class="p-4 text-center">❌</td>
-                  <td class="p-4 text-center">Action-only</td>
-                  <td class="p-4 text-center text-red-600 font-bold">77.0%</td>
-                </tr>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">Fast-WAM-IDM</td>
-                  <td class="p-4 text-center">Inverse Dynamics</td>
-                  <td class="p-4 text-center">✓</td>
-                  <td class="p-4 text-center">Action-only</td>
-                  <td class="p-4 text-center">85.4%</td>
-                </tr>
-                <tr class="border-b border-gray-100">
-                  <td class="p-4">Fast-WAM-Joint</td>
-                  <td class="p-4 text-center">Joint (both masked)</td>
-                  <td class="p-4 text-center">✓</td>
-                  <td class="p-4 text-center">Video+Action</td>
-                  <td class="p-4 text-center">89.6%</td>
-                </tr>
-                <tr class="bg-rose-50">
-                  <td class="p-4 font-bold text-rose-800">Fast-WAM</td>
-                  <td class="p-4 text-center">Joint → Action-only</td>
-                  <td class="p-4 text-center">✓</td>
-                  <td class="p-4 text-center">Action-only</td>
-                  <td class="p-4 text-center font-bold text-rose-700 bg-rose-100">91.8%</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 my-6 border border-amber-200">
-          <h4 class="font-bold text-amber-800 mb-3">关键发现：视频共训练带来14.8%提升</h4>
-          <p class="text-gray-700 mb-4">
-            对比Fast-WAM（91.8%）与Fast-WAM-NoVid（77.0%），<strong>视频共训练带来了14.8个百分点的性能提升</strong>。这一巨大差距揭示了以下关键洞察：
-          </p>
-          <div class="space-y-3">
-            <div class="flex items-start gap-3">
-              <div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <span class="text-white text-xs">1</span>
-              </div>
-              <p class="text-sm text-gray-700"><strong>表征丰富性：</strong>视频重建任务迫使模型学习细粒度的空间-时间特征，这些特征对动作预测具有强迁移性。</p>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <span class="text-white text-xs">2</span>
-              </div>
-              <p class="text-sm text-gray-700"><strong>物理理解：</strong>预测未来帧需要理解物体运动、碰撞、遮挡等物理规律，这些知识对动作规划至关重要。</p>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <span class="text-white text-xs">3</span>
-              </div>
-              <p class="text-sm text-gray-700"><strong>数据效率：</strong>每个样本同时提供视觉和动作监督，相比纯动作训练，数据利用效率显著提升。</p>
-            </div>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>为什么Fast-WAM-Joint不如Fast-WAM？</strong>Fast-WAM-Joint在推理时仍需生成视频（Video+Action），虽然训练时性能接近，但推理时的视频生成误差会传播到动作预测。Fast-WAM通过Mask策略避免了这一问题。
-        </p>
-      </div>
-    </div>
-
-    <!-- 6.4 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center text-sm font-bold">6.4</span>
-        真实世界实验
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          真实世界验证是评估World Model实用价值的关键。Fast-WAM在真实机器人上进行了 towel folding（毛巾折叠）任务测试。
-        </p>
-
-        <div class="bg-gradient-to-r from-rose-50 to-pink-50 rounded-xl p-6 my-6 border border-rose-100">
-          <h4 class="font-bold text-rose-800 mb-4">实验设置</h4>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div class="bg-white rounded-lg p-4">
-              <h5 class="font-bold text-gray-800 mb-2">任务描述</h5>
-              <p class="text-sm text-gray-700">将平铺的毛巾折叠成指定形状（如对折、三角折），涉及可变形物体的精确操作。</p>
-            </div>
-            <div class="bg-white rounded-lg p-4">
-              <h5 class="font-bold text-gray-800 mb-2">评估指标</h5>
-              <p class="text-sm text-gray-700">成功率（折叠形状符合要求）和操作时间。</p>
-            </div>
-            <div class="bg-white rounded-lg p-4">
-              <h5 class="font-bold text-gray-800 mb-2">数据收集</h5>
-              <p class="text-sm text-gray-700">50条人类演示，每条包含约15-20秒的毛巾操作。</p>
-            </div>
-            <div class="bg-white rounded-lg p-4">
-              <h5 class="font-bold text-gray-800 mb-2">测试环境</h5>
-              <p class="text-sm text-gray-700">真实Franka机器人，单臂+夹爪配置。</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 my-6">
-          <h4 class="font-bold text-gray-800 mb-4 text-center">Figure 4: Real-World Results (Towel Folding)</h4>
-          <div class="flex justify-center items-end gap-8 h-48 px-8">
-            <div class="flex flex-col items-center">
-              <div class="w-20 bg-rose-500 rounded-t-lg flex items-center justify-center text-white font-bold" style="height: 80%;">
-                80%
-              </div>
-              <p class="mt-2 text-sm font-medium text-gray-700 text-center">Fast-WAM<br/>(with video)</p>
-            </div>
-            <div class="flex flex-col items-center">
-              <div class="w-20 bg-gray-300 rounded-t-lg flex items-center justify-center text-gray-700 font-bold" style="height: 10%;">
-                10%
-              </div>
-              <p class="mt-2 text-sm font-medium text-gray-700 text-center">Fast-WAM<br/>(no video)</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-red-50 rounded-lg p-4 border-l-4 border-red-400 my-6">
-          <p class="text-red-800 text-sm">
-            <strong>震撼结果：</strong>有视频共训练的Fast-WAM达到<strong>80%成功率</strong>，而无视频版本仅<strong>10%</strong>。70个百分点的巨大差距充分证明了：在真实世界的复杂操作任务中，World Model提供的物理理解能力是不可或缺的。
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 6.5 -->
-    <div class="mb-10">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center text-sm font-bold">6.5</span>
-        延迟分析
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          Fast-WAM实现了<strong>4×加速</strong>，这一显著效率提升的来源值得深入分析。
-        </p>
-
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 my-6">
-          <h4 class="font-bold text-gray-800 mb-4">推理延迟拆解（单次动作预测）</h4>
-          <div class="space-y-4">
-            <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span>VAE编码（观测图像）</span>
-                <span class="font-mono">5ms</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-500 h-2 rounded-full" style="width: 5%"></div>
-              </div>
-            </div>
-            <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span>DiT去噪（25 steps）</span>
-                <span class="font-mono">80ms</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
-              </div>
-            </div>
-            <div>
-              <div class="flex justify-between text-sm mb-1">
-                <span>后处理</span>
-                <span class="font-mono">2ms</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-yellow-500 h-2 rounded-full" style="width: 2%"></div>
-              </div>
-            </div>
-            <div class="pt-3 border-t border-gray-200">
-              <div class="flex justify-between font-bold">
-                <span>总计（Fast-WAM）</span>
-                <span class="text-rose-600 font-mono">~87ms</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-6 my-6">
-          <div class="bg-white rounded-xl shadow-md border border-gray-200 p-5">
-            <h5 class="font-bold text-gray-800 mb-3">传统World Model</h5>
-            <ul class="text-sm text-gray-700 space-y-2">
-              <li>• VAE编码: 5ms</li>
-              <li>• 视频生成（25 steps）: <strong>320ms</strong></li>
-              <li>• 动作预测（从视频）: 15ms</li>
-              <li class="pt-2 border-t"><strong>总计: ~340ms</strong></li>
-            </ul>
-          </div>
-          <div class="bg-green-50 rounded-xl border border-green-200 p-5">
-            <h5 class="font-bold text-green-800 mb-3">Fast-WAM</h5>
-            <ul class="text-sm text-green-700 space-y-2">
-              <li>• VAE编码: 5ms</li>
-              <li>• 动作生成（25 steps）: <strong>80ms</strong></li>
-              <li>• 后处理: 2ms</li>
-              <li class="pt-2 border-t border-green-300"><strong>总计: ~87ms</strong></li>
-            </ul>
-            <p class="mt-3 text-sm font-bold text-green-800">加速比: 3.9× ≈ 4×</p>
-          </div>
-        </div>
-
-        <p class="mb-4">
-          <strong>4×加速的核心来源：</strong>视频token数量是动作token的约15-20倍。Fast-WAM推理时跳过视频生成，将扩散模型的序列长度从 $N$ 缩减到 $M$（$M \approx N/15$）。由于Transformer注意力复杂度为 $O(L^2)$，这一缩减带来了超线性的计算节省。
-        </p>
-      </div>
-    </div>
-
-    <!-- 6.6 -->
-    <div class="mb-6">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-        <span class="w-8 h-8 bg-rose-100 text-rose-700 rounded-lg flex items-center justify-center text-sm font-bold">6.6</span>
-        失败案例分析
-      </h3>
-      
-      <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-        <p class="mb-4">
-          理解失败案例对于改进模型同样重要。Fast-WAM在以下场景表现不佳：
-        </p>
-
-        <div class="space-y-4 my-6">
-          <div class="bg-red-50 rounded-lg p-4 border-l-4 border-red-400">
-            <h5 class="font-bold text-red-800 mb-2">1. 严重遮挡场景</h5>
-            <p class="text-sm text-red-700">
-              当目标物体被严重遮挡（遮挡比例>70%）时，模型难以推断物体位置，导致抓取失败率上升至约35%。
-            </p>
-          </div>
-
-          <div class="bg-orange-50 rounded-lg p-4 border-l-4 border-orange-400">
-            <h5 class="font-bold text-orange-800 mb-2">2. 未见过的物体类别</h5>
-            <p class="text-sm text-orange-700">
-              对于训练集中未出现过的物体类别（如特殊形状的容器），泛化性能下降至约65%，低于熟悉的物体类别（>90%）。
-            </p>
-          </div>
-
-          <div class="bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-400">
-            <h5 class="font-bold text-yellow-800 mb-2">3. 需要精确力控制的接触任务</h5>
-            <p class="text-sm text-yellow-700">
-              如插孔、按压开关等需要精确力反馈的任务，Fast-WAM表现欠佳（成功率约60%）。当前模型主要依赖视觉，缺乏力觉模态的融合。
-            </p>
-          </div>
-
-          <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
-            <h5 class="font-bold text-blue-800 mb-2">4. 高度动态环境</h5>
-            <p class="text-sm text-blue-700">
-              当环境中有其他运动物体（如移动的障碍物）时，模型难以实时调整策略，反应延迟约200-300ms。
-            </p>
-          </div>
-        </div>
-
-        <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl p-6 my-6">
-          <h4 class="font-bold text-gray-800 mb-3">泛化边界总结</h4>
-          <p class="text-gray-700 text-sm mb-4">
-            Fast-WAM的泛化能力主要受限于以下因素：
-          </p>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div class="bg-white rounded-lg p-3">
-              <p class="text-sm"><strong>视觉泛化：</strong>中等（对颜色和纹理变化鲁棒）</p>
-            </div>
-            <div class="bg-white rounded-lg p-3">
-              <p class="text-sm"><strong>物体泛化：</strong>有限（对未见类别表现下降）</p>
-            </div>
-            <div class="bg-white rounded-lg p-3">
-              <p class="text-sm"><strong>任务泛化：</strong>中等（相似任务可迁移）</p>
-            </div>
-            <div class="bg-white rounded-lg p-3">
-              <p class="text-sm"><strong>环境泛化：</strong>有限（对光照、背景敏感）</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-rose-50 rounded-lg p-4 border-l-4 border-rose-500">
-          <p class="text-rose-800 text-sm">
-            <strong>未来改进方向：</strong>结合力觉反馈、引入online adaptation机制、扩大训练数据的物体多样性，是提升Fast-WAM泛化能力的关键路径。
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast-WAM 论文分析 - Part VII & VIII</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Noto Serif SC', serif; }
-        .font-sans-en { font-family: 'Inter', sans-serif; }
-        .highlight { background: linear-gradient(120deg, #fef3c7 0%, #fef3c7 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; }
-        .section-card { transition: all 0.3s ease; }
-        .section-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-800">
-    <div class="max-w-4xl mx-auto px-6 py-12">
-        
-        <!-- Header -->
-        <header class="mb-12 text-center">
-            <div class="inline-block px-4 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium mb-4">学术批判性分析</div>
-            <h1 class="text-3xl font-bold text-slate-900 mb-2">Fast-WAM: 批判性讨论与总结</h1>
-            <p class="text-slate-600">Part VII & Part VIII · 深度学术评论</p>
-        </header>
-
-        <!-- Part VII: 批判性讨论 -->
-        <section id="part7" class="section-card bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-200">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-900">Part VII: 批判性讨论</h2>
-            </div>
-
-            <!-- 7.1 方法局限性 -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-rose-500 text-white rounded text-sm flex items-center justify-center font-sans-en">7.1</span>
-                    方法局限性
-                </h3>
-                <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed">
-                    <p class="mb-4">
-                        尽管Fast-WAM在效率与性能的平衡上取得了显著突破，但其方法论仍存在若干值得深入探讨的局限性。
-                    </p>
-                    <p class="mb-4">
-                        <strong>数据规模的局限性</strong>是首要问题。论文仅在<span class="font-sans-en">LIBERO</span>和<span class="font-sans-en">RoboTwin</span>两个模拟数据集上验证方法，合计任务场景不足百个。这与当前大模型时代"数据即一切"的共识形成鲜明对比。尤为重要的是，真实世界实验仅在一个单一场景（桌面操作）中完成，且成功率从模拟的91.8%骤降至80%。这种性能衰减在多大程度上源于跨域差异，多大程度上源于方法本身的脆弱性，论文未能给出清晰的消融分析。
-                    </p>
-                    <p class="mb-4">
-                        <strong>动作空间的限制</strong>同样值得关注。Fast-WAM采用6-DoF末端执行器控制（3维位置+3维旋转），这一设计虽然覆盖了多数桌面操作任务，但完全排除了需要关节级控制（<span class="font-sans-en">joint-level control</span>）的复杂场景，如全身移动操作（<span class="font-sans-en">mobile manipulation</span>）或双机器人协同。论文中<span class="font-sans-en">Action Expert</span>的1B参数规模在理论上具备扩展潜力，但未提供任何关于动作空间扩展的实验证据或架构调整指导。
-                    </p>
-                    <p class="mb-4">
-                        <strong>视觉生成质量的评估缺失</strong>是另一个关键疏漏。虽然论文的核心卖点是"测试时无需视频生成"，但在训练阶段，视频共训练（<span class="font-sans-en">video co-training</span>）的成功恰恰依赖于生成视频的质量。论文未报告任何视频生成质量的量化指标（如<span class="font-sans-en">FVD</span>、<span class="font-sans-en">FID</span>），读者无法判断：是生成视频本身质量高从而辅助了策略学习，还是仅仅是视频生成这一训练信号起到了正则化作用？这一区分对于方法的复现和迁移至关重要。
-                    </p>
-                    <p class="mb-4">
-                        最后，<strong>固定分辨率256×256的限制</strong>在实际部署中可能成为瓶颈。当前高端机械臂通常配备高分辨率相机（1080p甚至4K），强行降采样可能丢失精细的空间信息，如纹理细节或小尺度物体特征。论文未探讨分辨率与性能之间的权衡关系，也未提供超分辨率（<span class="font-sans-en">super-resolution</span>）或自适应分辨率的可行性分析。
-                    </p>
-                </div>
-            </div>
-
-            <!-- 7.2 实验设计问题 -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-rose-500 text-white rounded text-sm flex items-center justify-center font-sans-en">7.2</span>
-                    实验设计问题
-                </h3>
-                <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed">
-                    <p class="mb-4">
-                        从实验科学的角度审视，Fast-WAM的评估设计存在若干可以改进之处。
-                    </p>
-                    <p class="mb-4">
-                        <strong>基线选择的合理性</strong>值得商榷。论文主要对比了<span class="font-sans-en">Diffusion Policy</span>、<span class="font-sans-en">3D Diffusion Actor</span>等方法，但缺少与更近期的视频-动作联合建模方法的直接对比（如<span class="font-sans-en">RoboDreamer</span>、<span class="font-sans-en">Gen2Act</span>等同期工作）。更重要的是，论文未包含一个关键消融基线：使用相同数据量但无视频共训练的全动作专家模型。这一对比将直接回答：性能提升究竟是来自架构创新，还是仅仅受益于视频生成任务带来的数据增强效应？
-                    </p>
-                    <p class="mb-4">
-                        <strong>评估指标的充分性</strong>方面，论文主要依赖任务成功率这单一指标。在机器人学习领域，任务的<span class="highlight">时间效率</span>、<span class="highlight">动作平滑度</span>、<span class="highlight">能量消耗</span>等维度同样重要。Fast-WAM由于跳过了视频生成，理论上应该在推理延迟上具有显著优势，但论文未提供端到端延迟的详细测量（包括预处理、模型推理、后处理的全链路耗时）。此外，缺乏对不同随机种子下性能方差的报告，使得读者难以评估结果的统计显著性。
-                    </p>
-                    <p class="mb-4">
-                        <strong>真实世界评估的不足</strong>尤为突出。仅10个场景、未报告跨天/跨光照条件的鲁棒性测试，难以支撑"Ready for real-world deployment"的结论。真实机器人系统的可靠性通常需要数百乃至数千次试验的统计验证。
-                    </p>
-                </div>
-            </div>
-
-            <!-- 7.3 与SOTA的差距 -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-rose-500 text-white rounded text-sm flex items-center justify-center font-sans-en">7.3</span>
-                    与SOTA的差距分析
-                </h3>
-                <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed">
-                    <p class="mb-4">
-                        论文在<span class="font-sans-en">RoboTwin</span>上报告的91.8%成功率与SOTA的92.2%存在0.4%的差距。这一看似微小的差距实际上蕴含重要的技术信号。
-                    </p>
-                    <p class="mb-4">
-                        从统计角度看，0.4%的差距在数百次试验的规模下可能并不显著。但从技术演进角度看，这一差距可能反映了<span class="highlight">效率-性能权衡的边界</span>：完全剥离视频生成本质上是一种信息损失——模型失去了对未来视觉动态的显式推理能力。虽然Fast-WAM通过训练时的共训练补偿了部分损失，但可能无法完全弥补。
-                    </p>
-                    <p class="mb-4">
-                        如何进一步缩小这一差距？一个可能的方向是<span class="font-sans-en">adaptive inference</span>：在简单场景使用纯动作模式，在复杂或不确定场景动态切换回视频生成模式。另一个方向是知识蒸馏（<span class="font-sans-en">knowledge distillation</span>），将完整视频-动作模型的知识迁移到轻量动作专家中。
-                    </p>
-                    <p class="mb-4">
-                        从实际部署角度，0.4%的性能损失换取4×加速在绝大多数应用场景中是极具吸引力的交易。但在高安全敏感领域（如医疗手术机器人），这一差距可能需要通过额外的安全验证层来弥补。
-                    </p>
-                </div>
-            </div>
-
-            <!-- 7.4 未来研究方向 -->
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-rose-500 text-white rounded text-sm flex items-center justify-center font-sans-en">7.4</span>
-                    未来研究方向
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 mb-2">更高频率控制 (&gt;10Hz)</h4>
-                        <p class="text-sm text-slate-600">当前方法针对10Hz控制频率优化。对于需要高频反馈的接触丰富任务（如插孔、装配），需要研究架构适配与训练策略调整。</p>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 mb-2">多模态融合</h4>
-                        <p class="text-sm text-slate-600">扩展至语言指令、触觉反馈、本体感知（<span class="font-sans-en">proprioception</span>）的多模态统一建模，提升复杂场景泛化能力。</p>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 mb-2">跨机器人零样本迁移</h4>
-                        <p class="text-sm text-slate-600">探索动作表征与机器人本体解耦的方法，实现训练于Franka、部署于UR5的零样本迁移能力。</p>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 mb-2">在线学习与适应</h4>
-                        <p class="text-sm text-slate-600">结合增量学习（<span class="font-sans-en">incremental learning</span>）与元学习（<span class="font-sans-en">meta-learning</span>），使模型能够从新交互中持续改进。</p>
+            <!-- 核心问题引入 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 flex items-center justify-center text-sm">1</span>
+                    核心问题：传统WAM在推理时做什么？
+                </h2>
+                
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4">
+                    <h3 class="font-bold text-gray-700 dark:text-gray-300 mb-3">传统WAM（如UniPi, Motus）的推理流程：</h3>
+                    
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">1</div>
+                            <div class="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+                                <span class="font-medium">输入当前画面</span>
+                                <span class="text-gray-500 text-sm ml-2">→ "我看到杯子在左边"</span>
+                            </div>
+                        </div>
+                        <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold">2</div>
+                            <div class="flex-1 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 border-2 border-amber-300">
+                                <span class="font-bold text-amber-700">生成未来视频（50-100步去噪）</span>
+                                <span class="text-gray-500 text-sm ml-2">→ "想象：手伸过去→抓住杯子→拿起来..."</span>
+                                <div class="text-xs text-amber-600 mt-1">⚠️ 这一步很耗时！~500-800ms</div>
+                            </div>
+                        </div>
+                        <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">3</div>
+                            <div class="flex-1 bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                                <span class="font-medium">基于生成的视频预测动作</span>
+                                <span class="text-gray-500 text-sm ml-2">→ "根据想象，现在应该伸手"</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 7.5 对领域的启示 -->
-            <div class="mb-4">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-rose-500 text-white rounded text-sm flex items-center justify-center font-sans-en">7.5</span>
-                    对领域的启示
-                </h3>
-                <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed">
-                    <p class="mb-4">
-                        Fast-WAM的核心方法论——<span class="highlight">训练-测试解耦</span>——为机器人学习乃至整个AI领域提供了重要启示。这一范式挑战了"训练与测试必须一致"的传统假设，证明通过精心设计的知识迁移机制，可以在训练阶段利用昂贵但信息丰富的计算，在测试阶段享受轻量级的推理。
-                    </p>
-                    <p class="mb-4">
-                        在视频建模领域，Fast-WAM暗示了一种新范式：<span class="highlight">视频生成作为正则化手段而非最终目标</span>。这与当前生成式AI将视频生成本身作为核心任务的潮流形成有趣对比。或许，视频生成的真正价值不在于生成逼真的视频，而在于学习可迁移的世界动态表征。
-                    </p>
-                    <p class="mb-4">
-                        最后，Fast-WAM为效率与性能的平衡提供了新思路：与其在架构层面不断追求更高效的设计，不如在流程层面重新思考"哪些计算必须在测试时完成"。这种系统级的优化思维可能比局部的架构改进带来更大的收益。
+                <div class="highlight-box">
+                    <p class="font-medium text-amber-800 dark:text-amber-200">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        关键观察：模型在推理时<strong>显式地"想象"了完整的未来视频</strong>，这个想象过程需要50-100步去噪，非常耗时！
                     </p>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Part VIII: 总结 -->
-        <section id="part8" class="section-card bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 shadow-lg text-white">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+            <!-- Fast-WAM的洞察 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 flex items-center justify-center text-sm">2</span>
+                    Fast-WAM的核心洞察
+                </h2>
+
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-4 border border-green-200">
+                    <h3 class="font-bold text-green-800 dark:text-green-200 mb-2 text-lg">🤔 关键问题：</h3>
+                    <p class="text-green-700 dark:text-green-300">
+                        "我们真的需要在<strong>每一次推理</strong>时都重新想象未来吗？<br>
+                        还是说，这种'想象能力'可以在<strong>训练时</strong>就学会，推理时直接调用？"
+                    </p>
                 </div>
-                <h2 class="text-2xl font-bold">Part VIII: 总结</h2>
-            </div>
 
-            <!-- 8.1 核心贡献回顾 -->
-            <div class="mb-6">
-                <h3 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-amber-500/20 text-amber-400 rounded text-sm flex items-center justify-center font-sans-en">8.1</span>
-                    核心贡献回顾
-                </h3>
-                <p class="text-slate-300 leading-relaxed mb-4">
-                    Fast-WAM提出了一个革命性的机器人视觉-动作学习框架：通过训练时视频与动作的联合建模，实现测试时仅需动作预测的轻量推理。该方法在保持SOTA级性能（<span class="font-sans-en">RoboTwin</span> 91.8%、<span class="font-sans-en">LIBERO</span> 97.6%）的同时，实现了4倍的推理加速，为实时机器人控制开辟了新路径。
-                </p>
-            </div>
-
-            <!-- 8.2 关键发现总结 -->
-            <div class="mb-6">
-                <h3 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-amber-500/20 text-amber-400 rounded text-sm flex items-center justify-center font-sans-en">8.2</span>
-                    关键发现总结
-                </h3>
                 <div class="space-y-3">
                     <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <p class="text-slate-300">
-                            <strong class="text-white">视频共训练至关重要</strong>：消融实验揭示，移除视频共训练导致模拟环境性能从91.8%暴跌至77%，真实世界任务几乎完全失败（10%）。视频信号为动作学习提供了关键的世界动态先验。
-                        </p>
+                        <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs mt-0.5">✓</div>
+                        <p><strong>训练时：</strong>模型通过<strong>预测未来视频</strong>学习世界的物理规律（物体如何移动、交互如何发生）</p>
                     </div>
                     <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <p class="text-slate-300">
-                            <strong class="text-white">测试时视频生成非必需</strong>：在推理阶段移除视频生成头不影响动作预测质量，证明视频建模的价值主要体现在表征学习阶段，而非显式生成过程本身。
-                        </p>
+                        <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs mt-0.5">✓</div>
+                        <p><strong>训练完成后：</strong>模型已经"内化"了这些物理知识，<strong>不需要再显式生成视频</strong>来辅助决策</p>
                     </div>
                     <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <p class="text-slate-300">
-                            <strong class="text-white">4×加速切实可行</strong>：训练-测试解耦范式打破了"高质量必须高延迟"的固有认知，证明通过巧妙的架构设计可以实现效率与性能的双赢。
-                        </p>
+                        <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs mt-0.5">✓</div>
+                        <p><strong>推理时：</strong>直接问模型"基于当前画面，应该做什么动作？"</p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- 8.3 实践建议 -->
-            <div class="mb-4">
-                <h3 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-amber-500/20 text-amber-400 rounded text-sm flex items-center justify-center font-sans-en">8.3</span>
-                    实践建议
-                </h3>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <ul class="space-y-2 text-slate-300 text-sm">
-                        <li class="flex items-start gap-2">
-                            <span class="text-amber-400 font-bold">①</span>
-                            <span>对于追求实时性的机器人应用，Fast-WAM的训练-测试解耦思路值得优先考虑</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-amber-400 font-bold">②</span>
-                            <span>不要低估视频共训练的价值——即使最终不需要视频输出，训练阶段保留视频生成任务可能带来意想不到的表征学习收益</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-amber-400 font-bold">③</span>
-                            <span>在迁移至真实世界前，建议在多样化的模拟环境中充分验证，跨域性能衰减是当前方法的主要挑战</span>
-                        </li>
+            <!-- Mask机制详解（重点） -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-sm">3</span>
+                    如何实现？—— Mask机制详解（核心！）
+                </h2>
+
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Fast-WAM通过<strong>不同的Mask设计</strong>实现训练与推理的解耦：</p>
+
+                <!-- 训练时 -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4 border border-blue-200">
+                    <h3 class="font-bold text-blue-800 dark:text-blue-200 mb-3">
+                        <i class="fas fa-graduation-cap mr-2"></i>训练时：Joint Mask（联合掩码）
+                    </h3>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 mb-3">
+                        <p class="text-sm text-gray-500 mb-2">输入序列（简单示意）：</p>
+                        <div class="flex flex-wrap">
+                            <span class="token-box token-video">V₁</span>
+                            <span class="token-box token-video">V₂</span>
+                            <span class="token-box token-video">V₃</span>
+                            <span class="token-box token-video token-mask">V₄?</span>
+                            <span class="token-box token-video token-mask">V₅?</span>
+                            <span class="token-box token-action">A₁</span>
+                            <span class="token-box token-action">A₂</span>
+                            <span class="token-box token-action token-mask">A₃?</span>
+                            <span class="token-box token-action token-mask">A₄?</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <span class="token-box token-video" style="font-size:10px">V</span> 视频帧 
+                            <span class="token-box token-action" style="font-size:10px">A</span> 动作 
+                            <span class="token-box token-mask" style="font-size:10px">?</span> 需要预测的部分
+                        </p>
+                    </div>
+
+                    <ul class="text-sm space-y-1 text-blue-800 dark:text-blue-200">
+                        <li>• 模型需要同时预测<strong>未来视频帧</strong>和<strong>未来动作</strong></li>
+                        <li>• 通过预测视频，模型学习世界的物理规律</li>
+                        <li>• 通过预测动作，模型学习如何控制机器人</li>
                     </ul>
                 </div>
-            </div>
 
-            <!-- 结语 -->
-            <div class="mt-6 pt-6 border-t border-white/10">
-                <p class="text-center text-slate-400 text-sm italic">
-                    "Fast-WAM不仅是一个高效的机器人策略学习框架，更是对'生成模型是否必须在推理时生成'这一深层问题的有力回答。"
-                </p>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="mt-12 text-center text-slate-500 text-sm">
-            <p>Fast-WAM 论文批判性分析 · Part VII & VIII</p>
-        </footer>
-
-    </div>
-</body>
-</html>
-
-            <!-- Original Figures Section -->
-            <section id="original-figures" class="scroll-mt-20 mt-16 pt-8 border-t-2 border-gray-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="part-badge bg-pink-100 dark:bg-pink-900/30 text-pink-700">附录</span>
-                    <h2 class="text-2xl font-bold">论文原始图表</h2>
-                </div>
-                
-                <div id="fig1" class="paper-card p-6 mb-6 scroll-mt-20">
-                    <h3 class="font-bold text-lg mb-4">Figure 1: 三种WAM范式对比</h3>
-                    <div class="figure-container">
-                        <img src="https://arxiv.org/html/2603.16666v2/x1.png" alt="WAM Paradigms" class="w-full rounded-lg">
-                        <p class="figure-caption">(A) Joint-modeling (B) Autoregressive (C) Fast-WAM</p>
+                <!-- vs 对比 -->
+                <div class="flex items-center justify-center my-4">
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-full px-4 py-2 text-sm font-bold text-gray-600">
+                        <i class="fas fa-exchange-alt mr-2"></i>训练 vs 推理
                     </div>
                 </div>
 
-                <div id="fig2" class="paper-card p-6 mb-6 scroll-mt-20">
-                    <h3 class="font-bold text-lg mb-4">Figure 2(a): 模型架构</h3>
-                    <div class="figure-container">
-                        <img src="https://arxiv.org/html/2603.16666v2/x2.png" alt="Architecture" class="w-full rounded-lg">
-                        <p class="figure-caption">Wan2.2-5B Video DiT + Action Expert</p>
-                    </div>
-                </div>
-
-                <div id="fig3" class="paper-card p-6 mb-6 scroll-mt-20">
-                    <h3 class="font-bold text-lg mb-4">Figure 2(b): Mask设计</h3>
-                    <div class="figure-container">
-                        <img src="https://arxiv.org/html/2603.16666v2/x3.png" alt="Mask Design" class="w-full rounded-lg max-w-2xl mx-auto">
-                        <p class="figure-caption">训练时Joint Mask vs 推理时Action Mask</p>
-                    </div>
-                </div>
-
-                <div id="fig4" class="paper-card p-6 mb-6 scroll-mt-20">
-                    <h3 class="font-bold text-lg mb-4">Figure 4: 真实世界结果</h3>
-                    <div class="figure-container">
-                        <img src="https://arxiv.org/html/2603.16666v2/x4.png" alt="Real-world Results" class="w-full rounded-lg">
-                        <p class="figure-caption">毛巾折叠任务成功率对比</p>
-                    </div>
-                </div>
-
-                <div id="table1" class="paper-card p-6 scroll-mt-20">
-                    <h3 class="font-bold text-lg mb-4">Tables 1-3: 实验数据汇总</h3>
-                    <div class="space-y-4 text-sm">
-                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                            <h4 class="font-bold text-blue-800 mb-2">Table 1: RoboTwin Results</h4>
-                            <p>Fast-WAM: 91.8% | LingBot-VA: 92.2% | Motus: 87.8%</p>
+                <!-- 推理时 -->
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-2 border-green-400">
+                    <h3 class="font-bold text-green-800 dark:text-green-200 mb-3">
+                        <i class="fas fa-bolt mr-2"></i>推理时：Action Mask（动作掩码）← 关键创新！
+                    </h3>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 mb-3">
+                        <p class="text-sm text-gray-500 mb-2">输入序列：</p>
+                        <div class="flex flex-wrap">
+                            <span class="token-box token-video">V₁</span>
+                            <span class="token-box token-video">V₂</span>
+                            <span class="token-box token-video">V₃</span>
+                            <span class="token-box token-video" style="background:#fee2e2;color:#991b1b">—</span>
+                            <span class="token-box token-video" style="background:#fee2e2;color:#991b1b">—</span>
+                            <span class="token-box token-action">A₁</span>
+                            <span class="token-box token-action">A₂</span>
+                            <span class="token-box token-action token-mask">A₃?</span>
+                            <span class="token-box token-action token-mask">A₄?</span>
                         </div>
-                        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-                            <h4 class="font-bold text-green-800 mb-2">Table 2: LIBERO Results</h4>
-                            <p>Fast-WAM: 97.6% (Spatial: ~98%, Object: ~98%, Goal: ~97%, Long: ~97%)</p>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <span style="background:#fee2e2;color:#991b1b" class="px-1 rounded text-xs">—</span> = 完全跳过，不生成！
+                        </p>
+                    </div>
+
+                    <div class="bg-amber-100 dark:bg-amber-900/40 rounded-lg p-3 mb-3">
+                        <p class="text-amber-800 dark:text-amber-200 font-medium">
+                            <i class="fas fa-star mr-1"></i> 
+                            关键区别：模型<strong>只看到已知的视频帧</strong>，<strong>不需要预测未来视频</strong>，
+                            只需要预测动作！
+                        </p>
+                    </div>
+
+                    <ul class="text-sm space-y-1 text-green-800 dark:text-green-200">
+                        <li>• <strong>视频部分</strong>：输入当前观察，不预测未来</li>
+                        <li>• <strong>动作部分</strong>：预测接下来的动作序列</li>
+                        <li>• <strong>结果</strong>：跳过了50-100步视频去噪，速度提升4倍！</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 类比解释 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 flex items-center justify-center text-sm">4</span>
+                    一个类比帮助理解
+                </h2>
+
+                <div class="comparison-grid">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <h3 class="font-bold text-blue-800 dark:text-blue-200 mb-2">传统WAM像什么？</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            像一个<strong>每次下棋前都要在脑子里完整模拟整盘棋</strong>的棋手：<br><br>
+                            "如果我走这里，对方会走那里，然后我会..."<br><br>
+                            虽然厉害，但<strong>每步都要想很久</strong>。
+                        </p>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                        <h3 class="font-bold text-green-800 dark:text-green-200 mb-2">Fast-WAM像什么？</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            像一个<strong>通过大量对弈已经内化棋理</strong>的棋手：<br><br>
+                            "当前局面，基于经验，这手棋应该下这里。"<br><br>
+                            <strong>不需要完整模拟</strong>，直接做出决策。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                    <p class="text-center text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-quote-left text-gray-400 mr-2"></i>
+                        训练时的大量"模拟"（视频预测）让模型学会了"直觉"，<br>
+                        推理时可以直接依靠"直觉"做决策，不需要重新"模拟"。
+                        <i class="fas fa-quote-right text-gray-400 ml-2"></i>
+                    </p>
+                </div>
+            </section>
+
+            <!-- 为什么性能不下降？ -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center text-sm">5</span>
+                    关键问题：为什么跳过了视频生成，性能却不下降？
+                </h2>
+
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                            <i class="fas fa-brain"></i>
                         </div>
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
-                            <h4 class="font-bold text-amber-800 mb-2">Table 3: Ablation Study</h4>
-                            <p>Fast-WAM: 91.8% | Joint: 92.0% | IDM: 92.2% | No Video: 77.0%</p>
+                        <div>
+                            <h4 class="font-bold">原因1：知识已经内化</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                训练时的视频预测任务迫使模型<strong>学习了世界的物理规律</strong>（物体运动、交互效果等）。
+                                这些知识已经编码在模型的参数中，不需要每次推理时重新计算。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">原因2：共享的注意力机制</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                视频分支和动作分支<strong>共享Transformer层</strong>。
+                                训练时视频分支的梯度会<strong>影响共享层</strong>，从而间接提升动作预测能力。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">原因3：实验验证</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                消融实验证明：有视频训练 91.8% vs 无视频训练 77%，<br>
+                                <strong>视频训练确实带来了14.8%的性能提升</strong>，但这种提升来自训练阶段。
+                            </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Footer -->
-            <footer class="text-center text-sm text-gray-500 pt-8 border-t border-gray-200 mt-16">
-                <p class="font-medium">Fast-WAM 万字深度分析</p>
-                <p class="text-xs mt-1">总字数: 10,551字 | 8 Parts完整结构 | 含论文所有原始图表</p>
-                <p class="text-xs mt-1">arXiv: 2603.16666 | Generated with Paper Analyzer Skill v2.1</p>
+            <!-- 总结 -->
+            <section class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">总结</h2>
+                <div class="space-y-3 text-white/90">
+                    <p><strong>1.</strong> 传统WAM在推理时需要<strong>显式生成未来视频</strong>（50-100步去噪），非常耗时。</p>
+                    <p><strong>2.</strong> Fast-WAM的关键洞察：<strong>视频预测的知识可以在训练时学习</strong>，推理时直接调用。</p>
+                    <p><strong>3.</strong> 通过<strong>不同的Mask设计</strong>实现解耦：训练时预测视频+动作，推理时只预测动作。</p>
+                    <p><strong>4.</strong> 结果：<strong>4倍加速</strong>（跳过视频生成），但性能保持（91.8% vs SOTA 92.2%）。</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-white/20 flex flex-wrap gap-4">
+                    <div class="bg-white/10 rounded-lg px-4 py-2">
+                        <div class="text-2xl font-bold">4×</div>
+                        <div class="text-xs text-white/70">推理加速</div>
+                    </div>
+                    <div class="bg-white/10 rounded-lg px-4 py-2">
+                        <div class="text-2xl font-bold">91.8%</div>
+                        <div class="text-xs text-white/70">RoboTwin成功率</div>
+                    </div>
+                    <div class="bg-white/10 rounded-lg px-4 py-2">
+                        <div class="text-2xl font-bold">0.4%</div>
+                        <div class="text-xs text-white/70">与SOTA差距</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 原始论文图表 -->
+            <section class="step-card">
+                <h2 class="text-xl font-bold mb-4">原始论文图表参考</h2>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-2">Figure 1: 三种WAM范式对比</p>
+                        <img src="https://arxiv.org/html/2603.16666v2/x1.png" alt="Figure 1" class="w-full rounded-lg border">
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-2">Figure 2(b): Mask设计详解</p>
+                        <img src="https://arxiv.org/html/2603.16666v2/x3.png" alt="Figure 2b" class="w-full rounded-lg border max-w-md mx-auto">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 完整报告链接 -->
+            <div class="text-center py-4">
+                <a href="index.html" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium">
+                    <i class="fas fa-book"></i>
+                    查看完整万字深度分析报告
+                </a>
+            </div>
+
+            <footer class="text-center text-sm text-gray-500 pt-8 border-t">
+                <p>Fast-WAM 核心机制详解 | arXiv: 2603.16666</p>
             </footer>
         </div>
     </main>
-
-    <script>
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        
-        const sections = document.querySelectorAll('section[id]');
-        const navLinks = document.querySelectorAll('.nav-link');
-        
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                if (scrollY >= section.offsetTop - 100) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === '#' + current) {
-                    link.classList.add('active');
-                }
-            });
-        });
-
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-    </script>
 </body>
 </html>
