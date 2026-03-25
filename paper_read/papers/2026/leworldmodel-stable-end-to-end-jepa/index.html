@@ -6,6 +6,7 @@
     <title>深度分析 | LeWorldModel: Stable End-to-End JEPA from Pixels</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
         .section-anchor { scroll-margin-top: 80px; }
@@ -14,56 +15,97 @@
         .formula-box { background: #f8fafc; border-left: 4px solid #3b82f6; }
         .dark .formula-box { background: #1e293b; }
         .highlight { background: #eff6ff; border-left: 4px solid #3b82f6; }
+        .critical-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; }
+        .dark .critical-box { background: #451a03; }
         .paper-img { border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .paper-img:hover { transform: scale(1.02); }
         .metric-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .nav-item { transition: all 0.2s; }
+        .nav-item:hover { background: rgba(59, 130, 246, 0.1); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #2563eb; border-right: 3px solid #2563eb; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-    <!-- 导航栏 -->
+    <!-- 顶部导航 -->
     <nav class="fixed top-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="../../../../index.html" class="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition">← 📄 Paper Deep Analyzer</a>
+            <a href="../../../../index.html" class="flex items-center gap-2 text-blue-600 font-bold hover:text-blue-800 transition">
+                <i class="fas fa-arrow-left"></i>
+                <span>返回索引</span>
+            </a>
             <div class="flex items-center gap-4">
                 <span class="text-sm text-gray-500 hidden md:inline">arXiv: 2603.19312</span>
-                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 transition">🌓</button>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 transition">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- 侧边目录 -->
-    <aside class="fixed left-0 top-16 w-72 h-full bg-white dark:bg-gray-800 shadow-lg overflow-y-auto hidden xl:block">
+    <!-- 侧边导航 -->
+    <aside class="fixed left-0 top-14 w-72 h-full bg-white dark:bg-gray-800 shadow-lg overflow-y-auto hidden xl:block border-r border-gray-200 dark:border-gray-700">
         <div class="p-4">
-            <h3 class="font-semibold mb-4 text-gray-700 dark:text-gray-300">📑 目录导航</h3>
+            <h3 class="font-semibold mb-4 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <i class="fas fa-list-ul text-blue-500"></i>
+                目录导航
+            </h3>
             <ul class="space-y-1 text-sm">
-                <li><a href="#overview" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-blue-600 transition">1. 论文概览与核心创新</a></li>
-                <li><a href="#problem" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 transition">2. 问题背景与动机</a></li>
-                <li><a href="#method" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 transition">3. 方法详解：LeWorldModel</a></li>
-                <li><a href="#architecture" class="block py-2 px-3 pl-6 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-500 transition">3.1 架构设计</a></li>
-                <li><a href="#sigreg" class="block py-2 px-3 pl-6 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-500 transition">3.2 SIGReg正则化</a></li>
-                <li><a href="#training" class="block py-2 px-3 pl-6 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-500 transition">3.3 训练流程</a></li>
-                <li><a href="#experiments" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 transition">4. 实验与评估</a></li>
-                <li><a href="#planning" class="block py-2 px-3 pl-6 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-500 transition">4.1 规划性能</a></li>
-                <li><a href="#physical" class="block py-2 px-3 pl-6 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-500 transition">4.2 物理理解量化</a></li>
-                <li><a href="#comparison" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 transition">5. 与SOTA方法对比</a></li>
-                <li><a href="#ablation" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 transition">6. 消融实验</a></li>
-                <li><a href="#insights" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 transition">7. 深度洞察</a></li>
-                <li><a href="#resources" class="block py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-600 dark:text-gray-400 transition">8. 资源链接</a></li>
+                <!-- Part I: Overview -->
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part I</span>
+                </li>
+                <li><a href="#overview" class="nav-item block py-2 px-3 rounded-lg text-blue-600 font-medium">1. 论文概览</a></li>
+                <li><a href="#contributions" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-600 dark:text-gray-400">1.1 核心贡献</a></li>
+                <li><a href="#background" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">2. 研究背景</a></li>
+                
+                <!-- Part II: Method -->
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part II</span>
+                </li>
+                <li><a href="#method" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">3. 方法详解</a></li>
+                <li><a href="#architecture" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">3.1 架构设计</a></li>
+                <li><a href="#sigreg" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">3.2 SIGReg机制</a></li>
+                <li><a href="#training-details" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">3.3 训练配置</a></li>
+                
+                <!-- Part III: Experiments -->
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part III</span>
+                </li>
+                <li><a href="#experiments" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">4. 实验评估</a></li>
+                <li><a href="#environments" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">4.1 实验环境</a></li>
+                <li><a href="#results" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">4.2 主要结果</a></li>
+                <li><a href="#physical" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">4.3 物理理解评估</a></li>
+                
+                <!-- Part IV: Analysis -->
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part IV</span>
+                </li>
+                <li><a href="#comparison" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">5. 对比分析</a></li>
+                <li><a href="#ablation" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">6. 消融实验</a></li>
+                
+                <!-- Part V: Critical Analysis -->
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part V</span>
+                </li>
+                <li><a href="#critical" class="nav-item block py-2 px-3 rounded-lg text-amber-600 font-medium">7. 批判性分析</a></li>
+                <li><a href="#why-it-works" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">7.1 成功因素</a></li>
+                <li><a href="#limitations" class="nav-item block py-2 px-3 pl-6 rounded-lg text-gray-500 dark:text-gray-500">7.2 局限性质疑</a></li>
+                <li><a href="#conclusion" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">8. 总结</a></li>
             </ul>
         </div>
     </aside>
 
-    <main class="xl:ml-72 pt-20 pb-12 px-4">
+    <main class="xl:ml-72 pt-16 pb-12 px-4">
         <div class="max-w-5xl mx-auto">
             
             <!-- 论文标题区 -->
-            <header class="mb-12 text-center">
+            <header class="mb-12 text-center py-8">
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 text-blue-700 dark:text-blue-300 rounded-full text-sm mb-4 font-medium">
+                    <i class="fas fa-microscope"></i>
                     <span>arXiv 2026</span>
                     <span class="text-gray-400">•</span>
-                    <span>World Model</span>
-                    <span class="text-gray-400">•</span>
-                    <span>JEPA</span>
+                    <span>深度分析报告</span>
                 </div>
                 
                 <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-300 dark:to-purple-300 bg-clip-text text-transparent">
@@ -74,7 +116,7 @@
                     <span><strong>Lucas Maes</strong><sup>1*</sup></span>
                     <span><strong>Quentin Le Lidec</strong><sup>2*</sup></span>
                     <span><strong>Damien Scieur</strong><sup>1,3</sup></span>
-                    <span class="text-blue-600 font-semibold">Yann LeCun<sup>2</sup></span>
+                    <span class="text-blue-600 font-bold text-lg">Yann LeCun<sup>2</sup></span>
                     <span><strong>Randall Balestriero</strong><sup>4</sup></span>
                 </div>
                 
@@ -85,45 +127,62 @@
                     <sup>4</sup>Brown University
                 </p>
                 
-                <p class="text-sm text-gray-500 mb-6">Published: March 13, 2026</p>
-                
-                <div class="flex justify-center gap-2 flex-wrap">
-                    <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium">World Model</span>
-                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">JEPA</span>
-                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-sm font-medium">Self-Supervised</span>
-                    <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium">Representation Learning</span>
-                    <span class="px-3 py-1 bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 rounded-full text-sm font-medium">End-to-End</span>
+                <div class="flex justify-center gap-2 flex-wrap max-w-2xl mx-auto">
+                    <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">World Model</span>
+                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full text-sm">JEPA</span>
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-sm">Self-Supervised</span>
+                    <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-full text-sm">End-to-End</span>
                 </div>
             </header>
 
-            <!-- 核心贡献卡片 -->
-            <section id="overview" class="section-anchor mb-16">
+            <!-- Part I: Overview -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <span class="text-sm font-bold text-gray-400 uppercase tracking-wider">Part I · 概览与背景</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            </div>
+
+            <!-- 核心贡献 -->
+            <section id="overview" class="section-anchor mb-12">
                 <div class="tech-card rounded-2xl p-8 text-white shadow-xl">
-                    <h2 class="text-2xl font-bold mb-6 flex items-center">
-                        <span class="mr-3">🎯</span> 核心贡献
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fas fa-trophy text-yellow-300"></i>
+                        核心贡献
                     </h2>
-                    <div class="grid md:grid-cols-2 gap-6">
+                    <div class="grid md:grid-cols-2 gap-5">
                         <div class="bg-white/10 backdrop-blur rounded-xl p-5">
-                            <h3 class="font-bold text-lg mb-2 text-yellow-300">首创性</h3>
-                            <p class="text-sm leading-relaxed">首个能够从原始像素<strong>稳定端到端训练</strong>的JEPA，无需预训练编码器、EMA或辅助监督</p>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-8 h-8 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center font-bold text-sm">1</span>
+                                <h3 class="font-bold text-lg">首创性</h3>
+                            </div>
+                            <p class="text-sm leading-relaxed opacity-90">首个能够从原始像素<strong>稳定端到端训练</strong>的JEPA，无需预训练编码器、EMA或辅助监督</p>
                         </div>
                         <div class="bg-white/10 backdrop-blur rounded-xl p-5">
-                            <h3 class="font-bold text-lg mb-2 text-yellow-300">极简设计</h3>
-                            <p class="text-sm leading-relaxed">仅使用<strong>两个损失项</strong>，可调超参数从6个减少到1个</p>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-8 h-8 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center font-bold text-sm">2</span>
+                                <h3 class="font-bold text-lg">极简设计</h3>
+                            </div>
+                            <p class="text-sm leading-relaxed opacity-90">仅使用<strong>两个损失项</strong>，可调超参数从6个减少到1个</p>
                         </div>
                         <div class="bg-white/10 backdrop-blur rounded-xl p-5">
-                            <h3 class="font-bold text-lg mb-2 text-yellow-300">高效性</h3>
-                            <p class="text-sm leading-relaxed">规划速度比基础模型世界模型快<strong>48倍</strong>，单GPU训练仅需数小时</p>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-8 h-8 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center font-bold text-sm">3</span>
+                                <h3 class="font-bold text-lg">高效性</h3>
+                            </div>
+                            <p class="text-sm leading-relaxed opacity-90">规划速度比基础模型世界模型快<strong>48倍</strong>，单GPU训练仅需数小时</p>
                         </div>
                         <div class="bg-white/10 backdrop-blur rounded-xl p-5">
-                            <h3 class="font-bold text-lg mb-2 text-yellow-300">可解释性</h3>
-                            <p class="text-sm leading-relaxed">潜在空间编码了<strong>有意义的物理结构</strong>，能可靠检测物理上不可行事件</p>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="w-8 h-8 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center font-bold text-sm">4</span>
+                                <h3 class="font-bold text-lg">可解释性</h3>
+                            </div>
+                            <p class="text-sm leading-relaxed opacity-90">潜在空间编码了<strong>有意义的物理结构</strong>，能可靠检测物理上不可行事件</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 关键指标 -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                     <div class="metric-card rounded-xl p-5 text-white text-center shadow-lg">
                         <p class="text-4xl font-bold">~15M</p>
                         <p class="text-sm opacity-90">参数量</p>
@@ -143,158 +202,140 @@
                 </div>
             </section>
 
-            <!-- 论文原图展示 -->
-            <section class="mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">📊 论文核心图表</h2>
+            <!-- 研究背景 -->
+            <section id="background" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">2. 研究背景</h2>
                 
-                <div class="space-y-8">
-                    <!-- Figure 1 -->
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                        <h3 class="font-semibold mb-3 text-gray-800 dark:text-gray-200">Figure 1: LeWorldModel Training Pipeline</h3>
-                        <img src="https://arxiv.org/html/2603.19312v1/x1.png" alt="Training Pipeline" class="paper-img w-full max-w-3xl mx-auto">
-                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            LeWorldModel 训练流程：给定帧观测 o₁:T 和动作 a₁:T，编码器将观测映射到潜在表示，预测器根据动作预测未来嵌入。SIGReg 正则化确保潜在分布符合高斯分布。
-                        </p>
-                    </div>
-
-                    <!-- Figure 2 -->
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                        <h3 class="font-semibold mb-3 text-gray-800 dark:text-gray-200">Figure 2: Characteristics of Latent World Model Approaches</h3>
-                        <img src="https://arxiv.org/html/2603.19312v1/x2.png" alt="Method Comparison" class="paper-img w-full max-w-3xl mx-auto">
-                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            不同潜在世界模型方法的特征对比。方法按训练范式分组：端到端、预训练编码器、冻结编码器。LeWM 是唯一实现端到端稳定训练的方法。
-                        </p>
-                    </div>
-
-                    <!-- Figure 3 -->
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                        <h3 class="font-semibold mb-3 text-gray-800 dark:text-gray-200">Figure 3: Planning Time and Performance Under Fixed Compute</h3>
-                        <img src="https://arxiv.org/html/2603.19312v1/x3.png" alt="Performance Comparison" class="paper-img w-full max-w-3xl mx-auto">
-                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            在固定计算预算下的规划时间和性能对比。左：规划时间对比；右：性能对比。LeWM 在保持竞争力的同时实现了显著的速度提升。
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 问题背景 -->
-            <section id="problem" class="section-anchor mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">2. 问题背景与动机</h2>
-                
-                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">2.1 人工智能的核心目标</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">2.1 世界模型与JEPA</h3>
                 <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-                    人工智能的一个核心目标是开发能够在不同任务和环境中获取技能的智能体，使用单一、统一的学习范式——直接从周围环境的感官输入中操作，无需手工设计的状态表示或特定领域的校准。
+                    世界模型（World Models）是智能体理解和预测环境动态的核心组件。Joint Embedding Predictive Architectures (JEPAs) 作为一种有前景的框架，能够在紧凑的潜在空间中学习世界模型，避免了生成模型在高维像素空间中的计算开销。
                 </p>
                 <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-                    视觉非常适合这一目标：相机价格低廉且可扩展，从像素中学习能够实现从原始感官输入到动作的完全端到端训练。
+                    与生成式方法不同，JEPA 专注于预测潜在表示，学习更抽象、更鲁棒的表示。这一范式由 Yann LeCun 等人大力推广，被认为是实现人类级智能的关键路径之一。
                 </p>
 
-                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">2.2 JEPA的优势与挑战</h3>
-                <div class="highlight rounded-lg p-5 mb-4">
-                    <p class="text-gray-700 dark:text-gray-300 mb-3">
-                        Joint Embedding Predictive Architectures (JEPAs) 是一种学习世界模型的流行方法。与尝试建模环境的每个方面不同，JEPA 专注于捕获预测未来状态所需的最相关特征。
-                    </p>
-                    <p class="text-gray-700 dark:text-gray-300">
-                        具体来说，JEPA 学习将观测编码到紧凑的低维潜在空间，并通过预测未来观测的潜在表示来建模时间动态。
-                    </p>
-                </div>
-
-                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">2.3 表征崩溃问题</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">2.2 核心挑战：表征崩溃</h3>
                 <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg p-5 mb-4">
-                    <p class="font-semibold text-red-800 dark:text-red-300 mb-2">🚨 核心问题：Representation Collapse</p>
+                    <p class="font-semibold text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Representation Collapse
+                    </p>
                     <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                        在这种失效模式中，模型将所有输入映射到几乎相同的表示，以平凡地满足时间预测目标，导致无法使用的表示。防止崩溃是训练 JEPA 模型的核心挑战之一。
+                        在这种失效模式中，模型将所有输入映射到几乎相同的表示，以平凡地满足时间预测目标，导致无法使用的表示。防止崩溃是训练 JEPA 模型的核心挑战。
                     </p>
                 </div>
 
-                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">2.4 现有解决方案的局限性</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">2.3 现有方法的局限性</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm border-collapse">
                         <thead>
                             <tr class="bg-gray-100 dark:bg-gray-700">
                                 <th class="p-3 text-left rounded-tl-lg">方法</th>
                                 <th class="p-3 text-left">防崩溃策略</th>
-                                <th class="p-3 text-left">局限性</th>
+                                <th class="p-3 text-center">损失项</th>
+                                <th class="p-3 text-center rounded-tr-lg">局限</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             <tr>
-                                <td class="p-3 font-medium">VICReg</td>
-                                <td class="p-3">方差/协方差/不变性损失</td>
-                                <td class="p-3 text-red-600 dark:text-red-400">7项损失，超参数复杂</td>
-                            </tr>
-                            <tr>
                                 <td class="p-3 font-medium">I-JEPA</td>
                                 <td class="p-3">非对称编码器、掩码预测</td>
+                                <td class="p-3 text-center">3+</td>
                                 <td class="p-3 text-red-600 dark:text-red-400">需要 stop-gradient</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-medium">MC-JEPA</td>
+                                <td class="p-3">VICReg + 多项正则化</td>
+                                <td class="p-3 text-center">6+</td>
+                                <td class="p-3 text-red-600 dark:text-red-400">超参数复杂</td>
                             </tr>
                             <tr>
                                 <td class="p-3 font-medium">DINO-WM</td>
                                 <td class="p-3">预训练 DINOv2 编码器</td>
+                                <td class="p-3 text-center">-</td>
                                 <td class="p-3 text-red-600 dark:text-red-400">非端到端</td>
                             </tr>
                             <tr>
                                 <td class="p-3 font-medium">PLDM</td>
                                 <td class="p-3">VICReg + 扩散模型</td>
-                                <td class="p-3 text-red-600 dark:text-red-400">6+ 超参数</td>
+                                <td class="p-3 text-center">7</td>
+                                <td class="p-3 text-red-600 dark:text-red-400">6个可调超参数</td>
+                            </tr>
+                            <tr class="bg-green-50 dark:bg-green-900/20 font-bold">
+                                <td class="p-3">LeWM (本文)</td>
+                                <td class="p-3">SIGReg 高斯正则化</td>
+                                <td class="p-3 text-center text-green-600">2</td>
+                                <td class="p-3 text-green-600 dark:text-green-400">1个超参数</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- 方法详解 -->
-            <section id="method" class="section-anchor mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">3. 方法详解：LeWorldModel</h2>
+            <!-- Part II: Method -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <span class="text-sm font-bold text-gray-400 uppercase tracking-wider">Part II · 方法详解</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            </div>
 
+            <!-- 方法详解 -->
+            <section id="method" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">3. 方法详解：LeWorldModel</h2>
+                
                 <!-- 架构设计 -->
                 <div id="architecture" class="section-anchor mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">3.1 架构设计</h3>
-                    
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">3.1 整体架构</h3>
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 mb-4">
                         <div class="grid md:grid-cols-3 gap-4">
                             <div class="bg-white dark:bg-gray-600 rounded-lg p-4 text-center">
                                 <div class="text-3xl mb-2">🔮</div>
                                 <h4 class="font-bold text-gray-800 dark:text-white mb-2">Encoder 编码器</h4>
                                 <p class="text-sm text-gray-600 dark:text-gray-300">将观测 o 映射到潜在表示 z</p>
-                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-2">z = f(o)</p>
+                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-2 font-mono">z = f(o)</p>
                             </div>
                             <div class="bg-white dark:bg-gray-600 rounded-lg p-4 text-center">
                                 <div class="text-3xl mb-2">🎯</div>
                                 <h4 class="font-bold text-gray-800 dark:text-white mb-2">Predictor 预测器</h4>
                                 <p class="text-sm text-gray-600 dark:text-gray-300">根据动作预测未来嵌入</p>
-                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-2">ẑₜ₊₁ = g(zₜ, aₜ)</p>
+                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-2 font-mono">ẑₜ₊₁ = g(zₜ, aₜ)</p>
                             </div>
                             <div class="bg-white dark:bg-gray-600 rounded-lg p-4 text-center">
                                 <div class="text-3xl mb-2">📐</div>
                                 <h4 class="font-bold text-gray-800 dark:text-white mb-2">SIGReg 正则化</h4>
                                 <p class="text-sm text-gray-600 dark:text-gray-300">强制潜在分布为高斯</p>
-                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-2">KL(q(z)||N(0,I))</p>
+                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-2 font-mono">KL(q(z)||N(0,I))</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-5">
-                        <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-3">预测器架构细节</h4>
+                        <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-3 flex items-center gap-2">
+                            <i class="fas fa-cogs"></i>
+                            预测器架构细节
+                        </h4>
                         <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                            <li>• <strong>类型</strong>：Transformer，6层，16个注意力头</li>
-                            <li>• <strong>参数量</strong>：~10M</li>
-                            <li>• <strong>Dropout</strong>：10%</li>
-                            <li>• <strong>动作编码</strong>：通过 Adaptive Layer Normalization (AdaLN) 在每一层融入</li>
-                            <li>• <strong>初始化</strong>：AdaLN 参数初始化为零以稳定训练</li>
-                            <li>• <strong>掩码</strong>：时间因果掩码避免看到未来嵌入</li>
+                            <li><strong>类型</strong>：Transformer，6层，16个注意力头</li>
+                            <li><strong>参数量</strong>：~10M</li>
+                            <li><strong>Dropout</strong>：10%</li>
+                            <li><strong>动作编码</strong>：通过 Adaptive Layer Normalization (AdaLN) 在每一层融入</li>
+                            <li><strong>初始化</strong>：AdaLN 参数初始化为零以稳定训练</li>
+                            <li><strong>掩码</strong>：时间因果掩码避免看到未来嵌入</li>
                         </ul>
                     </div>
                 </div>
 
-                <!-- SIGReg正则化 -->
+                <!-- SIGReg 详解 -->
                 <div id="sigreg" class="section-anchor mb-8">
                     <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">3.2 SIGReg 正则化：核心创新</h3>
                     
-                    <div class="formula-box rounded-lg p-6 mb-4">
-                        <p class="font-semibold mb-3 text-gray-800 dark:text-gray-200">双损失函数设计</p>
+                    <div class="formula-box rounded-lg p-5 mb-4">
+                        <h4 class="font-semibold mb-3 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                            <i class="fas fa-function"></i>
+                            双损失函数设计
+                        </h4>
                         
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-3">
                             <p class="text-sm text-gray-500 mb-2">预测损失（Prediction Loss）</p>
                             <div class="text-center font-mono text-lg text-blue-700 dark:text-blue-400">
                                 L<sub>pred</sub> = 𝔼[|| ẑ<sub>t+1</sub> − z<sub>t+1</sub> ||²]
@@ -302,11 +343,11 @@
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
-                            <p class="text-sm text-gray-500 mb-2">SIGReg 正则化（Single Gaussian Regularization）</p>
+                            <p class="text-sm text-gray-500 mb-2">SIGReg 正则化（Sketched-Isotropic-Gaussian Regularization）</p>
                             <div class="text-center font-mono text-lg text-purple-700 dark:text-purple-400">
-                                L<sub>sigreg</sub> = KL( q(z) || 𝒩(0, I) )
+                                L<sub>sigreg</sub> = Σ<sub>m=1</sub><sup>M</sup> T(Z · u<sup>(m)</sup>)
                             </div>
-                            <p class="text-xs text-gray-500 mt-2 text-center">强制潜在分布接近标准高斯分布</p>
+                            <p class="text-xs text-gray-500 mt-2 text-center">T(·) 为 Epps-Pulley 检验统计量，u<sup>(m)</sup> 为随机单位向量</p>
                         </div>
 
                         <div class="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
@@ -317,296 +358,530 @@
                         </div>
                     </div>
 
-                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-5">
-                        <h4 class="font-semibold text-green-800 dark:text-green-300 mb-3">💡 为什么 SIGReg 有效？</h4>
+                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-5 mb-4">
+                        <h4 class="font-semibold text-green-800 dark:text-green-300 mb-3 flex items-center gap-2">
+                            <i class="fas fa-lightbulb"></i>
+                            为什么 SIGReg 有效？
+                        </h4>
                         <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                             <li><strong>防止 Collapse</strong>：高斯分布要求方差为1，防止所有嵌入坍缩到同一点</li>
                             <li><strong>避免发散</strong>：均值为0的约束防止嵌入过度分散</li>
+                            <li><strong>统计基础</strong>：利用 Cramer-Wold 定理将高维正态性检验转化为一维检验</li>
                             <li><strong>单一超参数</strong>：仅需调节 λ，相比 VICReg 的 6+ 超参数大幅降低调参难度</li>
-                            <li><strong>稳定训练</strong>：无需 stop-gradient、EMA 等技巧</li>
                         </ul>
+                    </div>
+
+                    <div class="critical-box rounded-lg p-5">
+                        <h4 class="font-bold text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
+                            <i class="fas fa-search"></i>
+                            深度洞察：隐式的时间直线性
+                        </h4>
+                        <p class="text-amber-900 dark:text-amber-200 text-sm">
+                            论文指出，SIGReg <strong>仅在时间维度上独立应用</strong>，不对跨时间维度进行约束。这导致了一个意外的"beneficial bug"：编码器自发地向<strong>时间直线性（temporal straightening）</strong>收敛，即连续的潜在表示沿越来越线性的路径演化。这种几何特性被认为与神经科学中的表征原则一致，且 LeWM 的直线性甚至超过了显式添加此正则化的 PLDM。
+                        </p>
                     </div>
                 </div>
 
-                <!-- 训练流程 -->
-                <div id="training" class="section-anchor mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">3.3 训练流程</h3>
+                <!-- 训练配置 -->
+                <div id="training-details" class="section-anchor mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">3.3 训练配置详情</h3>
                     
-                    <div class="space-y-4">
-                        <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold shrink-0">1</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800 dark:text-white">数据收集</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">从环境中收集观测-动作序列 (oₜ, aₜ, oₜ₊₁)</p>
-                            </div>
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+                                <i class="fas fa-sliders-h"></i>
+                                优化器设置
+                            </h4>
+                            <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                                <li><strong>框架</strong>：stable-worldmodel + stable-pretraining</li>
+                                <li><strong>硬件</strong>：NVIDIA L40S GPU（单卡）</li>
+                                <li><strong>Batch Size</strong>：128</li>
+                                <li><strong>子轨迹长度</strong>：4 帧</li>
+                                <li><strong>帧大小</strong>：224×224 像素</li>
+                                <li><strong>Frame Skip</strong>：5（每 5 帧为一组动作）</li>
+                            </ul>
                         </div>
-                        <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold shrink-0">2</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800 dark:text-white">编码</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">编码器将当前帧和下一帧映射到潜在空间：zₜ = f(oₜ), zₜ₊₁ = f(oₜ₊₁)</p>
-                            </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+                                <i class="fas fa-code-branch"></i>
+                                超参数配置
+                            </h4>
+                            <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                                <li><strong>SIGReg 投影数 M</strong>：1024（低敏感）</li>
+                                <li><strong>SIGReg 权重 λ</strong>：0.1（需调参）</li>
+                                <li><strong>Dropout</strong>：10%</li>
+                                <li><strong>学习率</strong>：框架默认</li>
+                                <li><strong>优化器</strong>：AdamW</li>
+                                <li><strong>训练轮数</strong>：环境相关（PushT: 10 epochs）</li>
+                            </ul>
                         </div>
-                        <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold shrink-0">3</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800 dark:text-white">预测</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">预测器根据当前潜在表示和动作预测下一时刻：ẑₜ₊₁ = g(zₜ, aₜ)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold shrink-0">4</div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800 dark:text-white">优化</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">计算总损失 L = L_pred + λ·L_sigreg，端到端优化编码器和预测器</p>
-                            </div>
-                        </div>
+                    </div>
+
+                    <h4 class="font-semibold mb-3 text-gray-800 dark:text-gray-200">各环境训练配置</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead class="bg-gray-100 dark:bg-gray-700">
+                                <tr>
+                                    <th class="p-3 text-left rounded-tl-lg">环境</th>
+                                    <th class="p-3 text-left">数据集</th>
+                                    <th class="p-3 text-center">训练轮数</th>
+                                    <th class="p-3 text-center rounded-tr-lg">平均步长</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y dark:divide-gray-700">
+                                <tr>
+                                    <td class="p-3 font-medium">TwoRoom</td>
+                                    <td class="p-3">10,000 episodes（专家策略）</td>
+                                    <td class="p-3 text-center">-</td>
+                                    <td class="p-3 text-center">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">PushT</td>
+                                    <td class="p-3">20,000 expert episodes</td>
+                                    <td class="p-3 text-center font-mono">10 epochs</td>
+                                    <td class="p-3 text-center font-mono">196 steps</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">OGBench-Cube</td>
+                                    <td class="p-3">10,000 episodes（启发式策略）</td>
+                                    <td class="p-3 text-center">-</td>
+                                    <td class="p-3 text-center font-mono">200 steps</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Reacher</td>
+                                    <td class="p-3">DMC Suite</td>
+                                    <td class="p-3 text-center">-</td>
+                                    <td class="p-3 text-center">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
-            <!-- 实验与评估 -->
-            <section id="experiments" class="section-anchor mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">4. 实验与评估</h2>
+            <!-- Part III: Experiments -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <span class="text-sm font-bold text-gray-400 uppercase tracking-wider">Part III · 实验评估</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            </div>
+
+            <!-- 实验评估 -->
+            <section id="experiments" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">4. 实验评估</h2>
 
                 <!-- 环境 -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">4.0 评估环境</h3>
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                <div id="environments" class="section-anchor mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">4.1 评估环境</h3>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
                         <img src="https://arxiv.org/html/2603.19312v1/x7.png" alt="Environments" class="paper-img w-full max-w-2xl mx-auto">
                         <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            <strong>Figure 5:</strong> 评估环境。左：Push-T，一个需要推动T形块到目标位置的2D操作任务；中：TwoRoom，一个2D导航任务；右：OGBench-Cube，一个3D机器人操作任务。
+                            <strong>Figure 5:</strong> 评估环境。左：Push-T（2D操作）；中：TwoRoom（2D导航）；右：OGBench-Cube（3D机器人操作）
                         </p>
                     </div>
                 </div>
 
-                <!-- 规划性能 -->
-                <div id="planning" class="section-anchor mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">4.1 规划性能对比</h3>
+                <!-- 主要结果 -->
+                <div id="results" class="section-anchor mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">4.2 主要结果</h3>
                     
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
                         <img src="https://arxiv.org/html/2603.19312v1/x8.png" alt="Planning Performance" class="paper-img w-full max-w-3xl mx-auto">
                         <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            <strong>Figure 6:</strong> 跨环境的规划性能。展示了在 Two-Room、Push-T 和 OGBench-Cube 上的结果。
+                            <strong>Figure 6:</strong> 跨环境的规划性能。LeWM 在 PushT 上比 PLDM 高 18% 成功率。
                         </p>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-700">
-                                    <th class="p-3 text-left rounded-tl-lg">方法</th>
-                                    <th class="p-3 text-center">类型</th>
-                                    <th class="p-3 text-center">损失项</th>
-                                    <th class="p-3 text-center">超参数</th>
-                                    <th class="p-3 text-center rounded-tr-lg">端到端</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr><td class="p-3">DINO-WM</td><td class="p-3 text-center"><span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs">预训练</span></td><td class="p-3 text-center">3+</td><td class="p-3 text-center">3+</td><td class="p-3 text-center text-red-500">✗</td></tr>
-                                <tr><td class="p-3">PLDM</td><td class="p-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">端到端</span></td><td class="p-3 text-center">7</td><td class="p-3 text-center">6</td><td class="p-3 text-center text-green-500">✓</td></tr>
-                                <tr><td class="p-3">GCBC</td><td class="p-3 text-center"><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">行为克隆</span></td><td class="p-3 text-center">-</td><td class="p-3 text-center">-</td><td class="p-3 text-center">-</td></tr>
-                                <tr><td class="p-3">GCIVL/GCIQL</td><td class="p-3 text-center"><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">Offline RL</span></td><td class="p-3 text-center">-</td><td class="p-3 text-center">-</td><td class="p-3 text-center">-</td></tr>
-                                <tr class="bg-blue-50 dark:bg-blue-900/20 font-bold"><td class="p-3">LeWM (本文)</td><td class="p-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">端到端</span></td><td class="p-3 text-center text-blue-600">2</td><td class="p-3 text-center text-blue-600">1</td><td class="p-3 text-center text-green-500">✓</td></tr>
-                            </tbody>
-                        </table>
+                    <div class="highlight rounded-lg p-5 mb-4">
+                        <h4 class="font-semibold mb-2 flex items-center gap-2">
+                            <i class="fas fa-chart-line text-blue-500"></i>
+                            关键发现
+                        </h4>
+                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            <li>• <strong>速度优势</strong>：LeWM 的规划速度比 DINO-WM 快 <strong>48 倍</strong>（单次规划 &lt; 1 秒）</li>
+                            <li>• <strong>数据效率</strong>：PushT 仅需 10 epochs 训练即可达到竞争力</li>
+                            <li>• <strong>像素-only 优势</strong>：在 PushT 上，LeWM（仅用像素）超越了使用额外本体感受信息的 DINO-WM</li>
+                            <li>• <strong>奇怪现象</strong>：在最简单的 TwoRoom 环境上反而表现不如 PLDM</li>
+                        </ul>
                     </div>
 
-                    <div class="highlight rounded-lg p-5 mt-4">
-                        <h4 class="font-semibold mb-2">关键发现</h4>
-                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                            <li>• <strong>速度优势</strong>：LeWM 的规划速度比 DINO-WM 快 48 倍，同时保持竞争力的性能</li>
-                            <li>• <strong>数据效率</strong>：在所有环境中，LeWM 都展现出优异的数据效率</li>
-                            <li>• <strong>稳定性</strong>：训练过程稳定，无需复杂的超参数调优</li>
-                        </ul>
+                    <h4 class="font-semibold mb-3 text-gray-800 dark:text-gray-200">CEM 规划器配置</h4>
+                    <div class="formula-block rounded-lg p-4">
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div><strong>采样数</strong>：300 候选序列</div>
+                            <div><strong>优化迭代</strong>：30 步（PushT）/ 10 步（其他）</div>
+                            <div><strong>精英比例</strong>：Top 30</div>
+                            <div><strong>初始方差</strong>：1.0</div>
+                            <div><strong>规划 Horizon</strong>：5 步</div>
+                            <div><strong>单次时间</strong>：&lt; 1 秒</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 物理理解量化 -->
+                <!-- 物理理解 -->
                 <div id="physical" class="section-anchor mb-8">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">4.2 物理理解量化评估</h3>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">4.3 物理理解量化评估</h3>
                     
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
                         <img src="https://arxiv.org/html/2603.19312v1/x14.png" alt="Decoder Visualization" class="paper-img w-full max-w-2xl mx-auto">
                         <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            <strong>Figure 8:</strong> 训练过程中的解码器可视化。随着训练进行，潜在空间保留了足够的信息来重建视觉场景。
+                            <strong>Figure 8:</strong> 训练过程中的解码器可视化。潜在空间保留了足够信息重建视觉场景。
                         </p>
                     </div>
 
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
-                        <img src="https://arxiv.org/html/2603.19312v1/x15.png" alt="Latent Space Visualization" class="paper-img w-full max-w-2xl mx-auto">
-                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            <strong>Figure 9:</strong> Push-T 环境下 LeWM 潜在空间的可视化。展示了潜在空间的结构化特征。
-                        </p>
-                    </div>
-
-                    <h4 class="font-semibold mb-3 text-gray-800 dark:text-gray-200">物理量探测结果</h4>
+                    <h4 class="font-semibold mb-3 text-gray-800 dark:text-gray-200">物理量探测结果（线性探测 R²）</h4>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-700">
+                            <thead class="bg-gray-100 dark:bg-gray-700">
+                                <tr>
                                     <th class="p-3 text-left rounded-tl-lg">物理量</th>
                                     <th class="p-3 text-center">LeWM</th>
                                     <th class="p-3 text-center">PLDM</th>
                                     <th class="p-3 text-center rounded-tr-lg">DINO-WM</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 text-center">
-                                <tr><td class="p-3 text-left">Position (x, y)</td><td class="p-3 text-green-600 font-bold">0.92</td><td class="p-3">0.78</td><td class="p-3">0.95</td></tr>
-                                <tr><td class="p-3 text-left">Velocity</td><td class="p-3 text-green-600 font-bold">0.88</td><td class="p-3">0.71</td><td class="p-3">0.89</td></tr>
-                                <tr><td class="p-3 text-left">Angle</td><td class="p-3 text-green-600 font-bold">0.85</td><td class="p-3">0.65</td><td class="p-3">0.87</td></tr>
-                                <tr><td class="p-3 text-left">Angular Velocity</td><td class="p-3 text-green-600 font-bold">0.79</td><td class="p-3">0.58</td><td class="p-3">0.81</td></tr>
+                            <tbody class="divide-y dark:divide-gray-700 text-center">
+                                <tr>
+                                    <td class="p-3 text-left">Position (x, y)</td>
+                                    <td class="p-3 text-green-600 font-bold">0.92</td>
+                                    <td class="p-3">0.78</td>
+                                    <td class="p-3">0.95</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-left">Velocity</td>
+                                    <td class="p-3 text-green-600 font-bold">0.88</td>
+                                    <td class="p-3">0.71</td>
+                                    <td class="p-3">0.89</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-left">Angle</td>
+                                    <td class="p-3 text-green-600 font-bold">0.85</td>
+                                    <td class="p-3">0.65</td>
+                                    <td class="p-3">0.87</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-left">Angular Velocity</td>
+                                    <td class="p-3 text-green-600 font-bold">0.79</td>
+                                    <td class="p-3">0.58</td>
+                                    <td class="p-3">0.81</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">数值表示线性探测的 R² 分数（越高越好）</p>
-
-                    <h4 class="font-semibold mb-3 mt-6 text-gray-800 dark:text-gray-200">违反期望评估 (Violation-of-Expectation)</h4>
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                        <img src="https://arxiv.org/html/2603.19312v1/x16.png" alt="Violation of Expectation" class="paper-img w-full max-w-3xl mx-auto">
-                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            <strong>Figure 10:</strong> 跨三个环境的违反期望评估。展示了 LeWM 检测物理上不可行事件的能力。
-                        </p>
-                    </div>
+                    <p class="text-xs text-gray-500 mt-2">注：均为线性探测结果；LeWM 显著优于 PLDM，接近 DINO-WM（后者使用大型预训练模型）</p>
                 </div>
             </section>
 
-            <!-- SOTA对比 -->
-            <section id="comparison" class="section-anchor mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">5. 与SOTA方法深度对比</h2>
+            <!-- Part IV: Analysis -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <span class="text-sm font-bold text-gray-400 uppercase tracking-wider">Part IV · 对比与消融</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            </div>
+
+            <!-- 对比分析 -->
+            <section id="comparison" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">5. LeWM vs PLDM 深度对比</h2>
                 
-                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-6">
-                    <img src="https://arxiv.org/html/2603.19312v1/x6.png" alt="Latent Planning" class="paper-img w-full max-w-3xl mx-auto">
-                    <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                        <strong>Figure 4:</strong> LeWorldModel 潜在规划。给定初始观测和目标，模型通过编码器-预测器循环进行规划。
-                    </p>
+                <div class="critical-box rounded-lg p-5 mb-6">
+                    <h3 class="font-bold text-amber-800 dark:text-amber-300 mb-3 flex items-center gap-2">
+                        <i class="fas fa-question-circle"></i>
+                        核心问题：为什么 LeWM 在 PushT 上比 PLDM 高 18%？
+                    </h3>
+                    <div class="space-y-3 text-amber-900 dark:text-amber-200 text-sm">
+                        <p><strong>假设 1：损失函数的解耦性</strong></p>
+                        <p class="ml-4">PLDM 的 7 项损失高度耦合，可能存在冲突。LeWM 的 2 项损失形成清晰的"预测-约束"分工，优化轨迹更稳定。</p>
+                        
+                        <p><strong>假设 2：超参数搜索效率</strong></p>
+                        <p class="ml-4">PLDM 需调节 6 个超参数，搜索空间为 O(n⁶)，原论文对每个环境都进行了大量调参。LeWM 仅需调节 λ，可用二分搜索 O(log n)。</p>
+                        
+                        <p><strong>假设 3：隐式时间直线性</strong></p>
+                        <p class="ml-4">PLDM 显式添加时间平滑正则化，但 LeWM 通过 SIGReg "漏洞"自发产生更强的时间直线性，这种自组织特性可能更适合物理动力学。</p>
+                    </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5">
-                        <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-3">vs PLDM (最接近的端到端方法)</h3>
-                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                            <li>• <strong>损失项</strong>：LeWM 2项 vs PLDM 7项</li>
-                            <li>• <strong>超参数</strong>：LeWM 1个 vs PLDM 6个</li>
-                            <li>• <strong>稳定性</strong>：LeWM 更稳定</li>
-                            <li>• <strong>物理探测</strong>：LeWM 优于 PLDM</li>
-                        </ul>
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">超参数调优复杂度对比</h3>
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm border-collapse">
+                        <thead class="bg-gray-100 dark:bg-gray-700">
+                            <tr>
+                                <th class="p-3">方法</th>
+                                <th class="p-3 text-center">可调参数</th>
+                                <th class="p-3 text-center">搜索复杂度</th>
+                                <th class="p-3 text-center">调优策略</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y dark:divide-gray-700">
+                            <tr class="bg-green-50 dark:bg-green-900/20">
+                                <td class="p-3 font-bold">LeWM</td>
+                                <td class="p-3 text-center text-green-600 font-bold">1 (λ)</td>
+                                <td class="p-3 text-center font-mono">O(log n)</td>
+                                <td class="p-3 text-center">二分搜索</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">PLDM</td>
+                                <td class="p-3 text-center">6 (α,β,γ,ζ,ν,μ)</td>
+                                <td class="p-3 text-center font-mono text-red-600">O(n⁶)</td>
+                                <td class="p-3 text-center">网格搜索（不可行）</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">损失函数对比</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="formula-block rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
+                        <p class="font-bold mb-2 text-green-700 flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            LeWM (2 terms)
+                        </p>
+                        <div class="font-mono text-sm space-y-1">
+                            <p>L = L_pred + λ·L_SIGReg</p>
+                            <p class="text-gray-500 text-xs mt-2"># L_pred: MSE 预测损失</p>
+                            <p class="text-gray-500 text-xs"># L_SIGReg: 高斯正则化</p>
+                        </div>
                     </div>
-                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-5">
-                        <h3 class="font-bold text-purple-800 dark:text-purple-300 mb-3">vs DINO-WM (SOTA性能)</h3>
-                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                            <li>• <strong>速度</strong>：LeWM 快 48×</li>
-                            <li>• <strong>端到端</strong>：LeWM ✓ vs DINO-WM ✗</li>
-                            <li>• <strong>参数量</strong>：LeWM ~15M vs DINO-WM  huge</li>
-                            <li>• <strong>训练成本</strong>：LeWM 单GPU数小时</li>
-                        </ul>
+                    <div class="formula-block rounded-lg p-4 bg-red-50 dark:bg-red-900/20">
+                        <p class="font-bold mb-2 text-red-700 flex items-center gap-2">
+                            <i class="fas fa-times-circle"></i>
+                            PLDM (7 terms)
+                        </p>
+                        <div class="font-mono text-xs space-y-1 text-gray-600">
+                            <p>L = α·L_pred + β·L_var + γ·L_cov</p>
+                            <p>+ ζ·L_inv + ν·L_temp + μ·L_aux + ...</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- 消融实验 -->
-            <section id="ablation" class="section-anchor mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+            <section id="ablation" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
                 <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">6. 消融实验</h2>
                 
                 <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-6">
-                    <img src="https://arxiv.org/html/2603.19312v1/x27.png" alt="Ablation Studies" class="paper-img w-full max-w-3xl mx-auto">
-                    <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                        <strong>Figure 15:</strong> LeWM 关键设计选择的消融研究。左：嵌入维度；右：历史帧数 N。
-                    </p>
-                </div>
-
-                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-6">
                     <img src="https://arxiv.org/html/2603.19312v1/x30.png" alt="SIGReg Weight" class="paper-img w-full max-w-2xl mx-auto">
                     <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                        <strong>Figure 16:</strong> SIGReg 正则化权重 λ 对 Push-T 规划性能的影响。
+                        <strong>Figure 16:</strong> SIGReg 权重 λ 对 Push-T 规划性能的影响。
                     </p>
                 </div>
 
-                <div class="highlight rounded-lg p-5">
-                    <h4 class="font-semibold mb-2">消融实验关键发现</h4>
-                    <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                        <li>• <strong>SIGReg 的必要性</strong>：移除 SIGReg 导致表征崩溃</li>
-                        <li>• <strong>λ 的鲁棒性</strong>：在 0.01-0.1 范围内性能稳定</li>
-                        <li>• <strong>历史帧数</strong>：N=8 是性能与效率的最佳平衡点</li>
-                        <li>• <strong>嵌入维度</strong>：192 维在表示能力和计算效率间取得平衡</li>
-                    </ul>
+                <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">关键发现</h3>
+                <div class="space-y-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">SIGReg 权重 λ</h4>
+                        <ul class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                            <li>• <strong>λ ∈ [0.01, 0.2]</strong>：成功率保持在 80% 以上</li>
+                            <li>• <strong>λ < 0.01</strong>：正则化不足，可能导致崩溃</li>
+                            <li>• <strong>λ > 0.2</strong>：过度正则化，限制表达能力</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2">投影数 M</h4>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            实验表明 M 对下游性能<strong>几乎没有影响</strong>，使用默认值 1024 即可，无需调参。
+                        </p>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-800 dark:text-purple-300 mb-2">Dropout</h4>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            Dropout 0.1 达到最佳性能，过高或过低都会降低成功率。
+                        </p>
+                    </div>
                 </div>
             </section>
 
-            <!-- 深度洞察 -->
-            <section id="insights" class="section-anchor mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">7. 深度洞察与未来方向</h2>
+            <!-- Part V: Critical Analysis -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-red-300 to-transparent"></div>
+                <span class="text-sm font-bold text-red-400 uppercase tracking-wider">Part V · 批判性分析</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-red-300 to-transparent"></div>
+            </div>
+
+            <!-- 批判性分析 -->
+            <section id="critical" class="section-anchor mb-12 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6 text-red-800 dark:text-red-300 flex items-center gap-3">
+                    <i class="fas fa-microscope"></i>
+                    7. 批判性分析与局限性质疑
+                </h2>
                 
-                <div class="space-y-6">
-                    <div class="border-l-4 border-blue-500 pl-5">
-                        <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2">理论洞察</h3>
-                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                            SIGReg 的成功证明了<strong>简单的分布约束</strong>可以替代复杂的正则化策略。这与信息瓶颈理论相呼应：通过限制潜在分布的形式，模型被迫学习最相关的信息。
-                        </p>
+                <div id="why-it-works" class="section-anchor mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-red-700 dark:text-red-400">7.1 深入剖析：LeWM 为什么能成功？</h3>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-4">
+                        <h4 class="font-bold text-gray-800 dark:text-white mb-3">核心机制拆解</h4>
+                        <ol class="space-y-3 text-sm text-gray-700 dark:text-gray-300 list-decimal list-inside">
+                            <li>
+                                <strong>SIGReg 的统计基础</strong>
+                                <p class="ml-6 mt-1 text-gray-600 dark:text-gray-400">利用 Cramer-Wold 定理将高维正态性检验转化为多个一维 Epps-Pulley 检验，计算高效且稳定。</p>
+                            </li>
+                            <li>
+                                <strong>损失函数的"正交性"</strong>
+                                <p class="ml-6 mt-1 text-gray-600 dark:text-gray-400">预测损失和正则化损失在优化空间中形成互补约束，避免了多损失冲突。</p>
+                            </li>
+                            <li>
+                                <strong>隐式的时间直线性</strong>
+                                <p class="ml-6 mt-1 text-gray-600 dark:text-gray-400">SIGReg 未显式约束时间维度，反而产生了有益的"temporal collapse"，这种自组织特性与神经科学原理一致。</p>
+                            </li>
+                            <li>
+                                <strong>超参数空间的简化</strong>
+                                <p class="ml-6 mt-1 text-gray-600 dark:text-gray-400">从 6 维搜索空间降至 1 维，使优化更易收敛，且可用对数级搜索快速调参。</p>
+                            </li>
+                        </ol>
                     </div>
 
-                    <div class="border-l-4 border-green-500 pl-5">
-                        <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2">实践意义</h3>
-                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                            LeWM 的极简设计大幅降低了研究门槛。研究者无需深入了解复杂的正则化技巧，也无需进行繁琐的超参数搜索，就能训练出有效的世界模型。
+                    <div class="critical-box rounded-lg p-5">
+                        <h4 class="font-bold text-amber-800 dark:text-amber-300 mb-2">48× 加速的真相</h4>
+                        <p class="text-amber-900 dark:text-amber-200 text-sm">
+                            这一加速是相对于 DINO-WM（基于大型预训练 ViT）的。DINO-WM 编码器本身参数量巨大，而 LeWM 仅 15M 参数。这不是同一量级模型的公平对比，更像是"轻量化设计" vs "重型预训练模型"的比较。
                         </p>
                     </div>
+                </div>
 
-                    <div class="border-l-4 border-purple-500 pl-5">
-                        <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2">局限与未来方向</h3>
-                        <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
-                            <li>• <strong>长程规划</strong>：当前方法限制在短程规划，层次化世界模型是 promising 方向</li>
-                            <li>• <strong>数据依赖</strong>：仍需充分的交互数据覆盖，离线数据集收集成本高</li>
-                            <li>• <strong>简单环境</strong>：在内在维度很低的简单环境中，SIGReg 效果受限</li>
-                            <li>• <strong>多模态</strong>：扩展到视觉-语言-动作多模态输入</li>
+                <div id="limitations" class="section-anchor mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-red-700 dark:text-red-400">7.2 局限性质疑</h3>
+                    
+                    <div class="space-y-5">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                            <h4 class="font-bold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                1. 简单环境表现反而更差
+                            </h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                LeWM 在 TwoRoom（最简单环境）上表现不如 PLDM。论文解释：数据多样性不足、内在维度太低。
+                            </p>
+                            <div class="mt-3 bg-gray-100 dark:bg-gray-700 rounded p-3 text-sm">
+                                <strong>批判观点：</strong>这揭示了 SIGReg 的根本性假设——需要足够的数据多样性来"填充"高斯分布。对于简单任务，这种假设可能过于严格，成为负担。
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                            <h4 class="font-bold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
+                                <i class="fas fa-ruler-horizontal"></i>
+                                2. 短程规划限制
+                            </h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                当前 latent world model 都受限于短程规划。LeWM 的 planning horizon 仅为 5 步（CEM 30 次迭代）。对于需要长程推理的任务，这一限制可能成为瓶颈。
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                            <h4 class="font-bold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
+                                <i class="fas fa-database"></i>
+                                3. 数据依赖
+                            </h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                方法依赖离线数据集且有"充分的交互覆盖"。论文使用了 10K-20K 专家/半专家轨迹。对于真实世界机器人任务，这种数据收集成本可能过高。
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                            <h4 class="font-bold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
+                                <i class="fas fa-brain"></i>
+                                4. 物理理解的"表面性"
+                            </h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                虽然物理探测实验显示可以从潜在表示解码物理量，但这是<strong>线性探测</strong>的结果。真正的"理解"可能需要更复杂的因果推理测试。
+                            </p>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                violation-of-expectation 实验相对简单（颜色变化、瞬间移动），难以证明深度理解。
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                            <h4 class="font-bold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
+                                <i class="fas fa-book"></i>
+                                5. 缺乏理论保证
+                            </h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                论文主要依赖实验验证，缺乏对 SIGReg 防止 collapse 的理论证明。为什么高斯约束能确保表示不崩溃？是否存在反例？这些问题尚未得到严格回答。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 总结 -->
+            <section id="conclusion" class="section-anchor mb-12 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                    <i class="fas fa-clipboard-check"></i>
+                    8. 总结与评价
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                        <h3 class="font-bold text-green-600 mb-3 flex items-center gap-2">
+                            <i class="fas fa-thumbs-up"></i>
+                            贡献与优点
+                        </h3>
+                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            <li>• 通过 SIGReg 实现了简单稳定的 JEPA 训练</li>
+                            <li>• 超参数从 6 个减少到 1 个，工程意义重大</li>
+                            <li>• 实验扎实，涵盖 4 个环境、多个 baseline</li>
+                            <li>• 训练快速，单 GPU 数小时可复现</li>
+                            <li>• 发现隐式时间直线性，具有启发意义</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                        <h3 class="font-bold text-red-600 mb-3 flex items-center gap-2">
+                            <i class="fas fa-thumbs-down"></i>
+                            局限与不足
+                        </h3>
+                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            <li>• 理论深度不足，缺乏防止崩溃的形式化证明</li>
+                            <li>• 简单环境表现奇怪，算法假设存在边界条件</li>
+                            <li>• 长程规划能力未验证，horizon 限制明显</li>
+                            <li>• 数据需求高，真实场景适用性待检验</li>
+                            <li>• 物理理解测试过于简单</li>
                         </ul>
                     </div>
                 </div>
+
+                <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-5">
+                    <h3 class="font-bold text-gray-800 dark:text-white mb-3">综合评价</h3>
+                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        LeWM 是一篇<strong>工程导向</strong>的 solid work。它并非提出全新的理论框架，而是通过精心设计的正则化策略（SIGReg）解决了 JEPA 训练的稳定性问题，将超参数搜索空间从 6 维降至 1 维。这种"简单即美"的理念值得肯定。然而，论文在理论深度上有所欠缺，对算法成功原因的分析更多停留在经验层面。此外，简单环境表现不佳、数据依赖等问题也限制了其适用范围。总体而言，这是一篇对 JEPA 领域有实用价值的论文，但不应被过度解读为"范式转变"。
+                    </p>
+                </div>
             </section>
 
-            <!-- 资源链接 -->
-            <section id="resources" class="section-anchor mb-16 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700">8. 相关资源</h2>
+            <!-- 相关资源 -->
+            <section class="mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3 border-gray-200 dark:border-gray-700 flex items-center gap-3">
+                    <i class="fas fa-external-link-alt"></i>
+                    相关资源
+                </h2>
                 
-                <div class="grid md:grid-cols-2 gap-4">
-                    <a href="https://arxiv.org/pdf/2603.19312.pdf" target="_blank" class="flex items-center p-5 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition group">
-                        <span class="text-4xl mr-4 group-hover:scale-110 transition">📄</span>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <a href="https://arxiv.org/pdf/2603.19312.pdf" target="_blank" class="flex items-center p-4 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 transition group">
+                        <span class="text-2xl mr-3 group-hover:scale-110 transition">📄</span>
                         <div>
-                            <p class="font-bold text-gray-800 dark:text-gray-200">论文 PDF</p>
-                            <p class="text-sm text-gray-500">arXiv: 2603.19312</p>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">论文 PDF</p>
+                            <p class="text-xs text-gray-500">arXiv: 2603.19312</p>
                         </div>
                     </a>
 
-                    <a href="https://arxiv.org/abs/2603.19312" target="_blank" class="flex items-center p-5 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
-                        <span class="text-4xl mr-4 group-hover:scale-110 transition">🌐</span>
+                    <a href="https://arxiv.org/abs/2603.19312" target="_blank" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 transition group">
+                        <span class="text-2xl mr-3 group-hover:scale-110 transition">🌐</span>
                         <div>
-                            <p class="font-bold text-gray-800 dark:text-gray-200">arXiv 页面</p>
-                            <p class="text-sm text-gray-500">查看论文详情</p>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">arXiv 页面</p>
+                            <p class="text-xs text-gray-500">查看详情和引用</p>
                         </div>
                     </a>
 
-                    <a href="https://arxiv.org/html/2603.19312" target="_blank" class="flex items-center p-5 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition group">
-                        <span class="text-4xl mr-4 group-hover:scale-110 transition">📖</span>
+                    <a href="https://arxiv.org/html/2603.19312" target="_blank" class="flex items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 transition group">
+                        <span class="text-2xl mr-3 group-hover:scale-110 transition">📖</span>
                         <div>
-                            <p class="font-bold text-gray-800 dark:text-gray-200">HTML 版本</p>
-                            <p class="text-sm text-gray-500">交互式阅读</p>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">HTML 版本</p>
+                            <p class="text-xs text-gray-500">交互式阅读</p>
                         </div>
                     </a>
-
-                    <div class="flex items-center p-5 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-                        <span class="text-4xl mr-4">👥</span>
-                        <div>
-                            <p class="font-bold text-gray-800 dark:text-gray-200">作者团队</p>
-                            <p class="text-sm text-gray-500">Mila, NYU, Samsung SAIL, Brown</p>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="mt-6 p-5 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                    <h3 class="font-bold mb-3 text-gray-800 dark:text-gray-200">📚 推荐阅读</h3>
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <h3 class="font-semibold mb-2 text-gray-800 dark:text-gray-200">推荐阅读</h3>
                     <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                        <li>• <a href="https://arxiv.org/abs/2301.08243" target="_blank" class="text-blue-600 hover:underline">I-JEPA: Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture</a> (LeCun et al., 2023)</li>
-                        <li>• <a href="https://arxiv.org/abs/2210.07224" target="_blank" class="text-blue-600 hover:underline">VICReg: Variance-Invariance-Covariance Regularization</a></li>
+                        <li>• <a href="https://arxiv.org/abs/2301.08243" target="_blank" class="text-blue-600 hover:underline">I-JEPA</a> (LeCun et al., 2023)</li>
+                        <li>• <a href="https://arxiv.org/abs/2210.07224" target="_blank" class="text-blue-600 hover:underline">VICReg</a> (Bardes et al., 2022)</li>
                         <li>• <a href="https://openreview.net/forum?id=BZ5a1r-kVsf" target="_blank" class="text-blue-600 hover:underline">A Path Towards Autonomous Machine Intelligence</a> (LeCun, 2022)</li>
                     </ul>
                 </div>
@@ -614,22 +889,46 @@
 
             <!-- 页脚 -->
             <footer class="text-center text-sm text-gray-500 mt-12 pb-8">
-                <p class="mb-1">Generated by Paper Deep Analyzer • 2025-03-25</p>
-                <p class="text-xs">Based on arXiv: 2603.19312v1 | Analysis includes 24 figures from original paper</p>
+                <p>Generated by Paper Deep Analyzer • 2025-03-25</p>
+                <p class="mt-1 text-xs">Based on arXiv:2603.19312v1 | Critical Analysis</p>
             </footer>
         </div>
     </main>
 
     <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Active nav item highlighting
+        const sections = document.querySelectorAll('.section-anchor');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
             });
         });
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
     </script>
 </body>
 </html>
