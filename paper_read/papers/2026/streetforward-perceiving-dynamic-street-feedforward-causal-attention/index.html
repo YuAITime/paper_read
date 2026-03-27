@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreetForward: Perceiving Dynamic Street with Feedforward Causal Attention - 论文分析报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <!-- Hero Section -->
+    <div class="gradient-hero text-white py-16 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="text-sm font-medium text-blue-200 mb-2">📄 arXiv:2603.19552</div>
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                StreetForward
+                <span class="block text-xl md:text-2xl font-normal text-blue-100 mt-2">
+                    Perceiving Dynamic Street with Feedforward Causal Attention
+                </span>
+            </h1>
+            <p class="text-blue-100 text-sm md:text-base max-w-2xl mx-auto">
+                论文深度分析报告 | 无需位姿和跟踪的前馈动态街道重建框架，通过因果掩码注意力实现高质量4D场景重建。
+            </p>
+            <div class="flex justify-center gap-3 mt-6">
+                <a href="https://arxiv.org/abs/2603.19552" target="_blank" 
+                   class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">
+                    📎 论文链接
+                </a>
+                <a href="https://streetforward.github.io" target="_blank" 
+                   class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">
+                    🌐 项目页面
+                </a>
+                <a href="../../index.html" 
+                   class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">
+                    ← 返回报告库
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto py-12 px-4">
+        <!-- 报告结构 -->
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <a href="streetforward_analysis_part1_2.html" 
+               class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 hover:transform hover:-translate-y-1 transition block">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl mb-4">I-II</div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">概览与背景 & 方法详解</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    论文概览、研究背景、核心问题定义、架构设计、实现细节、数学机制
+                </p>
+            </a>
+            
+            <a href="streetforward_analysis_part3_4.html" 
+               class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 hover:transform hover:-translate-y-1 transition block">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold text-xl mb-4">III-IV</div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">实验评估 & 消融对比</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Waymo/CARLA实验、与SOTA对比、组件消融、敏感性分析
+                </p>
+            </a>
+            
+            <a href="streetforward_analysis_part5.html" 
+               class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 hover:transform hover:-translate-y-1 transition block">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center text-white font-bold text-xl mb-4">V</div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">批判性分析</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    深入剖析、局限性质疑、常见误区澄清、综合评价与改进建议
+                </p>
+            </a>
+        </div>
+
+        <!-- 核心亮点 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">🎯 论文核心亮点</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">1</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">因果掩码注意力</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">在VGGT AA层上添加因果掩码，显式建模源→目标帧定向运动</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 flex items-center justify-center flex-shrink-0">2</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">无需跟踪器</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">端到端前馈框架，推理时不依赖外部跟踪或分割模型</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">3</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">跨帧渲染融合</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">排除当前帧动态高斯，强制跨帧一致性，实现遮挡恢复</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">4</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">SOTA深度估计</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Waymo动态区域RMSE 3.45，比DGGT降低46%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关键指标 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">24.30</div>
+                <div class="text-sm opacity-90">动态区域PSNR</div>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">3.14</div>
+                <div class="text-sm opacity-90">深度RMSE</div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">36</div>
+                <div class="text-sm opacity-90">AA层数</div>
+            </div>
+            <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">Zero-shot</div>
+                <div class="text-sm opacity-90">CARLA泛化</div>
+            </div>
+        </div>
+
+        <!-- 方法对比 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">🔍 与现有方法对比</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-700">
+                            <th class="px-3 py-2 text-left">能力</th>
+                            <th class="px-3 py-2 text-center">DGGT</th>
+                            <th class="px-3 py-2 text-center">STORM</th>
+                            <th class="px-3 py-2 text-center bg-green-100 dark:bg-green-900/50">Ours</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y dark:divide-gray-700">
+                        <tr>
+                            <td class="px-3 py-2">无需位姿</td>
+                            <td class="px-3 py-2 text-center text-green-500">✓</td>
+                            <td class="px-3 py-2 text-center text-green-500">✓</td>
+                            <td class="px-3 py-2 text-center text-green-500 font-bold">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2">无需跟踪</td>
+                            <td class="px-3 py-2 text-center text-red-500">✗</td>
+                            <td class="px-3 py-2 text-center text-green-500">✓</td>
+                            <td class="px-3 py-2 text-center text-green-500 font-bold">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2">刚体+形变</td>
+                            <td class="px-3 py-2 text-center text-green-500">✓</td>
+                            <td class="px-3 py-2 text-center text-yellow-500">刚体</td>
+                            <td class="px-3 py-2 text-center text-green-500 font-bold">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2">动态PSNR</td>
+                            <td class="px-3 py-2 text-center">20.99</td>
+                            <td class="px-3 py-2 text-center">22.10</td>
+                            <td class="px-3 py-2 text-center text-green-600 font-bold">24.30</td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2">深度RMSE</td>
+                            <td class="px-3 py-2 text-center">4.08</td>
+                            <td class="px-3 py-2 text-center">5.48</td>
+                            <td class="px-3 py-2 text-center text-green-600 font-bold">3.14</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 报告信息 -->
+        <div class="text-center text-sm text-gray-500 dark:text-gray-400 py-4 border-t dark:border-gray-700">
+            <p>分析报告生成时间: 2026-03-27 | 基于 arXiv:2603.19552</p>
+        </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button onclick="document.documentElement.classList.toggle('dark')" 
+            class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">
+        🌓
+    </button>
+</body>
+</html>

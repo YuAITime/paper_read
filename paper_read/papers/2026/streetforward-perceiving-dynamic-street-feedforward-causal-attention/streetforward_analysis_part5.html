@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreetForward 论文分析 - Part V: 批判性分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+        }
+        .nav-active {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .section-anchor {
+            scroll-margin-top: 80px;
+        }
+        .critique-card {
+            border-left: 4px solid;
+        }
+        .critique-insight { border-left-color: #3B82F6; }
+        .critique-limitation { border-left-color: #EF4444; }
+        .critique-question { border-left-color: #F59E0B; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <!-- Hero Section -->
+    <div class="gradient-hero text-white py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <span class="text-sm text-white/70">Part V</span>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">
+                StreetForward 批判性分析
+            </h1>
+            <p class="text-white/80 text-sm md:text-base max-w-2xl">
+                深入剖析算法成功因素、局限性质疑、常见误区澄清与综合评价
+            </p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 py-8 px-4">
+        <!-- Sidebar Navigation -->
+        <aside class="lg:w-72 flex-shrink-0">
+            <div class="sticky top-4 bg-white dark:bg-gray-800 rounded-xl card-shadow p-4">
+                <h3 class="font-semibold text-gray-900 dark:text-white mb-4 px-2">📑 报告目录</h3>
+                <nav class="space-y-1 text-sm">
+                    <a href="#part5" class="block px-3 py-2 rounded-lg nav-active transition font-medium">
+                        Part V: 批判性分析
+                    </a>
+                    <div class="ml-4 space-y-1">
+                        <a href="#sec12" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            12. 深入剖析
+                        </a>
+                        <a href="#sec13" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            13. 局限性质疑
+                        </a>
+                        <a href="#sec14" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            14. 常见误区澄清
+                        </a>
+                        <a href="#sec15" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            15. 综合评价
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0">
+            <!-- Part V: 批判性分析 -->
+            <section id="part5" class="section-anchor mb-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center text-white font-bold">V</span>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">批判性分析</h2>
+                </div>
+
+                <!-- Section 12: 深入剖析 -->
+                <div id="sec12" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">12</span>
+                        深入剖析
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- 成功因素分析 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">12.1 算法成功因素拆解</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="critique-card critique-insight bg-blue-50 dark:bg-blue-900/20 rounded-r-xl p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">因素1: 因果掩码的精准设计</div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                        这是StreetForward解决VGGT运动建模缺陷的核心。原始AA对所有帧等权处理，而因果掩码强制建模定向信息流：
+                                    </p>
+                                    <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-4">
+                                        <li>• <strong>时间方向性：</strong> 明确区分前向(f→f+1)和后向(f→f-1)预测</li>
+                                        <li>• <strong>可变范围：</strong> 随机下采样使模型适应±1到±4帧的多种时序尺度</li>
+                                        <li>• <strong>零初始化：</strong> 运动头保守启动，确保训练稳定性</li>
+                                    </ul>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                        <strong>关键洞察：</strong> 这不是简单的注意力变体，而是对<strong>运动物理本质</strong>的正确建模——运动是时间上的因果过程，而非对称关系。
+                                    </p>
+                                </div>
+
+                                <div class="critique-card critique-insight bg-blue-50 dark:bg-blue-900/20 rounded-r-xl p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">因素2: 跨帧渲染的几何约束</div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                        排除当前帧自身动态高斯的设计看似反直觉，实则蕴含深刻几何洞察：
+                                    </p>
+                                    <div class="grid md:grid-cols-2 gap-3">
+                                        <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                            <div class="font-medium text-sm mb-1">强制一致性</div>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400">
+                                                当前帧的动态物体必须从相邻帧"解释"，避免每帧独立优化导致的漂移
+                                            </p>
+                                        </div>
+                                        <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                            <div class="font-medium text-sm mb-1">遮挡恢复</div>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400">
+                                                当前被遮挡区域可从其他视角补全，提升重建完整性
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="critique-card critique-insight bg-blue-50 dark:bg-blue-900/20 rounded-r-xl p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">因素3: 分层正则化策略</div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                        三层正则形成互补约束体系：
+                                    </p>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-sm">
+                                            <thead>
+                                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                                    <th class="px-3 py-2 text-left">正则项</th>
+                                                    <th class="px-3 py-2 text-left">作用层级</th>
+                                                    <th class="px-3 py-2 text-left">解决的问题</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y dark:divide-gray-700">
+                                                <tr>
+                                                    <td class="px-3 py-2">L_opacity</td>
+                                                    <td class="px-3 py-2 text-gray-600">像素/高斯级</td>
+                                                    <td class="px-3 py-2 text-gray-600">防止不透明度塌陷</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-3 py-2">L_rigidity</td>
+                                                    <td class="px-3 py-2 text-gray-600">局部邻域级</td>
+                                                    <td class="px-3 py-2 text-gray-600">保持局部几何一致性</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-3 py-2">L_consistency</td>
+                                                    <td class="px-3 py-2 text-gray-600">时序轨迹级</td>
+                                                    <td class="px-3 py-2 text-gray-600">确保运动时间连续性</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 机制拆解 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">12.2 核心机制深度拆解</h4>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
+                                <div class="text-center text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                                    为什么"排除当前帧动态高斯"有效？
+                                </div>
+                                <div class="grid md:grid-cols-3 gap-3">
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 text-lg">1</div>
+                                        <div class="font-medium text-sm mb-1">防止过拟合</div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                                            强制模型学习跨帧对应关系，而非记忆单帧特征
+                                        </p>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 text-lg">2</div>
+                                        <div class="font-medium text-sm mb-1">几何验证</div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                                            预测的运动必须能解释其他帧的观测，形成自洽约束
+                                        </p>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 text-lg">3</div>
+                                        <div class="font-medium text-sm mb-1">多视图融合</div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                                            自然实现多视角信息融合，提升遮挡区域重建质量
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
+                                <div class="font-medium text-amber-800 dark:text-amber-300 mb-2">类比理解</div>
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    想象多人协作拼图：如果每人只拼自己负责的部分（单帧优化），边界处会出现错位。StreetForward要求每个人的拼图必须能与邻居的拼图上吻合（跨帧一致性），即使这意味着需要重新调整自己的部分。这种"相互验证"机制确保了整体一致性。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 13: 局限性质疑 -->
+                <div id="sec13" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 flex items-center justify-center text-sm">13</span>
+                        局限性质疑
+                    </h3>
+
+                    <div class="space-y-4">
+                        <!-- 质疑1 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑1: 评估场景局限性
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 实验仅在Waymo和CARLA上进行，两者都是结构化的城市场景，交通模式相对规律。</p>
+                                <p><strong>潜在影响：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>在极端天气（大雪、浓雾）下的表现未知</li>
+                                    <li>非结构化道路（乡村、越野）的泛化能力未验证</li>
+                                    <li>高速场景（高速公路>120km/h）的运动建模挑战未讨论</li>
+                                </ul>
+                                <p><strong>建议：</strong> 在更多样化的数据集（如nuScenes、Argoverse）上验证，特别是极端条件。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑2 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑2: 长时序建模能力
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 因果注意力的有效范围被限制在±1到±4帧（通过随机下采样）。</p>
+                                <p><strong>潜在限制：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>对于被长时间遮挡的物体（如被大车遮挡的行人），可能无法保持跟踪</li>
+                                    <li>长距离运动依赖的累积误差未量化分析</li>
+                                    <li>与显式跟踪器（如TAPIP3D）的长时序一致性对比缺失</li>
+                                </ul>
+                                <p><strong>建议：</strong> 分析长时序序列(>50帧)的性能衰减，以及与跟踪基线的对比。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑3 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑3: 计算资源与效率披露不足
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 论文强调"前馈效率"但未提供具体的推理时间和计算成本。</p>
+                                <p><strong>缺失信息：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>单场景推理时间（秒/帧）</li>
+                                    <li>GPU内存占用</li>
+                                    <li>与DGGT、STORM等前馈方法的实际速度对比</li>
+                                    <li>训练所需GPU小时数</li>
+                                </ul>
+                                <p><strong>影响：</strong> 难以评估实际部署可行性，特别是在车载边缘设备上。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑4 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑4: 失败案例分析不足
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 论文主要展示成功案例，对失败模式的分析较少。</p>
+                                <p><strong>潜在失败场景：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>快速旋转的非刚体（如旋转的风车）运动估计</li>
+                                    <li>新出现的物体（从盲区进入）的初始帧处理</li>
+                                    <li>复杂交互（两车交汇、行人横穿）的解耦</li>
+                                </ul>
+                                <p><strong>建议：</strong> 补充失败案例分析，帮助理解方法边界。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑5 -->
+                        <div class="critique-card critique-question bg-amber-50 dark:bg-amber-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
+                                <span>❓</span> 质疑5: 与LiDAR融合的可能性
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 论文使用LiDAR作为深度评估的真值，但未探讨融合LiDAR输入的可能性。</p>
+                                <p><strong>考虑因素：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>现代自动驾驶车辆通常配备LiDAR，融合可进一步提升精度</li>
+                                    <li>LiDAR在动态物体上存在运动畸变，如何与本文方法结合？</li>
+                                    <li>纯视觉方法与LiDAR融合方法的性能差距量化</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 14: 常见误区澄清 -->
+                <div id="sec14" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300 flex items-center justify-center text-sm">14</span>
+                        常见误区澄清
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                        <th class="px-4 py-3 text-left font-semibold w-1/3">常见误区</th>
+                                        <th class="px-4 py-3 text-left font-semibold">正确理解</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y dark:divide-gray-700">
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"StreetForward完全不需要相机位姿"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ❌ 错误。模型内部通过相机头预测位姿，只是不需要外部提供。"Pose-free"指的是无需外部SfM预处理，而非完全无视几何。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"因果注意力是全新的注意力机制"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ❌ 错误。这是在VGGT现有AA层之上添加的<strong>掩码约束</strong>，而非全新的注意力架构。核心创新在于时序建模的应用方式。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"零样本CARLA泛化证明方法完美通用"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ⚠️ CARLA是合成数据，与Waymo虽然外观不同但几何结构相似（都是城市场景）。向完全不同领域（如室内）的泛化能力未被验证。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"深度RMSE 3.14意味着厘米级精度"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ❌ 错误。RMSE是相对深度误差，单位不是米。实际物理精度取决于场景尺度，论文未明确换算。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"动态区域PSNR最高=所有区域都最好"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ⚠️ 全图指标(27.01/0.818)略低于DGGT(27.41/0.846)，说明在静态区域略逊。这是方法设计的权衡（专注于动态建模）。
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 15: 综合评价 -->
+                <div id="sec15" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">15</span>
+                        综合评价
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- 评分卡 -->
+                        <div class="grid md:grid-cols-4 gap-3">
+                            <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">A</div>
+                                <div class="text-sm opacity-90">创新性</div>
+                                <div class="text-xs opacity-75 mt-1">因果设计优雅</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">A-</div>
+                                <div class="text-sm opacity-90">实验完整性</div>
+                                <div class="text-xs opacity-75 mt-1">消融充分，但场景有限</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">B+</div>
+                                <div class="text-sm opacity-90">工程实用性</div>
+                                <div class="text-xs opacity-75 mt-1">效率数据缺失</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">A-</div>
+                                <div class="text-sm opacity-90">写作质量</div>
+                                <div class="text-xs opacity-75 mt-1">清晰但部分细节待补充</div>
+                            </div>
+                        </div>
+
+                        <!-- 贡献度评估 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">15.1 贡献度评估</h4>
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">方法创新（因果注意力）</span>
+                                            <span class="font-medium">高</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">实验验证</span>
+                                            <span class="font-medium">中高</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-blue-500 rounded-full" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">泛化能力</span>
+                                            <span class="font-medium">中</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-yellow-500 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">工程细节披露</span>
+                                            <span class="font-medium">低</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-red-500 rounded-full" style="width: 40%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 改进建议 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">15.2 改进建议</h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">短期改进</div>
+                                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                        <li>• 补充推理时间和计算成本数据</li>
+                                        <li>• 在nuScenes等更多数据集上验证</li>
+                                        <li>• 分析长时序序列(>50帧)的性能</li>
+                                        <li>• 补充失败案例和边界条件分析</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                                    <div class="font-medium text-purple-800 dark:text-purple-300 mb-2">长期研究方向</div>
+                                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                        <li>• 探索与LiDAR的融合策略</li>
+                                        <li>• 扩展到极端天气和夜间场景</li>
+                                        <li>• 研究长时序一致性保持机制</li>
+                                        <li>• 开发边缘设备优化版本</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 总体评价 -->
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+                            <h4 class="font-bold text-lg mb-3">📋 总体评价</h4>
+                            <p class="text-sm leading-relaxed mb-4">
+                                StreetForward是一篇<strong>高质量的自动驾驶场景重建论文</strong>，其因果掩码注意力设计优雅地解决了VGGT在动态场景中的运动建模缺陷。在动态区域达到SOTA性能的同时保持了前馈推理的效率，具有重要的实用价值。
+                            </p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <div class="font-semibold mb-1 text-blue-200">主要优点</div>
+                                    <ul class="space-y-1 text-white/90">
+                                        <li>• 因果设计巧妙，物理意义明确</li>
+                                        <li>• 无需外部跟踪，端到端友好</li>
+                                        <li>• 动态区域性能突出，深度精度SOTA</li>
+                                        <li>• 消融实验设计严谨</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <div class="font-semibold mb-1 text-blue-200">主要不足</div>
+                                    <ul class="space-y-1 text-white/90">
+                                        <li>• 推理效率数据缺失</li>
+                                        <li>• 评估数据集相对单一</li>
+                                        <li>• 长时序建模能力未验证</li>
+                                        <li>• 失败案例分析不足</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-white/20">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-semibold">推荐指数</span>
+                                    <span class="text-2xl">⭐⭐⭐⭐☆ (4/5)</span>
+                                </div>
+                                <p class="text-xs text-white/70 mt-1">
+                                    适合关注自动驾驶、动态场景重建、3D Gaussian Splatting的研究者和工程师阅读。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="text-center text-sm text-gray-500 dark:text-gray-400 py-8 border-t dark:border-gray-700">
+                <p>StreetForward 论文深度分析报告 | Part V: 批判性分析</p>
+                <p class="mt-1">生成时间: 2026-03-27 | 基于 arXiv:2603.19552</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button onclick="document.documentElement.classList.toggle('dark')" 
+            class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">
+        🌓
+    </button>
+
+    <script>
+        // Highlight active nav item on scroll
+        const sections = document.querySelectorAll('.section-anchor');
+        const navLinks = document.querySelectorAll('aside nav a[href^="#"]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('nav-active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('nav-active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

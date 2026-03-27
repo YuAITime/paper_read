@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreetForward 论文分析 - Part III & IV: 实验评估与消融对比</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+        }
+        .nav-active {
+            background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
+            color: white;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .section-anchor {
+            scroll-margin-top: 80px;
+        }
+        .metric-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <!-- Hero Section -->
+    <div class="gradient-hero text-white py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-sm text-blue-200">Part III & IV</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">
+                StreetForward 实验评估与消融对比
+            </h1>
+            <p class="text-blue-100 text-sm md:text-base max-w-2xl">
+                Waymo与CARLA基准测试、与SOTA方法对比、组件消融与敏感性分析
+            </p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 py-8 px-4">
+        <!-- Sidebar Navigation -->
+        <aside class="lg:w-72 flex-shrink-0">
+            <div class="sticky top-4 bg-white dark:bg-gray-800 rounded-xl card-shadow p-4">
+                <h3 class="font-semibold text-gray-900 dark:text-white mb-4 px-2">📑 报告目录</h3>
+                <nav class="space-y-1 text-sm">
+                    <a href="#part3" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
+                        Part III: 实验评估
+                    </a>
+                    <div class="ml-4 space-y-1">
+                        <a href="#sec8" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            8. 实验设置
+                        </a>
+                        <a href="#sec9" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            9. 主要结果
+                        </a>
+                    </div>
+                    
+                    <a href="#part4" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
+                        Part IV: 消融与对比
+                    </a>
+                    <div class="ml-4 space-y-1">
+                        <a href="#sec10" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            10. 与SOTA对比
+                        </a>
+                        <a href="#sec11" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            11. 消融实验
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0">
+            <!-- Part III: 实验评估 -->
+            <section id="part3" class="section-anchor mb-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold">III</span>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">实验评估</h2>
+                </div>
+
+                <!-- Section 8: 实验设置 -->
+                <div id="sec8" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 flex items-center justify-center text-sm">8</span>
+                        实验设置
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- 评估指标 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                                <span class="text-green-500">📊</span> 评估指标
+                            </h4>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-2">PSNR ↑</div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        峰值信噪比，衡量新视角合成质量，值越高越好
+                                    </p>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-2">SSIM ↑</div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        结构相似性指数，评估图像结构保持程度
+                                    </p>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-2">RMSE ↓</div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        深度均方根误差，与LiDAR投影深度对比，越低越好
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Baselines -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                                <span class="text-blue-500">🤖</span> Baseline方法
+                            </h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-700">
+                                            <th class="px-4 py-3 text-left font-semibold">方法</th>
+                                            <th class="px-4 py-3 text-left font-semibold">类型</th>
+                                            <th class="px-4 py-3 text-left font-semibold">特点</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y dark:divide-gray-700">
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">PVG</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Optimization</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Periodic Vibration Gaussian，基于优化的动态场景重建</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">STORM</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Feedforward</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">时空重建模型，假设近匀速运动</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">DGGT</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Feedforward</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">使用外部跟踪器，依赖高斯生命周期</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">AnySplat</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Feedforward</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">显式建模物体运动，产生鬼影伪影</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">DA3 w/ GS Head</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Feedforward</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Depth Anything 3 + GS头</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">VGGT / Pi3</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Feedforward</td>
+                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">仅深度估计基线</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 实验环境 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                                <span class="text-purple-500">🧪</span> 实验环境
+                            </h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="border dark:border-gray-700 rounded-lg p-4">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                        <span>🛣️</span> Waymo Open Dataset
+                                    </div>
+                                    <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                        <li>• <strong>训练:</strong> 798 scenes (~190-200帧/场景)</li>
+                                        <li>• <strong>测试:</strong> 202 scenes</li>
+                                        <li>• <strong>场景:</strong> 密集交通、夜间、雨天</li>
+                                        <li>• <strong>设置:</strong> 20帧clip，1/5/10/15帧为context，其余为target</li>
+                                    </ul>
+                                </div>
+                                <div class="border dark:border-gray-700 rounded-lg p-4">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                                        <span>🎮</span> CARLA (Zero-shot)
+                                    </div>
+                                    <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                        <li>• <strong>测试:</strong> 100 clips</li>
+                                        <li>• <strong>评估:</strong> 原始视角 + 偏移视角(左右车道)</li>
+                                        <li>• <strong>Zero-shot:</strong> 在Waymo训练，CARLA测试无微调</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 9: 主要结果 -->
+                <div id="sec9" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 flex items-center justify-center text-sm">9</span>
+                        主要结果
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- Waymo新视角合成 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">9.1 Waymo新视角合成</h4>
+                            
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-4">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">24.30</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">动态区域PSNR</div>
+                                    </div>
+                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">0.827</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">动态区域SSIM</div>
+                                    </div>
+                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">27.01</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">全图PSNR</div>
+                                    </div>
+                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">0.818</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">全图SSIM</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-700">
+                                            <th class="px-3 py-3 text-left font-semibold">方法</th>
+                                            <th class="px-3 py-3 text-center font-semibold" colspan="2">Dynamic Only</th>
+                                            <th class="px-3 py-3 text-center font-semibold" colspan="2">Full Image</th>
+                                        </tr>
+                                        <tr class="bg-gray-50 dark:bg-gray-800">
+                                            <th class="px-3 py-2"></th>
+                                            <th class="px-3 py-2 text-center">PSNR ↑</th>
+                                            <th class="px-3 py-2 text-center">SSIM ↑</th>
+                                            <th class="px-3 py-2 text-center">PSNR ↑</th>
+                                            <th class="px-3 py-2 text-center">SSIM ↑</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y dark:divide-gray-700">
+                                        <tr>
+                                            <td class="px-3 py-2">PVG</td>
+                                            <td class="px-3 py-2 text-center">15.51</td>
+                                            <td class="px-3 py-2 text-center">0.128</td>
+                                            <td class="px-3 py-2 text-center">22.38</td>
+                                            <td class="px-3 py-2 text-center">0.661</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">AnySplat</td>
+                                            <td class="px-3 py-2 text-center">15.99</td>
+                                            <td class="px-3 py-2 text-center">0.418</td>
+                                            <td class="px-3 py-2 text-center">23.32</td>
+                                            <td class="px-3 py-2 text-center">0.687</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">DA3 w/ GS Head</td>
+                                            <td class="px-3 py-2 text-center">15.96</td>
+                                            <td class="px-3 py-2 text-center">0.429</td>
+                                            <td class="px-3 py-2 text-center">23.27</td>
+                                            <td class="px-3 py-2 text-center">0.686</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">STORM</td>
+                                            <td class="px-3 py-2 text-center">22.10</td>
+                                            <td class="px-3 py-2 text-center">0.624</td>
+                                            <td class="px-3 py-2 text-center">26.38</td>
+                                            <td class="px-3 py-2 text-center">0.794</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">DGGT</td>
+                                            <td class="px-3 py-2 text-center">20.99</td>
+                                            <td class="px-3 py-2 text-center text-green-600 font-bold">0.821</td>
+                                            <td class="px-3 py-2 text-center text-green-600 font-bold">27.41</td>
+                                            <td class="px-3 py-2 text-center text-green-600 font-bold">0.846</td>
+                                        </tr>
+                                        <tr class="bg-green-50 dark:bg-green-900/30">
+                                            <td class="px-3 py-2 font-bold text-green-700 dark:text-green-400">Ours</td>
+                                            <td class="px-3 py-2 text-center font-bold text-green-600">24.30</td>
+                                            <td class="px-3 py-2 text-center font-bold text-green-600">0.827</td>
+                                            <td class="px-3 py-2 text-center font-bold">27.01</td>
+                                            <td class="px-3 py-2 text-center font-bold">0.818</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 mt-3">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    <strong>关键发现：</strong> StreetForward在动态区域达到<strong>最佳PSNR (24.30)</strong>，比STORM高+2.2dB，比DGGT高+3.3dB。这表明无需外部跟踪的因果运动建模对动态内容合成更有效。全图指标略低于DGGT，但差距很小。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Waymo深度估计 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">9.2 Waymo深度估计 (RMSE ↓)</h4>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-700">
+                                            <th class="px-4 py-3 text-left font-semibold">方法</th>
+                                            <th class="px-4 py-3 text-center font-semibold">Static Only</th>
+                                            <th class="px-4 py-3 text-center font-semibold">Dynamic Only</th>
+                                            <th class="px-4 py-3 text-center font-semibold">Full Image</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y dark:divide-gray-700">
+                                        <tr>
+                                            <td class="px-4 py-3">VGGT</td>
+                                            <td class="px-4 py-3 text-center">3.84</td>
+                                            <td class="px-4 py-3 text-center">6.36</td>
+                                            <td class="px-4 py-3 text-center">4.07</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">Pi3</td>
+                                            <td class="px-4 py-3 text-center">5.46</td>
+                                            <td class="px-4 py-3 text-center">7.93</td>
+                                            <td class="px-4 py-3 text-center">5.61</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">DA3</td>
+                                            <td class="px-4 py-3 text-center">11.25</td>
+                                            <td class="px-4 py-3 text-center">12.20</td>
+                                            <td class="px-4 py-3 text-center">11.66</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">STORM</td>
+                                            <td class="px-4 py-3 text-center">-</td>
+                                            <td class="px-4 py-3 text-center">7.50</td>
+                                            <td class="px-4 py-3 text-center">5.48</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">AnySplat</td>
+                                            <td class="px-4 py-3 text-center">9.83</td>
+                                            <td class="px-4 py-3 text-center">10.45</td>
+                                            <td class="px-4 py-3 text-center">10.31</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3">DGGT</td>
+                                            <td class="px-4 py-3 text-center">3.47</td>
+                                            <td class="px-4 py-3 text-center">6.37</td>
+                                            <td class="px-4 py-3 text-center">4.08</td>
+                                        </tr>
+                                        <tr class="bg-green-50 dark:bg-green-900/30">
+                                            <td class="px-4 py-3 font-bold text-green-700 dark:text-green-400">Ours</td>
+                                            <td class="px-4 py-3 text-center font-bold text-green-600">3.09</td>
+                                            <td class="px-4 py-3 text-center font-bold text-green-600">3.45</td>
+                                            <td class="px-4 py-3 text-center font-bold text-green-600">3.14</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 mt-3">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    <strong>突出表现：</strong> StreetForward在所有区域都达到<strong>SOTA深度估计性能</strong>。尤其在动态区域，RMSE仅3.45，比DGGT (6.37) 降低<strong>46%</strong>，比STORM (7.50) 降低<strong>54%</strong>。这证明了因果运动编码和速度感知融合对维持动态几何的有效性。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- CARLA Zero-shot -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">9.3 CARLA Zero-shot泛化</h4>
+                            
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-2">原始视角合成</div>
+                                    <table class="w-full text-sm">
+                                        <tr class="border-b dark:border-gray-600">
+                                            <td class="py-2">PSNR (Dynamic)</td>
+                                            <td class="py-2 text-right font-bold text-green-600">SOTA</td>
+                                        </tr>
+                                        <tr class="border-b dark:border-gray-600">
+                                            <td class="py-2">SSIM (Dynamic)</td>
+                                            <td class="py-2 text-right font-bold text-green-600">SOTA</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-2">深度RMSE</td>
+                                            <td class="py-2 text-right font-bold text-green-600">SOTA</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-2">偏移视角合成</div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                        评估左右车道偏移视角下的新视角合成能力，StreetForward在所有指标上超越最强基线，尤其在动态区域优势明显。
+                                    </p>
+                                    <div class="text-xs text-gray-500">
+                                        这表明改进的领域迁移鲁棒性，在appearance重建和运动一致几何两方面都有提升。
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    <strong>泛化能力验证：</strong> 在Waymo训练，CARLA零样本测试，StreetForward在所有评估指标和设置下都超越最强基线。这证明了方法的强域迁移能力。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part IV: 消融与对比 -->
+            <section id="part4" class="section-anchor mb-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold">IV</span>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">消融与对比</h2>
+                </div>
+
+                <!-- Section 10: 与SOTA对比 -->
+                <div id="sec10" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center text-sm">10</span>
+                        与 SOTA 对比
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- 优劣势分析 -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
+                                <h5 class="font-semibold text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
+                                    <span>✅</span> 相比优化方法的优势
+                                </h5>
+                                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                    <li>• <strong>速度:</strong> 前馈推理秒级 vs 逐场景优化数小时</li>
+                                    <li>• <strong>可扩展:</strong> 适合大规模数据集闭环仿真</li>
+                                    <li>• <strong>动态区域:</strong> PSNR 24.30 vs PVG 15.51 (+57%)</li>
+                                    <li>• <strong>深度精度:</strong> RMSE 3.14 vs PVG 13.01 (-76%)</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                <h5 class="font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+                                    <span>✅</span> 相比前馈方法的优势
+                                </h5>
+                                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                    <li>• <strong>无需跟踪:</strong> DGGT需要外部跟踪器，StreetForward完全端到端</li>
+                                    <li>• <strong>运动建模:</strong> 因果注意力比STORM的匀速假设更灵活</li>
+                                    <li>• <strong>深度精度:</strong> 动态区域RMSE 3.45 vs DGGT 6.37 (-46%)</li>
+                                    <li>• <strong>形变物体:</strong> 同时支持刚体和形变物体，STORM仅刚体</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 提升来源分析 -->
+                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
+                            <h5 class="font-semibold text-amber-800 dark:text-amber-300 mb-2">提升来源分析</h5>
+                            <div class="grid md:grid-cols-3 gap-3 text-sm">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-1">因果注意力 (~40%)</div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                                        定向运动建模，解决AA的无序性问题
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-1">跨帧渲染 (~35%)</div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                                        动态高斯时序聚合，遮挡恢复和一致性
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <div class="font-medium text-gray-900 dark:text-white mb-1">运动正则 (~25%)</div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                                        局部刚性+前向后向一致性，稳定无监督学习
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 11: 消融实验 -->
+                <div id="sec11" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center text-sm">11</span>
+                        消融实验
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- 组件消融 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.1 关键组件消融</h4>
+                            
+                            <div class="overflow-x-auto mb-4">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-700">
+                                            <th class="px-3 py-3 text-left font-semibold">变体</th>
+                                            <th class="px-3 py-3 text-center font-semibold" colspan="2">Dynamic Only</th>
+                                            <th class="px-3 py-3 text-center font-semibold" colspan="2">Full Image</th>
+                                        </tr>
+                                        <tr class="bg-gray-50 dark:bg-gray-800">
+                                            <th class="px-3 py-2"></th>
+                                            <th class="px-3 py-2 text-center">PSNR ↑</th>
+                                            <th class="px-3 py-2 text-center">SSIM ↑</th>
+                                            <th class="px-3 py-2 text-center">PSNR ↑</th>
+                                            <th class="px-3 py-2 text-center">SSIM ↑</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y dark:divide-gray-700">
+                                        <tr class="bg-green-50 dark:bg-green-900/30">
+                                            <td class="px-3 py-2 font-bold text-green-700 dark:text-green-400">Full Model</td>
+                                            <td class="px-3 py-2 text-center font-bold text-green-600">24.30</td>
+                                            <td class="px-3 py-2 text-center font-bold text-green-600">0.827</td>
+                                            <td class="px-3 py-2 text-center font-bold">27.01</td>
+                                            <td class="px-3 py-2 text-center font-bold">0.818</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">w/o causal attention</td>
+                                            <td class="px-3 py-2 text-center">22.36</td>
+                                            <td class="px-3 py-2 text-center">0.714</td>
+                                            <td class="px-3 py-2 text-center">24.07</td>
+                                            <td class="px-3 py-2 text-center">0.781</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">fixed causal horizon</td>
+                                            <td class="px-3 py-2 text-center">22.96</td>
+                                            <td class="px-3 py-2 text-center">0.722</td>
+                                            <td class="px-3 py-2 text-center">24.66</td>
+                                            <td class="px-3 py-2 text-center">0.760</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">w/o L_rigidity</td>
+                                            <td class="px-3 py-2 text-center">22.64</td>
+                                            <td class="px-3 py-2 text-center">0.743</td>
+                                            <td class="px-3 py-2 text-center">26.21</td>
+                                            <td class="px-3 py-2 text-center">0.786</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">w/o L_consistency (forward-only)</td>
+                                            <td class="px-3 py-2 text-center">23.26</td>
+                                            <td class="px-3 py-2 text-center">0.786</td>
+                                            <td class="px-3 py-2 text-center">26.88</td>
+                                            <td class="px-3 py-2 text-center">0.809</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">w/o L_opacity</td>
+                                            <td class="px-3 py-2 text-center">23.03</td>
+                                            <td class="px-3 py-2 text-center">0.721</td>
+                                            <td class="px-3 py-2 text-center">26.43</td>
+                                            <td class="px-3 py-2 text-center">0.794</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2">w/o cross-frame fusion</td>
+                                            <td class="px-3 py-2 text-center">21.02</td>
+                                            <td class="px-3 py-2 text-center">0.659</td>
+                                            <td class="px-3 py-2 text-center">25.85</td>
+                                            <td class="px-3 py-2 text-center">0.683</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    <strong>关键发现：</strong> 所有组件都对性能有显著贡献。因果注意力影响最大（PSNR下降1.94dB），跨帧融合次之（下降3.28dB）。固定因果范围(h=1)不如可变范围，验证了随机时序下采样的有效性。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 因果注意力分析 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.2 因果动态建模分析</h4>
+                            
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-4">
+                                <h5 class="font-medium text-red-800 dark:text-red-300 mb-2">移除因果注意力的影响</h5>
+                                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                    <li>• <strong>时序判别力下降：</strong> 运动token在不同时序采样率下产生不一致速度</li>
+                                    <li>• <strong>插值伪影：</strong> 出现ghosting和时间模糊</li>
+                                    <li>• <strong>误检增加：</strong> 静态区域产生错误运动提示（如停放车辆被误判为运动）</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 运动正则化分析 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.3 运动正则化分析</h4>
+                            
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
+                                    <h5 class="font-medium text-amber-800 dark:text-amber-300 mb-2">局部刚性约束 (L_rigidity)</h5>
+                                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                        <li>• 减少速度漂移</li>
+                                        <li>• 保持多帧聚合完整性</li>
+                                        <li>• 无此约束时出现结构浮点和塌陷</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
+                                    <h5 class="font-medium text-amber-800 dark:text-amber-300 mb-2">前向后向一致性 (L_consistency)</h5>
+                                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                        <li>• 纯前向运动仍具竞争力，但丢失遮挡恢复细节</li>
+                                        <li>• 双向融合使动态区域更完整</li>
+                                        <li>• 常速度假设惩罚偏离</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 几何正则化分析 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.4 几何正则化分析</h4>
+                            
+                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
+                                <h5 class="font-medium text-purple-800 dark:text-purple-300 mb-2">不透明度稳定化 (L_opacity) 的关键作用</h5>
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                        <div class="font-medium text-sm mb-1">无L_opacity时的问题</div>
+                                        <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                            <li>• 高斯倾向于降低不透明度而非调整3D位置</li>
+                                            <li>• 产生低不透明度伪影</li>
+                                            <li>• 新视角出现"黑洞"</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                        <div class="font-medium text-sm mb-1">有L_opacity时的改善</div>
+                                        <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                            <li>• 保持高斯参与渲染</li>
+                                            <li>• RGB损失驱动几何修正而非透明度掩码</li>
+                                            <li>• 新视角质量显著提升</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 敏感性分析总结 -->
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-3">消融实验关键发现总结</h4>
+                            <div class="grid md:grid-cols-2 gap-3 text-sm">
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">1</span>
+                                        <span class="text-gray-700 dark:text-gray-300">因果注意力对<strong>时序判别力</strong>至关重要</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">2</span>
+                                        <span class="text-gray-700 dark:text-gray-300">可变因果范围优于固定范围</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">3</span>
+                                        <span class="text-gray-700 dark:text-gray-300">运动正则化防止<strong>结构漂移</strong></span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">4</span>
+                                        <span class="text-gray-700 dark:text-gray-300">不透明度稳定化防止<strong>塌陷</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="text-center text-sm text-gray-500 dark:text-gray-400 py-8 border-t dark:border-gray-700">
+                <p>StreetForward 论文深度分析报告 | Part III-IV: 实验评估与消融对比</p>
+                <p class="mt-1">生成时间: 2026-03-27 | 基于 arXiv:2603.19552</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button onclick="document.documentElement.classList.toggle('dark')" 
+            class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">
+        🌓
+    </button>
+
+    <script>
+        // Highlight active nav item on scroll
+        const sections = document.querySelectorAll('.section-anchor');
+        const navLinks = document.querySelectorAll('aside nav a[href^="#"]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('nav-active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('nav-active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
