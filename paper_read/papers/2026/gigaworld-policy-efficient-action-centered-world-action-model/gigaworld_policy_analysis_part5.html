@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigaWorld-Policy 论文分析 - Part V: 批判性分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#8B5CF6',
+                        accent: '#10B981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+        }
+        .nav-active {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .section-anchor {
+            scroll-margin-top: 80px;
+        }
+        .critique-card {
+            border-left: 4px solid;
+        }
+        .critique-insight { border-left-color: #3B82F6; }
+        .critique-limitation { border-left-color: #EF4444; }
+        .critique-question { border-left-color: #F59E0B; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <!-- Hero Section -->
+    <div class="gradient-hero text-white py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-4">
+                <a href="./gigaworld_policy_analysis_part3_4.html" class="text-white/70 hover:text-white text-sm">← Part III-IV</a>
+                <span class="text-white/50">|</span>
+                <span class="text-sm text-white/70">Part V</span>
+                <span class="text-white/50">|</span>
+                <a href="./index.html" class="text-white/70 hover:text-white text-sm">📑 首页</a>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">
+                GigaWorld-Policy 批判性分析
+            </h1>
+            <p class="text-white/80 text-sm md:text-base max-w-2xl">
+                深入剖析算法成功因素、局限性质疑、常见误区澄清与综合评价
+            </p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 py-8 px-4">
+        <!-- Sidebar Navigation -->
+        <aside class="lg:w-72 flex-shrink-0">
+            <div class="sticky top-4 bg-white dark:bg-gray-800 rounded-xl card-shadow p-4">
+                <h3 class="font-semibold text-gray-900 dark:text-white mb-4 px-2">📑 报告目录</h3>
+                <nav class="space-y-1 text-sm">
+                    <a href="./gigaworld_policy_analysis_part1_2.html" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
+                        ← Part I-II: 概览与方法
+                    </a>
+                    <a href="./gigaworld_policy_analysis_part3_4.html" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
+                        ← Part III-IV: 实验与消融
+                    </a>
+                    <a href="#part5" class="block px-3 py-2 rounded-lg nav-active transition font-medium">
+                        Part V: 批判性分析
+                    </a>
+                    <div class="ml-4 space-y-1">
+                        <a href="#sec12" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            12. 深入剖析
+                        </a>
+                        <a href="#sec13" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            13. 局限性质疑
+                        </a>
+                        <a href="#sec14" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            14. 常见误区澄清
+                        </a>
+                        <a href="#sec15" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
+                            15. 综合评价
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0">
+            <!-- Part V: 批判性分析 -->
+            <section id="part5" class="section-anchor mb-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center text-white font-bold">V</span>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">批判性分析</h2>
+                </div>
+
+                <!-- Section 12: 深入剖析 -->
+                <div id="sec12" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">12</span>
+                        深入剖析
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- 成功因素分析 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">12.1 算法成功因素拆解</h4>
+                            
+                            <div class="space-y-4">
+                                <div class="critique-card critique-insight bg-blue-50 dark:bg-blue-900/20 rounded-r-xl p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">因素1: 因果掩码的巧妙设计</div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                        这是GigaWorld-Policy能够实现"训练时视频辅助、推理时纯动作"的核心机制。通过精心设计的块级因果掩码：
+                                    </p>
+                                    <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1 ml-4">
+                                        <li>• 动作token只能"向后看"（状态、观测），不能"向前看"（未来视频）</li>
+                                        <li>• 视频token可以"向前看"（动作），实现真正的动作条件化预测</li>
+                                        <li>• 语言通过交叉注意力独立注入，不破坏因果链</li>
+                                    </ul>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                        <strong>关键洞察：</strong> 这不仅是工程优化，更是对学习任务的<strong>物理因果结构</strong>的正确建模——动作导致状态变化，而非反之。
+                                    </p>
+                                </div>
+
+                                <div class="critique-card critique-insight bg-blue-50 dark:bg-blue-900/20 rounded-r-xl p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">因素2: 密集监督与稀疏动作的协同</div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                        VLA方法面临的核心问题是<strong>监督稀疏性</strong>——动作标签少且多样性低。GigaWorld-Policy通过两种方式解决：
+                                    </p>
+                                    <div class="grid md:grid-cols-2 gap-3">
+                                        <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                            <div class="font-medium text-sm mb-1">像素级密集监督</div>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400">
+                                                每个未来帧提供数千个像素级监督信号，远超稀疏的动作标签
+                                            </p>
+                                        </div>
+                                        <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                            <div class="font-medium text-sm mb-1">物理一致性约束</div>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400">
+                                                不合理的动作会导致不连贯的未来帧，视频预测作为"判别器"
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="critique-card critique-insight bg-blue-50 dark:bg-blue-900/20 rounded-r-xl p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">因素3: 课程预训练的数据效率</div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                        三阶段课程预训练策略体现了对数据分布的深刻理解：
+                                    </p>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-sm">
+                                            <thead>
+                                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                                    <th class="px-3 py-2 text-left">阶段</th>
+                                                    <th class="px-3 py-2 text-left">数据类型</th>
+                                                    <th class="px-3 py-2 text-left">学习目标</th>
+                                                    <th class="px-3 py-2 text-left">作用</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y dark:divide-gray-700">
+                                                <tr>
+                                                    <td class="px-3 py-2 font-medium">Web视频</td>
+                                                    <td class="px-3 py-2 text-gray-600">通用视频</td>
+                                                    <td class="px-3 py-2 text-gray-600">视觉-时序先验</td>
+                                                    <td class="px-3 py-2 text-gray-600">通用表示初始化</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-3 py-2 font-medium">具身数据</td>
+                                                    <td class="px-3 py-2 text-gray-600">机器人+人视频</td>
+                                                    <td class="px-3 py-2 text-gray-600">视角+交互适配</td>
+                                                    <td class="px-3 py-2 text-gray-600">领域迁移</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-3 py-2 font-medium">任务数据</td>
+                                                    <td class="px-3 py-2 text-gray-600">(观测, 动作, 语言)</td>
+                                                    <td class="px-3 py-2 text-gray-600">指令条件化控制</td>
+                                                    <td class="px-3 py-2 text-gray-600">任务特化</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 机制拆解 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">12.2 核心机制深度拆解</h4>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
+                                <div class="text-center text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                                    为什么"跳过视频生成"不会损失性能？
+                                </div>
+                                <div class="grid md:grid-cols-3 gap-3">
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 text-lg">1</div>
+                                        <div class="font-medium text-sm mb-1">解耦训练</div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                                            动作预测路径从未依赖过视频token，因果掩码确保独立性
+                                        </p>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 text-lg">2</div>
+                                        <div class="font-medium text-sm mb-1">间接正则</div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                                            视频预测作为正则化器，在训练时已"内化"到共享表示中
+                                        </p>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 text-lg">3</div>
+                                        <div class="font-medium text-sm mb-1">信息等价</div>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                                            观测+状态包含预测动作所需的全部信息（马尔可夫性）
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
+                                <div class="font-medium text-amber-800 dark:text-amber-300 mb-2">类比理解</div>
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    想象学习下棋：训练时你既下棋又想象后续局面（帮助理解棋理），但比赛时你只需下棋，不需要每一步都"想象"后续——棋理已经内化了。GigaWorld-Policy的视频预测就像这个"想象"过程，训练时有用，推理时非必需。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 13: 局限性质疑 -->
+                <div id="sec13" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 flex items-center justify-center text-sm">13</span>
+                        局限性质疑
+                    </h3>
+
+                    <div class="space-y-4">
+                        <!-- 质疑1 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑1: 真实世界任务覆盖不足
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 真实世界实验仅包含4个任务（Clean Desk, Scan QR, Stack Bowls, Sweep Trash），且都是相对简单的桌面操作任务。</p>
+                                <p><strong>潜在影响：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>无法验证在复杂长程任务（如多步骤装配）上的表现</li>
+                                    <li>未测试移动操作（mobile manipulation）场景</li>
+                                    <li>缺乏对抗性环境（adversarial environments）的鲁棒性测试</li>
+                                </ul>
+                                <p><strong>建议：</strong> 在更多样化的真实任务上进行评估，特别是需要复杂推理和长程规划的场景。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑2 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑2: 计算资源需求披露不充分
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 论文提到"6000 GPU hours"预训练，但未明确GPU型号、并行配置等关键信息。</p>
+                                <p><strong>缺失信息：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>使用的GPU类型（A100? H100?）</li>
+                                    <li>分布式训练配置</li>
+                                    <li>模型checkpoint大小和存储需求</li>
+                                    <li>推理时的内存占用</li>
+                                </ul>
+                                <p><strong>影响：</strong> 其他研究者难以准确评估复现成本，影响方法的可及性。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑3 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑3: Baseline调参公平性存疑
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 论文提到与π₀.₅和Motus等方法对比，但未明确说明是否对这些baseline进行了充分的超参数搜索。</p>
+                                <p><strong>潜在偏差：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>Motus在RoboTwin 2.0上的SR=0.73，但这是否是其最佳配置？</li>
+                                    <li>不同方法是否使用相同的训练数据量和训练时长？</li>
+                                    <li>π₀.₅的结果是否来自官方checkpoint还是重新训练？</li>
+                                </ul>
+                                <p><strong>建议：</strong> 提供更详细的baseline实验配置，或进行额外的公平性消融。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑4 -->
+                        <div class="critique-card critique-limitation bg-red-50 dark:bg-red-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> 质疑4: 视频质量与动作质量的因果关系未完全确立
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 论文假设视频预测质量与动作质量正相关，但这是否总是成立？</p>
+                                <p><strong>反例考虑：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>可能存在"模糊但正确的动作"——视频预测模糊但动作仍可成功执行</li>
+                                    <li>视频预测可能过度拟合训练分布的特定视觉特征</li>
+                                    <li>在分布外场景中，视频预测可能失效而动作仍可工作</li>
+                                </ul>
+                                <p><strong>建议：</strong> 分析视频预测质量（PSNR/SSIM）与任务成功率的相关性，检验假设。</p>
+                            </div>
+                        </div>
+
+                        <!-- 质疑5 -->
+                        <div class="critique-card critique-question bg-amber-50 dark:bg-amber-900/20 rounded-r-xl p-4">
+                            <div class="font-medium text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
+                                <span>❓</span> 质疑5: 稀疏未来帧的最佳数量
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                <p><strong>问题：</strong> 消融实验显示K=2（稀疏）优于K=4和K=8，但这个结论是否普适？</p>
+                                <p><strong>考虑因素：</strong></p>
+                                <ul class="list-disc list-inside ml-4 space-y-1 text-gray-600 dark:text-gray-400">
+                                    <li>不同任务可能需要不同的时间粒度（快速动态vs慢速动态）</li>
+                                    <li>动作horizon长度（本文H=16）是否是最优？</li>
+                                    <li>稀疏预测的收益是否随任务复杂度变化？</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 14: 常见误区澄清 -->
+                <div id="sec14" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300 flex items-center justify-center text-sm">14</span>
+                        常见误区澄清
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="bg-gray-100 dark:bg-gray-700">
+                                        <th class="px-4 py-3 text-left font-semibold w-1/3">常见误区</th>
+                                        <th class="px-4 py-3 text-left font-semibold">正确理解</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y dark:divide-gray-700">
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"GigaWorld-Policy完全放弃了视频生成"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ❌ 错误。视频生成在训练时仍是核心组件，提供密集监督；推理时只是"可选"而非"移除"。论文明确指出："If future prediction is needed, we can enable the video branch at inference time."
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"9×加速来自模型压缩或蒸馏"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ❌ 错误。加速来自<strong>因果设计</strong>使得推理时可跳过视频token的生成，而非模型压缩。GigaWorld-Policy使用5B参数完整模型，与Motus规模相当。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"共享Transformer意味着视频和动作表示完全相同"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ❌ 错误。虽然Q/K/V矩阵共享，但<strong>位置编码不同</strong>（视觉用2D，状态/动作用1D），且因果掩码确保不同token类型看到的信息不同，表示因此分化。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"稀疏未来帧预测是因为计算资源限制"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ❌ 错误。消融实验显示更密集的预测反而略微降低性能（0.82 vs 0.83）。稀疏预测是基于"时间连续性"的合理设计，过密预测可能引入冗余和噪声。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"Flow Matching比Diffusion更适合机器人策略"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ⚠️ 论文未充分验证此点。虽然使用Flow Matching，但未与相同架构的DDPM/SMC进行对比。其他方法（如π₀）也使用Flow Matching，这可能是领域趋势而非本文特有优势。
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                                            <strong>"10K小时预训练数据是本文独有"</strong>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                            ⚠️ 部分数据（如Open X-Embodiment）是公开数据集。本文贡献在于<strong>数据整合与课程预训练策略</strong>，而非数据收集本身。
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 15: 综合评价 -->
+                <div id="sec15" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">15</span>
+                        综合评价
+                    </h3>
+
+                    <div class="space-y-6">
+                        <!-- 评分卡 -->
+                        <div class="grid md:grid-cols-4 gap-3">
+                            <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">A</div>
+                                <div class="text-sm opacity-90">创新性</div>
+                                <div class="text-xs opacity-75 mt-1">因果设计优雅</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">A-</div>
+                                <div class="text-sm opacity-90">实验完整性</div>
+                                <div class="text-xs opacity-75 mt-1">仿真充分，真实世界较少</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">B+</div>
+                                <div class="text-sm opacity-90">可复现性</div>
+                                <div class="text-xs opacity-75 mt-1">代码未开源，细节待补充</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 text-white text-center">
+                                <div class="text-3xl font-bold">A-</div>
+                                <div class="text-sm opacity-90">写作质量</div>
+                                <div class="text-xs opacity-75 mt-1">清晰但部分细节缺失</div>
+                            </div>
+                        </div>
+
+                        <!-- 贡献度评估 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">15.1 贡献度评估</h4>
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">方法创新（因果设计）</span>
+                                            <span class="font-medium">高</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-green-500 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">实验验证</span>
+                                            <span class="font-medium">中高</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-blue-500 rounded-full" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">预训练策略</span>
+                                            <span class="font-medium">中</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-yellow-500 rounded-full" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-700 dark:text-gray-300">开放性与可复现性</span>
+                                            <span class="font-medium">低</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
+                                            <div class="h-full bg-red-500 rounded-full" style="width: 30%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 改进建议 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">15.2 改进建议</h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                                    <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">短期改进</div>
+                                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                        <li>• 补充完整计算资源配置细节</li>
+                                        <li>• 在更多真实世界任务上验证</li>
+                                        <li>• 提供baseline的详细调参过程</li>
+                                        <li>• 开源代码或提供模型checkpoint</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                                    <div class="font-medium text-purple-800 dark:text-purple-300 mb-2">长期研究方向</div>
+                                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                                        <li>• 探索自适应稀疏预测机制</li>
+                                        <li>• 扩展到移动操作和多机器人协作</li>
+                                        <li>• 结合3D几何信息进行世界建模</li>
+                                        <li>• 研究视频质量与动作质量的定量关系</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 总体评价 -->
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+                            <h4 class="font-bold text-lg mb-3">📋 总体评价</h4>
+                            <p class="text-sm leading-relaxed mb-4">
+                                GigaWorld-Policy是一篇<strong>高质量的机器人学习论文</strong>，其核心贡献在于提出了优雅的因果设计，实现了World-Action Model训练-推理的解耦。9倍加速与性能提升兼备的结果令人信服，为WAM领域的实际部署提供了可行路径。
+                            </p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <div class="font-semibold mb-1 text-blue-200">主要优点</div>
+                                    <ul class="space-y-1 text-white/90">
+                                        <li>• 因果设计巧妙，机制清晰</li>
+                                        <li>• 实验设计严谨，消融充分</li>
+                                        <li>• 兼顾性能与效率，实用性强</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <div class="font-semibold mb-1 text-blue-200">主要不足</div>
+                                    <ul class="space-y-1 text-white/90">
+                                        <li>• 真实世界验证规模有限</li>
+                                        <li>• 代码/模型未开源</li>
+                                        <li>• 部分实现细节披露不足</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-white/20">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-semibold">推荐指数</span>
+                                    <span class="text-2xl">⭐⭐⭐⭐☆ (4/5)</span>
+                                </div>
+                                <p class="text-xs text-white/70 mt-1">
+                                    适合关注机器人策略学习、World Model和推理效率的研究者和工程师阅读。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="text-center text-sm text-gray-500 dark:text-gray-400 py-8 border-t dark:border-gray-700">
+                <p>GigaWorld-Policy 论文深度分析报告 | Part V: 批判性分析</p>
+                <p class="mt-1">生成时间: 2026-03-26 | 基于 arXiv:2603.17240</p>
+                <div class="mt-4 flex justify-center gap-2">
+                    <a href="./gigaworld_policy_analysis_part1_2.html" class="text-blue-600 hover:underline">← Part I-II</a>
+                    <span>|</span>
+                    <a href="./gigaworld_policy_analysis_part3_4.html" class="text-blue-600 hover:underline">← Part III-IV</a>
+                    <span>|</span>
+                    <span class="text-gray-400">Part V</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button onclick="document.documentElement.classList.toggle('dark')" 
+            class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">
+        🌓
+    </button>
+
+    <script>
+        // Highlight active nav item on scroll
+        const sections = document.querySelectorAll('.section-anchor');
+        const navLinks = document.querySelectorAll('aside nav a[href^="#"]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('nav-active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('nav-active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

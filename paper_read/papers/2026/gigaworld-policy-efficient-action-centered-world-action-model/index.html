@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigaWorld-Policy: An Efficient Action-Centered World–Action Model - 论文分析报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <!-- Hero Section -->
+    <div class="gradient-hero text-white py-16 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="text-sm font-medium text-blue-200 mb-2">📄 arXiv:2603.17240</div>
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                GigaWorld-Policy
+                <span class="block text-xl md:text-2xl font-normal text-blue-100 mt-2">
+                    An Efficient Action-Centered World–Action Model
+                </span>
+            </h1>
+            <p class="text-blue-100 text-sm md:text-base max-w-2xl mx-auto">
+                论文深度分析报告 | 以动作中心的高效世界-动作模型，通过因果设计实现训练时视频辅助监督、推理时纯动作解码，达成9×推理加速。
+            </p>
+            <div class="flex justify-center gap-3 mt-6">
+                <a href="https://arxiv.org/abs/2603.17240" target="_blank" 
+                   class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">
+                    📎 论文链接
+                </a>
+                <a href="../../index.html" 
+                   class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">
+                    ← 返回报告库
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto py-12 px-4">
+        <!-- 报告结构 -->
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <a href="gigaworld_policy_analysis_part1_2.html" 
+               class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 hover:transform hover:-translate-y-1 transition block">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl mb-4">I-II</div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">概览与背景 & 方法详解</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    论文概览、研究背景、核心问题定义、架构设计、实现细节、数学机制
+                </p>
+            </a>
+            
+            <a href="gigaworld_policy_analysis_part3_4.html" 
+               class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 hover:transform hover:-translate-y-1 transition block">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold text-xl mb-4">III-IV</div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">实验评估 & 消融对比</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    实验设置、主要结果、与SOTA对比、消融实验、敏感性分析
+                </p>
+            </a>
+            
+            <a href="gigaworld_policy_analysis_part5.html" 
+               class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 hover:transform hover:-translate-y-1 transition block">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center text-white font-bold text-xl mb-4">V</div>
+                <h3 class="font-bold text-gray-900 dark:text-white mb-2">批判性分析</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    深入剖析、局限性质疑、常见误区澄清、综合评价与改进建议
+                </p>
+            </a>
+        </div>
+
+        <!-- 核心亮点 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">🎯 论文核心亮点</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">1</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">因果掩码设计</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">块级因果注意力实现训练-推理解耦，动作token仅关注当前观测和状态</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 flex items-center justify-center flex-shrink-0">2</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">9×推理加速</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">推理时可选跳过视频生成，延迟从3.24s降至0.36s</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">3</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">像素级密集监督</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">视频预测提供数千倍于动作标签的监督信号，缓解监督稀疏问题</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">4</span>
+                    <div>
+                        <div class="font-medium text-gray-900 dark:text-white">三阶段课程预训练</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Web视频→具身数据→任务数据，渐进注入物理先验</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关键指标 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">5B</div>
+                <div class="text-sm opacity-90">模型参数量</div>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">9×</div>
+                <div class="text-sm opacity-90">推理加速比</div>
+            </div>
+            <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">10K</div>
+                <div class="text-sm opacity-90">预训练小时</div>
+            </div>
+            <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 text-white text-center">
+                <div class="text-3xl font-bold">0.86</div>
+                <div class="text-sm opacity-90">RoboTwin SR</div>
+            </div>
+        </div>
+
+        <!-- 报告信息 -->
+        <div class="text-center text-sm text-gray-500 dark:text-gray-400 py-4 border-t dark:border-gray-700">
+            <p>分析报告生成时间: 2026-03-26 | 基于 arXiv:2603.17240</p>
+        </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button onclick="document.documentElement.classList.toggle('dark')" 
+            class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">
+        🌓
+    </button>
+</body>
+</html>
