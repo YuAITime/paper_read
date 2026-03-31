@@ -3,857 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GigaWorld-Policy 论文分析 - Part III & IV: 实验评估与消融对比</title>
+    <title>GigaWorld-Policy | Part III-IV: 实验评估与消融对比</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#3B82F6',
-                        secondary: '#8B5CF6',
-                        accent: '#10B981',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .gradient-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .card-shadow {
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
-        }
-        .nav-active {
-            background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
-            color: white;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        .section-anchor {
-            scroll-margin-top: 80px;
-        }
-        .metric-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.2);
-        }
-    </style>
+    <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+    <style>.gradient-hero{background:linear-gradient(135deg,#667eea0%,#764ba2100%);}.card-shadow{box-shadow:0 10px 40px -10px rgba(0,0,0,0.15);}.nav-active{background:linear-gradient(90deg,#3B82F60%,#8B5CF6100%);color:white;}html{scroll-behavior:smooth;}.section-anchor{scroll-margin-top:80px;}</style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
-    <!-- Hero Section -->
     <div class="gradient-hero text-white py-12 px-6">
         <div class="max-w-6xl mx-auto">
-            <div class="flex items-center gap-3 mb-4">
-                <a href="./gigaworld_policy_analysis_part1_2.html" class="text-blue-200 hover:text-white text-sm">← Part I-II</a>
-                <span class="text-blue-300">|</span>
-                <span class="text-sm text-blue-200">Part III & IV</span>
-            </div>
-            <h1 class="text-2xl md:text-3xl font-bold mb-2">
-                GigaWorld-Policy 实验评估与消融对比
-            </h1>
-            <p class="text-blue-100 text-sm md:text-base max-w-2xl">
-                9×推理加速的实证分析、RoboTwin 2.0仿真基准测试、真实机器人平台验证与组件消融研究
-            </p>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">GigaWorld-Policy 实验评估与消融对比</h1>
+            <p class="text-blue-100">9×推理加速的实证分析、RoboTwin 2.0仿真基准、真实机器人验证</p>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 py-8 px-4">
-        <!-- Sidebar Navigation -->
         <aside class="lg:w-72 flex-shrink-0">
             <div class="sticky top-4 bg-white dark:bg-gray-800 rounded-xl card-shadow p-4">
-                <h3 class="font-semibold text-gray-900 dark:text-white mb-4 px-2">📑 报告目录</h3>
+                <h3 class="font-semibold mb-4 px-2">📑 报告目录</h3>
                 <nav class="space-y-1 text-sm">
-                    <a href="#part3" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
-                        Part III: 实验评估
-                    </a>
+                    <a href="#part3" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium">Part III: 实验评估</a>
                     <div class="ml-4 space-y-1">
-                        <a href="#sec8" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            8. 实验设置
-                        </a>
-                        <a href="#sec9" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            9. 主要结果
-                        </a>
+                        <a href="#sec8" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">8. 实验设置</a>
+                        <a href="#sec9" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">9. 主要结果</a>
                     </div>
-                    
-                    <a href="#part4" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
-                        Part IV: 消融与对比
-                    </a>
+                    <a href="#part4" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium">Part IV: 消融与对比</a>
                     <div class="ml-4 space-y-1">
-                        <a href="#sec10" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            10. 与SOTA对比
-                        </a>
-                        <a href="#sec11" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            11. 消融实验
-                        </a>
+                        <a href="#sec10" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">10. 与SOTA对比</a>
+                        <a href="#sec11" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">11. 消融实验</a>
                     </div>
-                    
-                    <a href="./gigaworld_policy_analysis_part5.html" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
-                        Part V: 批判性分析 →
-                    </a>
                 </nav>
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="flex-1 min-w-0">
-            <!-- Part III: 实验评估 -->
             <section id="part3" class="section-anchor mb-12">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold">III</span>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">实验评估</h2>
+                    <h2 class="text-2xl font-bold">实验评估</h2>
                 </div>
 
-                <!-- Section 8: 实验设置 -->
                 <div id="sec8" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 flex items-center justify-center text-sm">8</span>
-                        实验设置
-                    </h3>
-
-                    <div class="space-y-6">
-                        <!-- 评估指标 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                <span class="text-green-500">📊</span> 评估指标
-                            </h4>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2">Success Rate (SR)</div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        <strong>仿真环境：</strong>二元指标，任务完成则SR=1，否则SR=0
-                                    </p>
-                                </div>
-                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2">分级评估协议</div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        <strong>真实世界：</strong>Pick-and-place任务中，成功抓取得0.5分，成功放置到目标位置额外得0.5分
-                                    </p>
-                                </div>
-                            </div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 flex items-center justify-center text-sm">8</span>实验设置</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                            <div class="font-medium mb-2">评估指标</div>
+                            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                <li>• <strong>Success Rate (SR)</strong>: 任务完成率</li>
+                                <li>• <strong>推理延迟</strong>: 每步推理时间</li>
+                                <li>• <strong>PSNR/SSIM</strong>: 视频生成质量</li>
+                            </ul>
                         </div>
-
-                        <!-- Baselines -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                <span class="text-blue-500">🤖</span> Baseline方法
-                            </h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="bg-gray-100 dark:bg-gray-700">
-                                            <th class="px-4 py-3 text-left font-semibold">类别</th>
-                                            <th class="px-4 py-3 text-left font-semibold">方法</th>
-                                            <th class="px-4 py-3 text-left font-semibold">特点</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y dark:divide-gray-700">
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium" rowspan="3">VLM-based VLA</td>
-                                            <td class="px-4 py-3">π₀.₅</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">VLA flow model，异构任务协同训练</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3">GigaBrain-0</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">世界模型生成数据减少真实数据依赖</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3">X-VLA</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">跨具身软提示，Flow Matching动作预测</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium" rowspan="2">WAM</td>
-                                            <td class="px-4 py-3">Cosmos-Policy</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">视频模型微调，单阶段后训练</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3">Motus</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">MoE架构，UniDiffuser调度器</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- 实验环境 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                <span class="text-purple-500">🧪</span> 实验环境
-                            </h4>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="border dark:border-gray-700 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                        <span>🖥️</span> 仿真环境
-                                    </div>
-                                    <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                                        <li>• <strong>平台:</strong> RoboTwin 2.0</li>
-                                        <li>• <strong>任务数:</strong> 50个代表性操作任务</li>
-                                        <li>• <strong>训练数据:</strong> 2,500条干净场景 + 25,000条随机化场景</li>
-                                        <li>• <strong>随机化:</strong> 背景、桌面杂物、高度、光照变化</li>
-                                        <li>• <strong>测试:</strong> 每任务100个测试episode</li>
-                                    </ul>
-                                </div>
-                                <div class="border dark:border-gray-700 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                                        <span>🦾</span> 真实世界
-                                    </div>
-                                    <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                                        <li>• <strong>平台:</strong> AgileX PiPER 6-DoF机械臂</li>
-                                        <li>• <strong>任务:</strong> Clean the Desk, Scan QR Code, Stack Bowls, Sweep up Trash</li>
-                                        <li>• <strong>训练:</strong> 每任务50条演示轨迹</li>
-                                        <li>• <strong>测试:</strong> 每方法每任务20次试验，最多5次尝试</li>
-                                        <li>• <strong>推理硬件:</strong> NVIDIA A100 GPU</li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                            <div class="font-medium mb-2">实验环境</div>
+                            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                <li>• <strong>仿真</strong>: RoboTwin 2.0 (50任务)</li>
+                                <li>• <strong>真实世界</strong>: AgileX PiPER 6-DoF</li>
+                                <li>• <strong>硬件</strong>: NVIDIA A100 GPU</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 9: 主要结果 -->
                 <div id="sec9" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 flex items-center justify-center text-sm">9</span>
-                        主要结果
-                    </h3>
-
-                    <div class="space-y-6">
-                        <!-- 推理速度对比 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">9.1 推理速度对比</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm">
-                                        <thead>
-                                            <tr class="bg-gray-100 dark:bg-gray-600">
-                                                <th class="px-4 py-3 text-left font-semibold">方法</th>
-                                                <th class="px-4 py-3 text-center font-semibold">推理时间/步</th>
-                                                <th class="px-4 py-3 text-center font-semibold">相对速度</th>
-                                                <th class="px-4 py-3 text-center font-semibold">仿真SR</th>
-                                                <th class="px-4 py-3 text-center font-semibold">真实世界SR</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y dark:divide-gray-600">
-                                            <tr>
-                                                <td class="px-4 py-3 font-medium">Motus</td>
-                                                <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-bold">~3.24s</td>
-                                                <td class="px-4 py-3 text-center">1× (Baseline)</td>
-                                                <td class="px-4 py-3 text-center">0.73</td>
-                                                <td class="px-4 py-3 text-center">0.69</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 font-medium">π₀.₅</td>
-                                                <td class="px-4 py-3 text-center">~0.40s</td>
-                                                <td class="px-4 py-3 text-center">~8×</td>
-                                                <td class="px-4 py-3 text-center">0.44</td>
-                                                <td class="px-4 py-3 text-center">-</td>
-                                            </tr>
-                                            <tr class="bg-green-50 dark:bg-green-900/30">
-                                                <td class="px-4 py-3 font-bold text-green-700 dark:text-green-400">GigaWorld-Policy</td>
-                                                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 font-bold">0.36s</td>
-                                                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 font-bold">9×</td>
-                                                <td class="px-4 py-3 text-center font-bold">0.86</td>
-                                                <td class="px-4 py-3 text-center font-bold text-green-600">0.83</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">
-                                    <strong>关键发现：</strong> GigaWorld-Policy在实现9倍加速的同时，仿真性能与Motus相当，真实世界性能显著提升。这证明了因果设计的有效性——加速不牺牲性能。
-                                </p>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 flex items-center justify-center text-sm">9</span>主要结果</h3>
+                    
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-green-600">9×</div>
+                                <div class="text-xs text-gray-500">推理加速</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-green-600">0.36s</div>
+                                <div class="text-xs text-gray-500">单次推理</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-blue-600">0.86</div>
+                                <div class="text-xs text-gray-500">RoboTwin SR</div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-blue-600">+95%</div>
+                                <div class="text-xs text-gray-500">vs π₀.₅</div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 仿真基准结果 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">9.2 RoboTwin 2.0 仿真基准</h4>
-                            
-                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-4">
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">0.86</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">平均成功率 (Clean)</div>
-                                    </div>
-                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">0.85</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">平均成功率 (Randomized)</div>
-                                    </div>
-                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">+95%</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">相比π₀.₅提升</div>
-                                    </div>
-                                    <div class="metric-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center">
-                                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">+18%</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">相比Motus提升</div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="overflow-x-auto mb-4">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <th class="px-3 py-2 text-left">方法</th>
+                                    <th class="px-3 py-2 text-center">推理时间</th>
+                                    <th class="px-3 py-2 text-center">仿真SR</th>
+                                    <th class="px-3 py-2 text-center">真实SR</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y dark:divide-gray-700">
+                                <tr><td class="px-3 py-2">π₀.₅</td><td class="px-3 py-2 text-center">~0.40s</td><td class="px-3 py-2 text-center">0.44</td><td class="px-3 py-2 text-center">0.69</td></tr>
+                                <tr><td class="px-3 py-2">Motus</td><td class="px-3 py-2 text-center text-red-600">~3.24s</td><td class="px-3 py-2 text-center">0.73</td><td class="px-3 py-2 text-center">0.76</td></tr>
+                                <tr class="bg-green-50 dark:bg-green-900/30"><td class="px-3 py-2 font-bold text-green-700">GigaWorld-Policy</td><td class="px-3 py-2 text-center text-green-600 font-bold">0.36s</td><td class="px-3 py-2 text-center font-bold">0.86</td><td class="px-3 py-2 text-center font-bold text-green-600">0.83</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                            <!-- 部分任务详细结果 -->
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="bg-gray-100 dark:bg-gray-700">
-                                            <th class="px-3 py-2 text-left font-semibold">任务</th>
-                                            <th class="px-3 py-2 text-center font-semibold">π₀.₅</th>
-                                            <th class="px-3 py-2 text-center font-semibold">Motus</th>
-                                            <th class="px-3 py-2 text-center font-semibold bg-green-100 dark:bg-green-900/50">Ours</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y dark:divide-gray-700 text-xs">
-                                        <tr>
-                                            <td class="px-3 py-2">Adjust Bottle</td>
-                                            <td class="px-3 py-2 text-center">0.83</td>
-                                            <td class="px-3 py-2 text-center">0.99</td>
-                                            <td class="px-3 py-2 text-center font-bold bg-green-50 dark:bg-green-900/20">1.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-2">Place Bread Skillet</td>
-                                            <td class="px-3 py-2 text-center">0.46</td>
-                                            <td class="px-3 py-2 text-center">0.67</td>
-                                            <td class="px-3 py-2 text-center font-bold bg-green-50 dark:bg-green-900/20">0.90</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-2">Place Mouse Pad</td>
-                                            <td class="px-3 py-2 text-center">0.26</td>
-                                            <td class="px-3 py-2 text-center">0.70</td>
-                                            <td class="px-3 py-2 text-center font-bold bg-green-50 dark:bg-green-900/20">0.90</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-2">Stack Blocks Two</td>
-                                            <td class="px-3 py-2 text-center">0.56</td>
-                                            <td class="px-3 py-2 text-center">0.87</td>
-                                            <td class="px-3 py-2 text-center font-bold bg-green-50 dark:bg-green-900/20">0.94</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-2">Turn Switch</td>
-                                            <td class="px-3 py-2 text-center">0.06</td>
-                                            <td class="px-3 py-2 text-center">0.61</td>
-                                            <td class="px-3 py-2 text-center font-bold bg-green-50 dark:bg-green-900/20">0.84</td>
-                                        </tr>
-                                        <tr class="bg-gray-50 dark:bg-gray-800 font-bold">
-                                            <td class="px-3 py-2">Average</td>
-                                            <td class="px-3 py-2 text-center">0.44</td>
-                                            <td class="px-3 py-2 text-center">0.73</td>
-                                            <td class="px-3 py-2 text-center text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30">0.86</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                注：表格展示部分代表性任务，完整50个任务结果见论文附录。
-                            </p>
-                        </div>
-
-                        <!-- 真实世界实验 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">9.3 真实世界实验</h4>
-                            
-                            <div class="grid md:grid-cols-4 gap-3 mb-4">
-                                <div class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-3">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white mb-1">Clean the Desk</div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-lg font-bold text-green-600 dark:text-green-400">0.90</div>
-                                        <div class="text-xs text-gray-500">vs Motus 0.80</div>
-                                    </div>
-                                </div>
-                                <div class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-3">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white mb-1">Scan QR Code</div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-lg font-bold text-green-600 dark:text-green-400">0.75</div>
-                                        <div class="text-xs text-gray-500">vs Motus 0.75</div>
-                                    </div>
-                                </div>
-                                <div class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-3">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white mb-1">Sweep up Trash</div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-lg font-bold text-green-600 dark:text-green-400">0.75</div>
-                                        <div class="text-xs text-gray-500">vs Motus 0.70</div>
-                                    </div>
-                                </div>
-                                <div class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-3">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white mb-1">Stack Bowls</div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-lg font-bold text-green-600 dark:text-green-400">0.90</div>
-                                        <div class="text-xs text-gray-500">vs Motus 0.80</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
-                                <h5 class="font-medium text-amber-800 dark:text-amber-300 mb-2">关键洞察</h5>
-                                <p class="text-sm text-gray-700 dark:text-gray-300">
-                                    尽管GigaWorld-Policy比Motus快9倍，但在真实世界中仍达到更高的成功率。作者将此归因于：<strong>推理速度与执行效率的紧密耦合</strong>——较慢的推理引入控制延迟，降低有效动作更新率，削弱闭环误差修正能力。GigaWorld-Policy的低延迟使其在真实部署中更具优势。
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- 数据效率 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">9.4 数据效率分析</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                                    在真实世界任务上，通过子采样训练演示数据对比GigaWorld-Policy与VLA baseline的数据效率：
-                                </p>
-                                <div class="flex items-center gap-4">
-                                    <div class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white mb-2">样本效率提升</div>
-                                        <div class="text-3xl font-bold text-green-600 dark:text-green-400">4×</div>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            GigaWorld-Policy仅用<strong>25%训练数据</strong>即可达到VLA使用100%数据的最大成功率
-                                        </p>
-                                    </div>
-                                    <div class="text-gray-400 text-2xl">=</div>
-                                    <div class="flex-1">
-                                        <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                                            <div>• 视频先验表示提升样本效率</div>
-                                            <div>• World-Action建模有效利用无动作标签的视频数据</div>
-                                            <div>• 预训练注入的物理先验降低任务特定数据需求</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
+                        <p class="text-sm"><strong>关键发现：</strong> GigaWorld-Policy在实现9倍加速的同时，仿真性能与Motus相当，真实世界性能显著提升。这证明了因果设计的有效性。</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Part IV: 消融与对比 -->
             <section id="part4" class="section-anchor mb-12">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold">IV</span>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">消融与对比</h2>
+                    <h2 class="text-2xl font-bold">消融与对比</h2>
                 </div>
 
-                <!-- Section 10: 与SOTA对比 -->
                 <div id="sec10" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center text-sm">10</span>
-                        与 SOTA 对比
-                    </h3>
-
-                    <div class="space-y-6">
-                        <!-- 综合对比表 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">多维度性能对比</h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="bg-gray-100 dark:bg-gray-700">
-                                            <th class="px-3 py-3 text-left font-semibold">方法</th>
-                                            <th class="px-3 py-3 text-center font-semibold">范式</th>
-                                            <th class="px-3 py-3 text-center font-semibold">推理延迟</th>
-                                            <th class="px-3 py-3 text-center font-semibold">RoboTwin SR</th>
-                                            <th class="px-3 py-3 text-center font-semibold">真实世界SR</th>
-                                            <th class="px-3 py-3 text-center font-semibold">速度-性能权衡</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y dark:divide-gray-700">
-                                        <tr>
-                                            <td class="px-3 py-3 font-medium">π₀.₅</td>
-                                            <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs">VLA</span></td>
-                                            <td class="px-3 py-3 text-center text-green-600">~0.40s</td>
-                                            <td class="px-3 py-3 text-center">0.44</td>
-                                            <td class="px-3 py-3 text-center">0.69</td>
-                                            <td class="px-3 py-3 text-center">
-                                                <div class="w-20 h-2 bg-gray-200 dark:bg-gray-600 rounded-full mx-auto">
-                                                    <div class="h-full bg-yellow-400 rounded-full" style="width: 40%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-3 font-medium">GigaBrain-0</td>
-                                            <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs">VLA</span></td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                            <td class="px-3 py-3 text-center">0.68</td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-3 font-medium">X-VLA</td>
-                                            <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs">VLA</span></td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                            <td class="px-3 py-3 text-center">0.43</td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                            <td class="px-3 py-3 text-center">
-                                                <div class="w-20 h-2 bg-gray-200 dark:bg-gray-600 rounded-full mx-auto">
-                                                    <div class="h-full bg-yellow-400 rounded-full" style="width: 35%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-3 font-medium">Cosmos-Policy</td>
-                                            <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-xs">WAM</span></td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                            <td class="px-3 py-3 text-center">0.58</td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                            <td class="px-3 py-3 text-center">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-3 py-3 font-medium">Motus</td>
-                                            <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-xs">WAM</span></td>
-                                            <td class="px-3 py-3 text-center text-red-600">~3.24s</td>
-                                            <td class="px-3 py-3 text-center">0.73</td>
-                                            <td class="px-3 py-3 text-center">0.76</td>
-                                            <td class="px-3 py-3 text-center">
-                                                <div class="w-20 h-2 bg-gray-200 dark:bg-gray-600 rounded-full mx-auto">
-                                                    <div class="h-full bg-red-400 rounded-full" style="width: 60%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr class="bg-green-50 dark:bg-green-900/30">
-                                            <td class="px-3 py-3 font-bold text-green-700 dark:text-green-400">GigaWorld-Policy</td>
-                                            <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-xs">WAM (Ours)</span></td>
-                                            <td class="px-3 py-3 text-center text-green-600 font-bold">0.36s</td>
-                                            <td class="px-3 py-3 text-center font-bold">0.86</td>
-                                            <td class="px-3 py-3 text-center font-bold">0.83</td>
-                                            <td class="px-3 py-3 text-center">
-                                                <div class="w-20 h-2 bg-gray-200 dark:bg-gray-600 rounded-full mx-auto">
-                                                    <div class="h-full bg-green-500 rounded-full" style="width: 95%"></div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900 text-orange-600 flex items-center justify-center text-sm">10</span>与 SOTA 对比</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
+                            <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2">相比VLA方法</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>• 性能提升: RoboTwin SR 0.44→0.86 (+95%)</li>
+                                <li>• 物理一致性: 视频动态约束</li>
+                                <li>• 数据效率: 4×样本效率提升</li>
+                            </ul>
                         </div>
-
-                        <!-- 优劣势分析 -->
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
-                                <h5 class="font-semibold text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
-                                    <span>✅</span> 相比VLA方法的优势
-                                </h5>
-                                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                                    <li>• <strong>性能提升:</strong> RoboTwin 2.0上SR从0.44→0.86 (+95%)</li>
-                                    <li>• <strong>物理一致性:</strong> 视频动态约束提供更合理的动作规划</li>
-                                    <li>• <strong>数据效率:</strong> 4×样本效率提升</li>
-                                    <li>• <strong>密集监督:</strong> 像素级监督缓解动作稀疏问题</li>
-                                </ul>
-                            </div>
-                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                                <h5 class="font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
-                                    <span>✅</span> 相比WAM方法的优势
-                                </h5>
-                                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                                    <li>• <strong>速度优势:</strong> 9×推理加速 (3.24s→0.36s)</li>
-                                    <li>• <strong>实时性:</strong> 支持低延迟闭环控制</li>
-                                    <li>• <strong>部署友好:</strong> 可选视频生成降低资源需求</li>
-                                    <li>• <strong>误差避免:</strong> 消除长程视频生成误差累积</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- 提升来源分析 -->
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
-                            <h5 class="font-semibold text-amber-800 dark:text-amber-300 mb-2">提升来源分析</h5>
-                            <div class="grid md:grid-cols-3 gap-3 text-sm">
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-1">算法创新 (~40%)</div>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400">
-                                        因果掩码设计、训练-推理解耦、Flow Matching统一优化
-                                    </div>
-                                </div>
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-1">预训练策略 (~35%)</div>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400">
-                                        三阶段课程预训练、10K小时大规模数据、视频-机器人-任务渐进迁移
-                                    </div>
-                                </div>
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-1">工程优化 (~25%)</div>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400">
-                                        稀疏未来帧预测、共享Transformer设计、推理时视频跳过
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">相比WAM方法</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>• 速度优势: 9×推理加速</li>
+                                <li>• 实时性: 支持低延迟闭环控制</li>
+                                <li>• 部署友好: 可选视频生成</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 11: 消融实验 -->
                 <div id="sec11" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center text-sm">11</span>
-                        消融实验
-                    </h3>
-
-                    <div class="space-y-6">
-                        <!-- 预训练组件消融 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.1 预训练组件消融</h4>
-                            
-                            <div class="overflow-x-auto mb-4">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="bg-gray-100 dark:bg-gray-700">
-                                            <th class="px-4 py-3 text-left font-semibold">设置</th>
-                                            <th class="px-4 py-3 text-center font-semibold">视频模型初始化</th>
-                                            <th class="px-4 py-3 text-center font-semibold">具身数据预训练</th>
-                                            <th class="px-4 py-3 text-center font-semibold">成功率 (SR)</th>
-                                            <th class="px-4 py-3 text-center font-semibold">相对提升</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y dark:divide-gray-700">
-                                        <tr>
-                                            <td class="px-4 py-3">从零训练</td>
-                                            <td class="px-4 py-3 text-center">✗</td>
-                                            <td class="px-4 py-3 text-center">✗</td>
-                                            <td class="px-4 py-3 text-center font-bold">0.45</td>
-                                            <td class="px-4 py-3 text-center">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3">仅视频初始化</td>
-                                            <td class="px-4 py-3 text-center text-green-600">✓</td>
-                                            <td class="px-4 py-3 text-center">✗</td>
-                                            <td class="px-4 py-3 text-center font-bold">0.57</td>
-                                            <td class="px-4 py-3 text-center text-green-600">+27%</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3">仅具身预训练</td>
-                                            <td class="px-4 py-3 text-center">✗</td>
-                                            <td class="px-4 py-3 text-center text-green-600">✓</td>
-                                            <td class="px-4 py-3 text-center font-bold">0.73</td>
-                                            <td class="px-4 py-3 text-center text-green-600">+62%</td>
-                                        </tr>
-                                        <tr class="bg-green-50 dark:bg-green-900/30">
-                                            <td class="px-4 py-3 font-bold">完整预训练</td>
-                                            <td class="px-4 py-3 text-center text-green-600 font-bold">✓</td>
-                                            <td class="px-4 py-3 text-center text-green-600 font-bold">✓</td>
-                                            <td class="px-4 py-3 text-center font-bold text-green-600">0.83</td>
-                                            <td class="px-4 py-3 text-center text-green-600 font-bold">+84%</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-                                <p class="text-sm text-gray-700 dark:text-gray-300">
-                                    <strong>结论：</strong> 视频模型初始化和具身数据预训练提供<strong>互补收益</strong>。视频初始化提供通用视觉-时序先验，具身预训练适配特定视角和交互模式，两者结合效果最佳。
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- 具身数据规模消融 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.2 具身数据规模消融</h4>
-                            
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                                <div class="grid grid-cols-5 gap-2 text-center mb-3">
-                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2">
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">0%数据</div>
-                                        <div class="text-lg font-bold">0.57</div>
-                                    </div>
-                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2">
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">20%数据</div>
-                                        <div class="text-lg font-bold text-blue-600">0.65</div>
-                                    </div>
-                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2">
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">40%数据</div>
-                                        <div class="text-lg font-bold text-blue-600">0.71</div>
-                                    </div>
-                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2">
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">60%数据</div>
-                                        <div class="text-lg font-bold text-blue-600">0.76</div>
-                                    </div>
-                                    <div class="bg-green-100 dark:bg-green-900/30 rounded-lg p-2 border border-green-300 dark:border-green-700">
-                                        <div class="text-xs text-green-600 dark:text-green-400">100%数据</div>
-                                        <div class="text-lg font-bold text-green-600">0.83</div>
-                                    </div>
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    随着具身预训练数据量提升，真实世界成功率稳步增长，从0%数据的0.57提升至100%数据的0.83。表明增加具身覆盖范围可进一步强化动作相关表示学习。
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- 未来帧数量消融 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.3 预测未来帧数量消融</h4>
-                            
-                            <div class="overflow-x-auto mb-4">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="bg-gray-100 dark:bg-gray-700">
-                                            <th class="px-4 py-3 text-left font-semibold">预测帧数 K</th>
-                                            <th class="px-4 py-3 text-center font-semibold">步长 Δ</th>
-                                            <th class="px-4 py-3 text-center font-semibold">成功率 (SR)</th>
-                                            <th class="px-4 py-3 text-center font-semibold">视频预测</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y dark:divide-gray-700">
-                                        <tr>
-                                            <td class="px-4 py-3">0 (仅动作)</td>
-                                            <td class="px-4 py-3 text-center">-</td>
-                                            <td class="px-4 py-3 text-center">0.79</td>
-                                            <td class="px-4 py-3 text-center"><span class="text-red-500">✗</span></td>
-                                        </tr>
-                                        <tr class="bg-green-50 dark:bg-green-900/30">
-                                            <td class="px-4 py-3 font-bold">2 (稀疏)</td>
-                                            <td class="px-4 py-3 text-center">8</td>
-                                            <td class="px-4 py-3 text-center font-bold text-green-600">0.83</td>
-                                            <td class="px-4 py-3 text-center"><span class="text-green-500">✓</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3">4 (中等)</td>
-                                            <td class="px-4 py-3 text-center">4</td>
-                                            <td class="px-4 py-3 text-center">0.82</td>
-                                            <td class="px-4 py-3 text-center"><span class="text-green-500">✓</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3">8 (密集)</td>
-                                            <td class="px-4 py-3 text-center">2</td>
-                                            <td class="px-4 py-3 text-center">0.81</td>
-                                            <td class="px-4 py-3 text-center"><span class="text-green-500">✓</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
-                                <p class="text-sm text-gray-700 dark:text-gray-300">
-                                    <strong>关键发现：</strong> 
-                                    <ul class="mt-1 space-y-1">
-                                        <li>• 启用前向动态建模后SR从0.79→0.83，<strong>绝对提升4%</strong></li>
-                                        <li>• 更密集的未来视频预测<strong>无额外收益</strong>，甚至略微下降</li>
-                                        <li>• 适度的未来建模足以提供有用的决策信息，过长预测可能引入噪声</li>
-                                    </ul>
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- 注意力掩码消融 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">11.4 因果自注意力掩码消融</h4>
-                            
-                            <div class="grid md:grid-cols-2 gap-4 mb-4">
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm">
-                                        <thead>
-                                            <tr class="bg-gray-100 dark:bg-gray-700">
-                                                <th class="px-3 py-2 text-left font-semibold">指标</th>
-                                                <th class="px-3 py-2 text-center font-semibold">Self-Attn</th>
-                                                <th class="px-3 py-2 text-center font-semibold bg-green-100 dark:bg-green-900/50">Causal (Ours)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y dark:divide-gray-700">
-                                            <tr>
-                                                <td class="px-3 py-2">Success Rate</td>
-                                                <td class="px-3 py-2 text-center">0.81</td>
-                                                <td class="px-3 py-2 text-center font-bold text-green-600">0.83</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-3 py-2">PSNR</td>
-                                                <td class="px-3 py-2 text-center">27.87</td>
-                                                <td class="px-3 py-2 text-center font-bold text-green-600">28.41</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-3 py-2">SSIM</td>
-                                                <td class="px-3 py-2 text-center">0.892</td>
-                                                <td class="px-3 py-2 text-center font-bold text-green-600">0.901</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                                    <h5 class="font-medium text-blue-800 dark:text-blue-300 mb-2 text-sm">因果设计的优势</h5>
-                                    <ul class="text-xs text-gray-700 dark:text-gray-300 space-y-1">
-                                        <li>• <strong>部署友好：</strong> 确保推理时视频预测可选</li>
-                                        <li>• <strong>物理意义：</strong> 动作→视频的因果因子分解</li>
-                                        <li>• <strong>视频质量：</strong> 更高的PSNR和SSIM</li>
-                                        <li>• <strong>信息隔离：</strong> 防止未来帧向动作token泄漏</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
-                                <p class="text-gray-700 dark:text-gray-300">
-                                    <strong>Self-Attention的问题：</strong> 在无约束自注意力下，动作token可能在训练时关注到未来帧token，引入信息泄漏，削弱动作条件化动态学习。因果掩码强制执行物理上有意义的因子分解，使视频预测真正基于已预测的动作。
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- 敏感性分析总结 -->
-                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
-                            <h4 class="font-semibold text-purple-800 dark:text-purple-300 mb-3">消融实验关键发现总结</h4>
-                            <div class="grid md:grid-cols-2 gap-3 text-sm">
-                                <div class="space-y-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">1</span>
-                                        <span class="text-gray-700 dark:text-gray-300">预训练组件是<strong>互补而非替代</strong>关系</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">2</span>
-                                        <span class="text-gray-700 dark:text-gray-300">具身数据规模与性能呈<strong>正相关</strong></span>
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">3</span>
-                                        <span class="text-gray-700 dark:text-gray-300">适度的未来建模即可，<strong>过犹不及</strong></span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">4</span>
-                                        <span class="text-gray-700 dark:text-gray-300">因果掩码对<strong>视频质量</strong>和<strong>部署灵活性</strong>都关键</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900 text-orange-600 flex items-center justify-center text-sm">11</span>消融实验</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <th class="px-3 py-2 text-left">设置</th>
+                                    <th class="px-3 py-2 text-center">视频初始化</th>
+                                    <th class="px-3 py-2 text-center">具身预训练</th>
+                                    <th class="px-3 py-2 text-center">SR</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y dark:divide-gray-700">
+                                <tr><td class="px-3 py-2">从零训练</td><td class="px-3 py-2 text-center">✗</td><td class="px-3 py-2 text-center">✗</td><td class="px-3 py-2 text-center">0.45</td></tr>
+                                <tr><td class="px-3 py-2">仅视频初始化</td><td class="px-3 py-2 text-center text-green-600">✓</td><td class="px-3 py-2 text-center">✗</td><td class="px-3 py-2 text-center">0.57</td></tr>
+                                <tr><td class="px-3 py-2">仅具身预训练</td><td class="px-3 py-2 text-center">✗</td><td class="px-3 py-2 text-center text-green-600">✓</td><td class="px-3 py-2 text-center">0.73</td></tr>
+                                <tr class="bg-green-50 dark:bg-green-900/30"><td class="px-3 py-2 font-bold text-green-700">完整预训练</td><td class="px-3 py-2 text-center text-green-600 font-bold">✓</td><td class="px-3 py-2 text-center text-green-600 font-bold">✓</td><td class="px-3 py-2 text-center font-bold text-green-600">0.83</td></tr>
+                            </tbody>
+                        </table>
                     </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">视频模型初始化和具身数据预训练提供互补收益，两者结合效果最佳。</p>
                 </div>
             </section>
 
-            <!-- Footer -->
             <footer class="text-center text-sm text-gray-500 dark:text-gray-400 py-8 border-t dark:border-gray-700">
-                <p>GigaWorld-Policy 论文深度分析报告 | Part III-IV: 实验评估与消融对比</p>
-                <p class="mt-1">生成时间: 2026-03-26 | 基于 arXiv:2603.17240</p>
-                <div class="mt-4 flex justify-center gap-2">
-                    <a href="./gigaworld_policy_analysis_part1_2.html" class="text-blue-600 hover:underline">← Part I-II</a>
-                    <span>|</span>
-                    <span class="text-gray-400">Part III-IV</span>
-                    <span>|</span>
-                    <a href="./gigaworld_policy_analysis_part5.html" class="text-blue-600 hover:underline">Part V →</a>
-                </div>
+                <p>GigaWorld-Policy 论文深度分析报告 | Part III-IV | 生成时间: 2026-03-27</p>
             </footer>
         </main>
     </div>
 
-    <!-- Dark Mode Toggle -->
-    <button onclick="document.documentElement.classList.toggle('dark')" 
-            class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">
-        🌓
-    </button>
-
-    <script>
-        // Highlight active nav item on scroll
-        const sections = document.querySelectorAll('.section-anchor');
-        const navLinks = document.querySelectorAll('aside nav a[href^="#"]');
-        
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 100) {
-                    current = section.getAttribute('id');
-                }
-            });
-            
-            navLinks.forEach(link => {
-                link.classList.remove('nav-active');
-                if (link.getAttribute('href') === '#' + current) {
-                    link.classList.add('nav-active');
-                }
-            });
-        });
-    </script>
+    <button onclick="document.documentElement.classList.toggle('dark')" class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">🌓</button>
 </body>
 </html>

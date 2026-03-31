@@ -13,50 +13,17 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#3B82F6',
-                        secondary: '#8B5CF6',
-                        accent: '#10B981',
                     }
                 }
             }
         }
     </script>
     <style>
-        .gradient-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .card-shadow {
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
-        }
-        .code-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            font-family: 'Fira Code', monospace;
-        }
-        .token-visual {
-            display: inline-flex;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-        .token-o { background: #dbeafe; color: #1e40af; }
-        .token-s { background: #dcfce7; color: #166534; }
-        .token-a { background: #fef3c7; color: #92400e; }
-        .token-f { background: #fce7f3; color: #9d174d; }
-        .token-l { background: #e0e7ff; color: #3730a3; }
-        .nav-active {
-            background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
-            color: white;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        .section-anchor {
-            scroll-margin-top: 80px;
-        }
+        .gradient-hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15); }
+        .nav-active { background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%); color: white; }
+        html { scroll-behavior: smooth; }
+        .section-anchor { scroll-margin-top: 80px; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
@@ -65,88 +32,55 @@
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div class="flex-1">
-                    <div class="text-sm font-medium text-blue-200 mb-2">📄 arXiv:2603.17240</div>
-                    <h1 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                        GigaWorld-Policy
-                        <span class="block text-xl md:text-2xl font-normal text-blue-100 mt-2">
-                            An Efficient Action-Centered World–Action Model
-                        </span>
-                    </h1>
-                    <p class="text-blue-100 text-sm md:text-base max-w-2xl">
-                        一种以动作中心的高效世界-动作模型，通过因果设计实现训练时视频辅助监督、推理时纯动作解码，达成9×推理加速。
-                    </p>
+                    <div class="text-sm font-medium text-blue-200 mb-2">📄 arXiv:2603.17240 | <a href="https://github.com/open-gigaai/giga-world-policy" class="underline">GitHub</a></div>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4">GigaWorld-Policy</h1>
+                    <p class="text-xl text-blue-100 mb-2">An Efficient Action-Centered World–Action Model</p>
+                    <p class="text-blue-100 text-sm max-w-2xl">以动作中心的高效世界-动作模型，通过因果设计实现训练时视频辅助监督、推理时纯动作解码，达成9×推理加速与7%性能提升。</p>
                 </div>
                 <div class="flex gap-3">
-                    <a href="https://arxiv.org/abs/2603.17240" target="_blank" 
-                       class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">
-                        📎 论文链接
-                    </a>
-                    <a href="./index.html" 
-                       class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">
-                        📑 报告首页
-                    </a>
+                    <a href="https://arxiv.org/abs/2603.17240" target="_blank" class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">📎 论文</a>
+                    <a href="https://github.com/open-gigaai/giga-world-policy" target="_blank" class="bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition">💻 代码</a>
                 </div>
             </div>
-            
-            <!-- Key Metrics Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
                     <div class="text-2xl font-bold">5B</div>
-                    <div class="text-xs text-blue-200">模型参数量</div>
+                    <div class="text-xs text-blue-200">模型参数</div>
                 </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
                     <div class="text-2xl font-bold">9×</div>
-                    <div class="text-xs text-blue-200">推理加速比</div>
+                    <div class="text-xs text-blue-200">推理加速</div>
                 </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
                     <div class="text-2xl font-bold">10K</div>
-                    <div class="text-xs text-blue-200">预训练数据小时</div>
+                    <div class="text-xs text-blue-200">预训练小时</div>
                 </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
                     <div class="text-2xl font-bold">0.36s</div>
-                    <div class="text-xs text-blue-200">单次推理延迟</div>
+                    <div class="text-xs text-blue-200">推理延迟</div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 py-8 px-4">
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar -->
         <aside class="lg:w-72 flex-shrink-0">
             <div class="sticky top-4 bg-white dark:bg-gray-800 rounded-xl card-shadow p-4">
                 <h3 class="font-semibold text-gray-900 dark:text-white mb-4 px-2">📑 报告目录</h3>
                 <nav class="space-y-1 text-sm">
-                    <a href="#part1" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
-                        Part I: 概览与背景
-                    </a>
+                    <a href="#part1" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium">Part I: 概览与背景</a>
                     <div class="ml-4 space-y-1">
-                        <a href="#sec1" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            1. 论文概览
-                        </a>
-                        <a href="#sec2" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            2. 研究背景
-                        </a>
-                        <a href="#sec3" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            3. 核心问题定义
-                        </a>
+                        <a href="#sec1" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">1. 论文概览</a>
+                        <a href="#sec2" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">2. 研究背景</a>
+                        <a href="#sec3" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">3. 核心问题</a>
                     </div>
-                    
-                    <a href="#part2" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium text-gray-700 dark:text-gray-300">
-                        Part II: 方法详解
-                    </a>
+                    <a href="#part2" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium">Part II: 方法详解</a>
                     <div class="ml-4 space-y-1">
-                        <a href="#sec4" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            4. 架构设计
-                        </a>
-                        <a href="#sec5" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            5. 实现细节
-                        </a>
-                        <a href="#sec6" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            6. 数学机制
-                        </a>
-                        <a href="#sec7" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">
-                            7. 关键创新深入解析
-                        </a>
+                        <a href="#sec4" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">4. 架构设计</a>
+                        <a href="#sec5" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">5. 实现细节</a>
+                        <a href="#sec6" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">6. 数学机制</a>
+                        <a href="#sec7" class="block px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400 text-xs">7. 关键创新</a>
                     </div>
                 </nav>
             </div>
@@ -154,745 +88,199 @@
 
         <!-- Main Content -->
         <main class="flex-1 min-w-0">
-            <!-- Part I: 概览与背景 -->
+            <!-- Part I -->
             <section id="part1" class="section-anchor mb-12">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">I</span>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">概览与背景</h2>
+                    <h2 class="text-2xl font-bold">概览与背景</h2>
                 </div>
 
-                <!-- Section 1: 论文概览 -->
+                <!-- Section 1 -->
                 <div id="sec1" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">1</span>
-                        论文概览
-                    </h3>
-                    
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 flex items-center justify-center text-sm">1</span>论文概览</h3>
                     <div class="grid md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <table class="w-full text-sm">
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400 w-24">标题</td>
-                                    <td class="py-2 font-medium">GigaWorld-Policy: An Efficient Action-Centered World–Action Model</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">作者</td>
-                                    <td class="py-2">Angen Ye, Boyuan Wang, Chaojun Ni, et al. (GigaAI Team)</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">机构</td>
-                                    <td class="py-2">GigaAI Project</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-700">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">arXiv</td>
-                                    <td class="py-2">
-                                        <a href="https://arxiv.org/abs/2603.17240" class="text-blue-600 hover:underline">2603.17240</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">发布时间</td>
-                                    <td class="py-2">March 2026</td>
-                                </tr>
+                                <tr class="border-b dark:border-gray-700"><td class="py-2 text-gray-500 w-24">标题</td><td class="py-2 font-medium">GigaWorld-Policy: An Efficient Action-Centered World–Action Model</td></tr>
+                                <tr class="border-b dark:border-gray-700"><td class="py-2 text-gray-500">作者</td><td class="py-2">Angen Ye, Boyuan Wang, Chaojun Ni, et al. (GigaAI Team)</td></tr>
+                                <tr class="border-b dark:border-gray-700"><td class="py-2 text-gray-500">机构</td><td class="py-2">GigaAI Project</td></tr>
+                                <tr class="border-b dark:border-gray-700"><td class="py-2 text-gray-500">arXiv</td><td class="py-2"><a href="https://arxiv.org/abs/2603.17240" class="text-blue-600 hover:underline">2603.17240</a></td></tr>
+                                <tr><td class="py-2 text-gray-500">代码</td><td class="py-2"><a href="https://github.com/open-gigaai/giga-world-policy" class="text-blue-600 hover:underline">open-gigaai/giga-world-policy</a></td></tr>
                             </table>
                         </div>
                         <div class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4">
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">🎯 核心贡献</h4>
-                            <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                                <li class="flex items-start gap-2">
-                                    <span class="text-green-500 mt-0.5">✓</span>
-                                    <span>提出以动作中心的高效World-Action模型，训练时利用未来视觉动态提供密集监督</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-green-500 mt-0.5">✓</span>
-                                    <span>推理时未来视频预测可选，支持纯动作解码模式，实现低延迟控制</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-green-500 mt-0.5">✓</span>
-                                    <span>构建大规模机器人数据集进行预训练，将通用视频生成模型转化为机器人策略学习强初始化</span>
-                                </li>
+                            <h4 class="font-semibold mb-3">🎯 核心贡献</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>提出以动作中心的高效World-Action模型，训练时利用未来视觉动态提供密集监督</span></li>
+                                <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>推理时未来视频预测可选，支持纯动作解码模式，实现低延迟控制(0.36s)</span></li>
+                                <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>构建10K小时大规模机器人数据集进行课程预训练</span></li>
+                                <li class="flex items-start gap-2"><span class="text-green-500">✓</span><span>开源代码，促进社区复现和进一步研究</span></li>
                             </ul>
                         </div>
                     </div>
-
                     <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-                        <h4 class="font-semibold text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
-                            💡 一句话总结
-                        </h4>
-                        <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                            GigaWorld-Policy通过<strong>因果掩码设计</strong>实现了训练与推理的解耦：训练时同时学习动作预测和视频生成，利用像素级动态提供密集监督；推理时可跳过视频生成，仅解码动作，在保持性能的同时实现<strong>9倍推理加速</strong>。
-                        </p>
+                        <h4 class="font-semibold text-amber-800 dark:text-amber-300 mb-2">💡 一句话总结</h4>
+                        <p class="text-sm">GigaWorld-Policy通过<strong>因果掩码设计</strong>实现训练与推理的解耦：训练时同时学习动作预测和视频生成，利用像素级动态提供密集监督；推理时可跳过视频生成，仅解码动作，在保持性能的同时实现<strong>9倍推理加速</strong>（3.24s→0.36s）。</p>
                     </div>
                 </div>
 
-                <!-- Section 2: 研究背景 -->
+                <!-- Section 2 -->
                 <div id="sec2" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">2</span>
-                        研究背景
-                    </h3>
-
-                    <div class="space-y-6">
-                        <!-- 领域现状 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                <span class="text-blue-500">📊</span> 领域现状
-                            </h4>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2">Vision-Language-Action (VLA)</div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        基于VLM的VLA模型（如π₀、GigaBrain-0、X-VLA）通过大规模预训练实现强大的视觉-语言对齐和动作解码，但面临<strong>监督稀疏性</strong>问题——动作监督稀疏且多样性低，容易导致模型依赖浅层上下文信号。
-                                    </p>
-                                </div>
-                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2">World-Action Models (WAM)</div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        如Motus、Cosmos-Policy等方法将视频生成模型融入机器人策略学习，通过预测未来视觉动态提供<strong>时间密集监督</strong>，但通常需要迭代采样生成视频，推理开销大且视频预测误差会传播到动作解码。
-                                    </p>
-                                </div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 flex items-center justify-center text-sm">2</span>研究背景</h3>
+                    <div class="space-y-4">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                <div class="font-medium mb-2">VLA模型的挑战</div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Vision-Language-Action模型面临<strong>监督稀疏性</strong>问题——动作监督稀疏且多样性低，容易导致模型依赖浅层上下文信号。</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                <div class="font-medium mb-2">WAM模型的瓶颈</div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">World-Action Models提供密集监督，但需要迭代采样生成视频，<strong>推理开销大</strong>且视频预测误差会传播到动作解码。</p>
                             </div>
                         </div>
-
-                        <!-- 核心问题 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                <span class="text-red-500">⚠️</span> 现有方法的核心瓶颈
-                            </h4>
-                            <div class="space-y-3">
-                                <div class="flex items-start gap-3 bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
-                                    <span class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs flex-shrink-0">1</span>
-                                    <div>
-                                        <div class="font-medium text-red-800 dark:text-red-300">推理开销大</div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                            联合推理未来视觉动态和对应动作需要大量计算，现有WAM方法需要迭代扩散采样来生成未来视频，导致高延迟。
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start gap-3 bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
-                                    <span class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs flex-shrink-0">2</span>
-                                    <div>
-                                        <div class="font-medium text-red-800 dark:text-red-300">表征纠缠</div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                            联合建模往往使视觉表征和运动表征纠缠，动作预测准确性过度依赖未来视频预测质量。视频预测误差会随时间累积，影响长期控制性能。
-                                        </p>
-                                    </div>
-                                </div>
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3 bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+                                <span class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs flex-shrink-0">1</span>
+                                <div><div class="font-medium text-red-800 dark:text-red-300">推理开销大</div><p class="text-sm text-gray-600 dark:text-gray-400">联合推理未来视觉动态和动作需要大量计算，现有WAM需要迭代扩散采样，导致高延迟(~3.24s/步)。</p></div>
                             </div>
-                        </div>
-
-                        <!-- 相关工作对比 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                <span class="text-purple-500">🔍</span> 相关工作对比
-                            </h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="bg-gray-100 dark:bg-gray-700">
-                                            <th class="px-4 py-3 text-left font-semibold">方法</th>
-                                            <th class="px-4 py-3 text-left font-semibold">架构特点</th>
-                                            <th class="px-4 py-3 text-left font-semibold">推理方式</th>
-                                            <th class="px-4 py-3 text-left font-semibold">局限性</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y dark:divide-gray-700">
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">π₀</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">VLA + Flow Matching</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">纯动作解码</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">监督稀疏，缺乏物理一致性约束</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">VideoVLA</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">多模态扩散Transformer</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">联合视频+动作</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">推理需生成视频，开销大</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Motus</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">MoE + UniDiffuser</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">多模态联合推理</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">推理速度慢（~3.24s/步）</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Mimic-video</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">两阶段：视频→动作</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">先视频后动作</td>
-                                            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">误差累积，延迟高</td>
-                                        </tr>
-                                        <tr class="bg-green-50 dark:bg-green-900/20">
-                                            <td class="px-4 py-3 font-bold text-green-700 dark:text-green-400">GigaWorld-Policy</td>
-                                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">因果掩码 + 共享Transformer</td>
-                                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">可选视频生成</td>
-                                            <td class="px-4 py-3 text-green-700 dark:text-green-400">9×加速，性能提升</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="flex items-start gap-3 bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+                                <span class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs flex-shrink-0">2</span>
+                                <div><div class="font-medium text-red-800 dark:text-red-300">表征纠缠</div><p class="text-sm text-gray-600 dark:text-gray-400">联合建模使视觉表征和运动表征纠缠，动作预测准确性过度依赖未来视频预测质量。</p></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 3: 核心问题定义 -->
+                <!-- Section 3 -->
                 <div id="sec3" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">3</span>
-                        核心问题定义
-                    </h3>
-
-                    <div class="space-y-4">
-                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">问题形式化</h4>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                                机器人操作可形式化为序列决策任务。在每个时间步t，机器人接收多视角RGB观测 <span class="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">oₜ</span>、自然语言指令 <span class="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">l</span> 和本体感受状态 <span class="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">sₜ</span>。策略需要预测长度为H的动作块 <span class="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">aₜ:ₜ₊ₕ</span>。
-                            </p>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-600 flex items-center justify-center text-sm">3</span>核心问题定义</h3>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-4">
+                        <p class="text-sm">机器人操作可形式化为序列决策任务。在每个时间步t，机器人接收多视角RGB观测、自然语言指令和本体感受状态，策略需要预测长度为H的动作块。</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="border dark:border-gray-700 rounded-xl p-4">
+                            <div class="text-sm font-medium text-gray-500 mb-2">传统VLA范式</div>
+                            <div class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">p(a | o, s, l)</div>
+                            <p class="text-xs text-gray-500 mt-2">仅从演示中学习动作分布，无显式观测空间监督</p>
                         </div>
-
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div class="border dark:border-gray-700 rounded-xl p-4">
-                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">传统VLA范式</div>
-                                <div class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
-                                    p(a | o, s, l)
-                                </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                    仅从演示中学习动作分布，无显式观测空间监督
-                                </p>
+                        <div class="border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10 rounded-xl p-4">
+                            <div class="text-sm font-medium text-green-700 dark:text-green-400 mb-2">GigaWorld-Policy范式</div>
+                            <div class="space-y-2">
+                                <div class="font-mono text-sm bg-white dark:bg-gray-800 p-2 rounded-lg border border-green-200 dark:border-green-800">p(a | o, s, l) — 动作建模</div>
+                                <div class="font-mono text-sm bg-white dark:bg-gray-800 p-2 rounded-lg border border-green-200 dark:border-green-800">p(o_future | o, s, a, l) — 视觉前向动态</div>
                             </div>
-                            <div class="border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10 rounded-xl p-4">
-                                <div class="text-sm font-medium text-green-700 dark:text-green-400 mb-2">GigaWorld-Policy范式</div>
-                                <div class="space-y-2">
-                                    <div class="font-mono text-sm bg-white dark:bg-gray-800 p-2 rounded-lg border border-green-200 dark:border-green-800">
-                                        p(a | o, s, l) — 动作建模
-                                    </div>
-                                    <div class="font-mono text-sm bg-white dark:bg-gray-800 p-2 rounded-lg border border-green-200 dark:border-green-800">
-                                        p(o_future | o, s, a, l) — 视觉前向动态
-                                    </div>
-                                </div>
-                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                                    同时建模动作分布和视觉动态，提供双重监督信号
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
-                            <h4 class="font-semibold text-amber-800 dark:text-amber-300 mb-2">研究假设与验证思路</h4>
-                            <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                                <li class="flex items-start gap-2">
-                                    <span class="font-bold text-amber-600">H1:</span>
-                                    <span>未来视觉动态可作为<strong>密集监督信号</strong>和<strong>推理由信号</strong>，无需过度依赖显式视频合成</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="font-bold text-amber-600">H2:</span>
-                                    <span>通过<strong>因果设计</strong>防止未来视频token影响动作token，可使视频生成在推理时变为可选</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="font-bold text-amber-600">H3:</span>
-                                    <span>课程式预训练（Web视频 → 具身数据 → 任务数据）可提供更强的策略初始化</span>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Part II: 方法详解 -->
+            <!-- Part II -->
             <section id="part2" class="section-anchor mb-12">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold">II</span>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">方法详解</h2>
+                    <h2 class="text-2xl font-bold">方法详解</h2>
                 </div>
 
-                <!-- Section 4: 架构设计 -->
+                <!-- Section 4 -->
                 <div id="sec4" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">4</span>
-                        架构设计
-                    </h3>
-
-                    <div class="space-y-6">
-                        <!-- 整体架构 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">整体架构</h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                GigaWorld-Policy基于<strong>5B参数扩散Transformer</strong>（Wan 2.1），通过以动作为中心的目标预训练作为机器人操作的World-Action模型。核心设计包括多视角输入融合、共享Transformer块和因果自注意力掩码。
-                            </p>
-                            
-                            <!-- 架构图 -->
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
-                                <div class="text-center text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">GigaWorld-Policy 架构概览</div>
-                                <div class="flex flex-col items-center gap-2">
-                                    <!-- 输入层 -->
-                                    <div class="flex gap-4 justify-center">
-                                        <div class="bg-blue-100 dark:bg-blue-900/30 px-3 py-2 rounded-lg text-center">
-                                            <div class="text-xs text-blue-600 dark:text-blue-400">多视角图像</div>
-                                            <div class="token-visual token-o">oₜ^comp</div>
-                                        </div>
-                                        <div class="bg-green-100 dark:bg-green-900/30 px-3 py-2 rounded-lg text-center">
-                                            <div class="text-xs text-green-600 dark:text-green-400">本体状态</div>
-                                            <div class="token-visual token-s">sₜ</div>
-                                        </div>
-                                        <div class="bg-indigo-100 dark:bg-indigo-900/30 px-3 py-2 rounded-lg text-center">
-                                            <div class="text-xs text-indigo-600 dark:text-indigo-400">语言指令</div>
-                                            <div class="token-visual token-l">l</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-gray-400">↓</div>
-                                    <!-- VAE编码 -->
-                                    <div class="bg-gray-200 dark:bg-gray-600 px-4 py-2 rounded-lg text-sm">
-                                        Pre-trained VAE → 视觉Token
-                                    </div>
-                                    <div class="text-gray-400">↓</div>
-                                    <!-- Transformer -->
-                                    <div class="bg-purple-100 dark:bg-purple-900/30 border-2 border-purple-300 dark:border-purple-700 px-6 py-3 rounded-xl">
-                                        <div class="font-semibold text-purple-800 dark:text-purple-300">Shared Transformer Blocks (5B)</div>
-                                        <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">共享Q/K/V投影矩阵 + 因果掩码</div>
-                                    </div>
-                                    <div class="text-gray-400">↓</div>
-                                    <!-- 输出 -->
-                                    <div class="flex gap-4 justify-center">
-                                        <div class="bg-amber-100 dark:bg-amber-900/30 px-3 py-2 rounded-lg text-center">
-                                            <div class="text-xs text-amber-600 dark:text-amber-400">动作输出</div>
-                                            <div class="token-visual token-a">aₜ:ₜ₊ₕ</div>
-                                        </div>
-                                        <div class="bg-pink-100 dark:bg-pink-900/30 px-3 py-2 rounded-lg text-center">
-                                            <div class="text-xs text-pink-600 dark:text-pink-400">未来视频 (可选)</div>
-                                            <div class="token-visual token-f">o_future</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 flex items-center justify-center text-sm">4</span>架构设计</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">基于<strong>WAN 2.1 5B</strong>扩散Transformer，核心设计包括多视角输入融合、共享Transformer块和因果自注意力掩码。</p>
+                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
+                        <div class="text-center text-sm font-medium text-gray-500 mb-3">Token序列: T_t = [T_o; T_s; T_a; T_f]</div>
+                        <div class="flex items-center justify-center gap-2 flex-wrap">
+                            <span class="inline-flex px-3 py-1 rounded-lg text-sm font-medium bg-blue-100 text-blue-800">T_o 观测</span>
+                            <span class="text-gray-400">→</span>
+                            <span class="inline-flex px-3 py-1 rounded-lg text-sm font-medium bg-green-100 text-green-800">T_s 状态</span>
+                            <span class="text-gray-400">→</span>
+                            <span class="inline-flex px-3 py-1 rounded-lg text-sm font-medium bg-amber-100 text-amber-800">T_a 动作</span>
+                            <span class="text-gray-400">→</span>
+                            <span class="inline-flex px-3 py-1 rounded-lg text-sm font-medium bg-pink-100 text-pink-800">T_f 未来视频</span>
                         </div>
-
-                        <!-- 输入Token设计 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">输入Token设计</h4>
-                            
-                            <div class="space-y-3">
-                                <div class="border dark:border-gray-700 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2">多视角融合</div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                        为支持多视角生成且不修改backbone，将三个相机视角合并为单一复合图像：
-                                    </p>
-                                    <div class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
-                                        oₜ^comp = Compose(oₜ^left, oₜ^front, oₜ^right)
-                                    </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                        该复合表示保留各视角在共享坐标系中的空间结构，促进跨视角一致性。
-                                    </p>
-                                </div>
-
-                                <div class="border dark:border-gray-700 rounded-lg p-4">
-                                    <div class="font-medium text-gray-900 dark:text-white mb-2">稀疏未来帧预测</div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                        由于相邻观测具有强时间连续性和冗余性，采用固定步长仅预测稀疏的未来帧集合：
-                                    </p>
-                                    <div class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
-                                        {oₜ₊ₖΔ^comp}ₖ₌₁ᴷ
-                                    </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                        沿动作horizon每Δ步预测一帧未来观测，保留场景关键演变同时减少监督冗余。
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 共享Transformer块 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">共享Transformer块</h4>
-                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                                    与MoE设计不同，所有token类型由<strong>单一共享Transformer块栈</strong>处理：
-                                </p>
-                                <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-blue-500">•</span>
-                                        <span>所有token在每层共享相同的Q/K/V投影矩阵</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-blue-500">•</span>
-                                        <span>紧密耦合动作token与视觉证据，同时保持预训练backbone的计算特性</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span class="text-blue-500">•</span>
-                                        <span>不同类型token使用不同位置编码：视觉token使用2D图像网格位置编码，状态和动作token使用1D时间位置编码</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                        <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">因果掩码规则</div>
+                        <ul class="text-sm space-y-1">
+                            <li>• T_s ↔ T_o: 可相互关注，但不能关注T_a或T_f</li>
+                            <li>• T_a → {T_s, T_o}: 动作token可关注状态和观测，不能关注T_f</li>
+                            <li>• T_f → {T_s, T_o, T_a}: 未来视频token可关注所有前置token</li>
+                        </ul>
                     </div>
                 </div>
 
-                <!-- Section 5: 实现细节 -->
+                <!-- Section 5 -->
                 <div id="sec5" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">5</span>
-                        实现细节
-                    </h3>
-
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 flex items-center justify-center text-sm">5</span>实现细节</h3>
                     <div class="grid md:grid-cols-2 gap-4">
                         <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">模型配置</h4>
+                            <h4 class="font-semibold mb-3">模型配置</h4>
                             <table class="w-full text-sm">
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">Backbone</td>
-                                    <td class="py-2 font-medium">Wan 2.1 5B</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">参数量</td>
-                                    <td class="py-2 font-medium">5 Billion</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">架构类型</td>
-                                    <td class="py-2 font-medium">Diffusion Transformer</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">动作块长度</td>
-                                    <td class="py-2 font-medium">H = 16</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">未来观测步长</td>
-                                    <td class="py-2 font-medium">Δ (稀疏预测)</td>
-                                </tr>
+                                <tr class="border-b dark:border-gray-600"><td class="py-2 text-gray-500">Backbone</td><td class="py-2 font-medium">WAN 2.1 5B</td></tr>
+                                <tr class="border-b dark:border-gray-600"><td class="py-2 text-gray-500">参数量</td><td class="py-2 font-medium">5 Billion</td></tr>
+                                <tr class="border-b dark:border-gray-600"><td class="py-2 text-gray-500">动作块长度</td><td class="py-2 font-medium">H = 16</td></tr>
+                                <tr><td class="py-2 text-gray-500">优化器</td><td class="py-2 font-medium">AdamW</td></tr>
                             </table>
                         </div>
-
                         <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">预训练配置</h4>
+                            <h4 class="font-semibold mb-3">预训练数据 (~10K小时)</h4>
                             <table class="w-full text-sm">
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">优化器</td>
-                                    <td class="py-2 font-medium">AdamW (β₁=0.9, β₂=0.95)</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">学习率</td>
-                                    <td class="py-2 font-medium">初始 1e-4 → 最终 1e-5 (Cosine)</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">全局Batch Size</td>
-                                    <td class="py-2 font-medium">256</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-600">
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">训练时长</td>
-                                    <td class="py-2 font-medium">6000 GPU Hours</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2 text-gray-500 dark:text-gray-400">预训练数据</td>
-                                    <td class="py-2 font-medium">~10,000 小时</td>
-                                </tr>
+                                <tr class="border-b dark:border-gray-600"><td class="py-2">EgoDex</td><td class="py-2 text-right">800h</td></tr>
+                                <tr class="border-b dark:border-gray-600"><td class="py-2">Agibot</td><td class="py-2 text-right">2,500h</td></tr>
+                                <tr class="border-b dark:border-gray-600"><td class="py-2">EGO4D</td><td class="py-2 text-right">3,500h</td></tr>
+                                <tr><td class="py-2">Open X-Embodiment</td><td class="py-2 text-right">3,500h</td></tr>
                             </table>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-900 dark:text-white mb-3">训练数据构成</h4>
-                        <div class="grid md:grid-cols-3 gap-3 text-sm">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border dark:border-gray-600">
-                                <div class="font-medium text-gray-900 dark:text-white mb-1">第一人称视频</div>
-                                <div class="text-gray-600 dark:text-gray-400">
-                                    EgoDex (800h)<br>
-                                    Ego4D (3,500h)<br>
-                                    Something-Something V2 (200h)
-                                </div>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border dark:border-gray-600">
-                                <div class="font-medium text-gray-900 dark:text-white mb-1">机器人视频</div>
-                                <div class="text-gray-600 dark:text-gray-400">
-                                    Agibot (2,500h)<br>
-                                    RoboMind (300h)<br>
-                                    DROID (350h)<br>
-                                    RDT (25h)<br>
-                                    ATARA (10h)
-                                </div>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border dark:border-gray-600">
-                                <div class="font-medium text-gray-900 dark:text-white mb-1">跨具身数据</div>
-                                <div class="text-gray-600 dark:text-gray-400">
-                                    Open X-Embodiment (3,500h)
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 6: 数学机制 -->
+                <!-- Section 6 -->
                 <div id="sec6" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">6</span>
-                        数学机制
-                    </h3>
-
-                    <div class="space-y-6">
-                        <!-- 因果自注意力 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">因果自注意力机制</h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                为统一动作生成和前向视觉动态建模，将所有模态打包为单一token序列，使用<strong>因果注意力掩码</strong>控制信息流：
-                            </p>
-                            
-                            <!-- Token序列可视化 -->
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
-                                <div class="text-center text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">统一Token序列</div>
-                                <div class="flex items-center justify-center gap-1 flex-wrap">
-                                    <span class="token-visual token-o">T_o</span>
-                                    <span class="text-gray-400">;</span>
-                                    <span class="token-visual token-s">T_s</span>
-                                    <span class="text-gray-400">;</span>
-                                    <span class="token-visual token-a">T_a</span>
-                                    <span class="text-gray-400">;</span>
-                                    <span class="token-visual token-f">T_f</span>
-                                </div>
-                                <div class="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                    T_t = [T_o; T_s; T_a; T_f]
-                                </div>
-                            </div>
-
-                            <!-- 注意力掩码规则 -->
-                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4">
-                                <div class="font-medium text-amber-800 dark:text-amber-300 mb-2">块级因果注意力掩码规则</div>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex items-start gap-2">
-                                        <span class="w-5 h-5 rounded bg-green-500 text-white flex items-center justify-center text-xs flex-shrink-0">✓</span>
-                                        <span><strong>T_s ↔ T_o:</strong> 状态和当前观测可相互关注，但不能关注T_a或T_f</span>
-                                    </div>
-                                    <div class="flex items-start gap-2">
-                                        <span class="w-5 h-5 rounded bg-blue-500 text-white flex items-center justify-center text-xs flex-shrink-0">✓</span>
-                                        <span><strong>T_a → {T_s, T_o}:</strong> 动作token可关注状态/观测，但不能关注T_f</span>
-                                    </div>
-                                    <div class="flex items-start gap-2">
-                                        <span class="w-5 h-5 rounded bg-purple-500 text-white flex items-center justify-center text-xs flex-shrink-0">✓</span>
-                                        <span><strong>T_f → {T_s, T_o, T_a}:</strong> 未来视频token可关注所有前置token，实现基于动作块的前向动态预测</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">
-                                <strong>关键设计：</strong>语言指令l不纳入统一自注意力序列，而是作为外部条件信号通过<strong>交叉注意力</strong>提供，因此不参与上述因果排序。
-                            </p>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 flex items-center justify-center text-sm">6</span>数学机制</h3>
+                    <div class="space-y-3">
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">Flow Matching目标</div>
+                            <div class="font-mono text-sm">L = λ_video · L_video + λ_action · L_action</div>
                         </div>
-
-                        <!-- Flow Matching目标 -->
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Flow Matching训练目标</h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                使用Flow Matching优化动作预测和视觉前向动态建模：
-                            </p>
-                            
-                            <div class="space-y-3">
-                                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">插值噪声变量 (Eq. 6)</div>
-                                    <div class="font-mono text-sm">x_t = (1-t)·x_0 + t·x_1 + σ_t·ε</div>
-                                </div>
-                                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">目标速度场 (Eq. 7)</div>
-                                    <div class="font-mono text-sm">v_t = x_1 - x_0</div>
-                                </div>
-                                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">视频流匹配目标 (Eq. 8)</div>
-                                    <div class="font-mono text-sm">L_video = E[||v_f - φ_θ(z_f | history, a)||²]</div>
-                                </div>
-                                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">动作流匹配目标 (Eq. 9)</div>
-                                    <div class="font-mono text-sm">L_action = E[||v_a - φ_θ(z_a | history)||²]</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mt-3">
-                                <div class="font-medium text-blue-800 dark:text-blue-300 mb-2">组合损失 (Eq. 10)</div>
-                                <div class="font-mono text-sm bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
-                                    L = λ_video · L_video + λ_action · L_action
-                                </div>
-                                <ul class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
-                                    <li>• 预训练阶段：仅优化视频流匹配目标</li>
-                                    <li>• Post-training阶段：组合视频和动作目标，权重λ平衡贡献</li>
-                                    <li>• 强调动作预测同时保留视频一致性正则化</li>
-                                </ul>
-                            </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">视频流匹配</div>
+                            <div class="font-mono text-sm">L_video = E[||v_f - φ_θ(z_f | history, a)||²]</div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                            <div class="text-xs text-gray-500 mb-1">动作流匹配</div>
+                            <div class="font-mono text-sm">L_action = E[||v_a - φ_θ(z_a | history)||²]</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 7: 关键创新深入解析 -->
+                <!-- Section 7 -->
                 <div id="sec7" class="section-anchor bg-white dark:bg-gray-800 rounded-xl card-shadow p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">7</span>
-                        关键创新深入解析
-                    </h3>
-
-                    <!-- 核心创新：可选视频生成 -->
-                    <div class="space-y-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 flex items-center justify-center text-sm">7</span>关键创新深入解析</h3>
+                    <div class="space-y-4">
                         <div class="border-l-4 border-green-500 pl-4">
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">创新点1: 可选视频生成的因果设计</h4>
-                            
-                            <!-- L1/L2/L3 三层解释 -->
-                            <div class="space-y-4">
-                                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-                                    <div class="font-medium text-green-800 dark:text-green-300 text-sm mb-1">L1: 直观理解</div>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                                        就像一个学生在解题时，草稿纸（视频生成）帮助思考过程，但交卷时只需要答案（动作）。GigaWorld-Policy训练时用"草稿纸"辅助，推理时可以直接"交卷"，不需要写草稿。
-                                    </p>
-                                </div>
-                                
-                                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-                                    <div class="font-medium text-blue-800 dark:text-blue-300 text-sm mb-1">L2: 机制流程</div>
-                                    <div class="grid md:grid-cols-2 gap-3">
-                                        <div class="bg-white dark:bg-gray-800 rounded p-3 border dark:border-gray-600">
-                                            <div class="font-medium text-sm mb-2">训练阶段</div>
-                                            <div class="space-y-1 text-xs">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="token-visual token-o">o</span>
-                                                    <span>+</span>
-                                                    <span class="token-visual token-s">s</span>
-                                                    <span>→</span>
-                                                    <span class="token-visual token-a">a</span>
-                                                    <span>(动作预测)</span>
-                                                </div>
-                                                <div class="flex items-center gap-1">
-                                                    <span class="token-visual token-o">o</span>
-                                                    <span>+</span>
-                                                    <span class="token-visual token-s">s</span>
-                                                    <span>+</span>
-                                                    <span class="token-visual token-a">a</span>
-                                                    <span>→</span>
-                                                    <span class="token-visual token-f">f</span>
-                                                    <span>(视频预测)</span>
-                                                </div>
-                                                <div class="text-gray-500">两者并行训练，共享梯度</div>
-                                            </div>
-                                        </div>
-                                        <div class="bg-white dark:bg-gray-800 rounded p-3 border dark:border-gray-600">
-                                            <div class="font-medium text-sm mb-2">推理阶段</div>
-                                            <div class="space-y-1 text-xs">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="token-visual token-o">o</span>
-                                                    <span>+</span>
-                                                    <span class="token-visual token-s">s</span>
-                                                    <span>→</span>
-                                                    <span class="token-visual token-a">a</span>
-                                                    <span class="text-green-600">✓ (仅需此步)</span>
-                                                </div>
-                                                <div class="flex items-center gap-1 text-gray-400">
-                                                    <span class="token-visual token-f">f</span>
-                                                    <span>生成可选</span>
-                                                </div>
-                                                <div class="text-green-600">跳过视频token，9×加速</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
-                                    <div class="font-medium text-purple-800 dark:text-purple-300 text-sm mb-1">L3: 技术细节</div>
-                                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                                        <li>• <strong>因果掩码的关键作用：</strong> 通过限制T_a只能关注{T_s, T_o}，确保动作预测不依赖未来视频token</li>
-                                        <li>• <strong>解耦原理：</strong> T_f可以关注T_a，但T_a不能关注T_f，形成单向信息流</li>
-                                        <li>• <strong>推理优化：</strong> 不实例化任何T_f token，仅采样动作块，避免视频生成开销</li>
-                                        <li>• <strong>KV Cache复用：</strong> 如需视频生成，可复用动作去噪阶段的KV Cache，条件化地去噪视频token</li>
-                                    </ul>
-                                </div>
+                            <h4 class="font-semibold mb-2">创新点1: 因果掩码设计</h4>
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                                <p class="text-sm">通过限制T_a只能关注{T_s, T_o}，确保动作预测不依赖未来视频token，使视频生成在推理时变为可选。</p>
                             </div>
                         </div>
-
-                        <!-- 创新点2：课程预训练 -->
                         <div class="border-l-4 border-blue-500 pl-4">
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">创新点2: 三阶段课程预训练</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="text-center flex-1">
-                                        <div class="w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center mx-auto mb-2">1</div>
-                                        <div class="text-sm font-medium">Web视频预训练</div>
-                                        <div class="text-xs text-gray-500">通用视频基础模型</div>
-                                    </div>
-                                    <div class="text-gray-400">→</div>
-                                    <div class="text-center flex-1">
-                                        <div class="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center mx-auto mb-2">2</div>
-                                        <div class="text-sm font-medium">具身数据预训练</div>
-                                        <div class="text-xs text-gray-500">~10K小时机器人/人视频</div>
-                                    </div>
-                                    <div class="text-gray-400">→</div>
-                                    <div class="text-center flex-1">
-                                        <div class="w-12 h-12 rounded-full bg-pink-500 text-white flex items-center justify-center mx-auto mb-2">3</div>
-                                        <div class="text-sm font-medium">任务后训练</div>
-                                        <div class="text-xs text-gray-500">目标机器人轨迹数据</div>
-                                    </div>
-                                </div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">
-                                    <strong>消融实验验证：</strong> 仅视频初始化（SR=0.57）→ 仅具身预训练（SR=0.73）→ 两者结合（SR=0.83），证明各阶段提供互补收益。
-                                </div>
+                            <h4 class="font-semibold mb-2">创新点2: 三阶段课程预训练</h4>
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 rounded-lg">Web视频</span>
+                                <span class="text-gray-400">→</span>
+                                <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 rounded-lg">具身数据</span>
+                                <span class="text-gray-400">→</span>
+                                <span class="px-3 py-1 bg-pink-100 dark:bg-pink-900 rounded-lg">任务数据</span>
                             </div>
-                        </div>
-
-                        <!-- 常见误区澄清 -->
-                        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-                            <h4 class="font-semibold text-amber-800 dark:text-amber-300 mb-3">⚠️ 常见误区澄清</h4>
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="border-b border-amber-200 dark:border-amber-800">
-                                        <th class="text-left py-2 text-amber-700 dark:text-amber-400">误区</th>
-                                        <th class="text-left py-2 text-amber-700 dark:text-amber-400">澄清</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-amber-100 dark:divide-amber-800/50">
-                                    <tr>
-                                        <td class="py-2 text-gray-700 dark:text-gray-300">"跳过视频生成会导致信息丢失"</td>
-                                        <td class="py-2 text-gray-600 dark:text-gray-400">因果设计确保动作token从不依赖视频token，训练已完成解耦</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2 text-gray-700 dark:text-gray-300">"共享参数意味着共享表示"</td>
-                                        <td class="py-2 text-gray-600 dark:text-gray-400">虽然Q/K/V矩阵共享，但不同类型token使用不同位置编码，保持结构区分</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2 text-gray-700 dark:text-gray-300">"稀疏未来帧预测会损失信息"</td>
-                                        <td class="py-2 text-gray-600 dark:text-gray-400">实验表明密集预测无额外收益，适度稀疏足以提供有用的时序先验</td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Footer -->
             <footer class="text-center text-sm text-gray-500 dark:text-gray-400 py-8 border-t dark:border-gray-700">
-                <p>GigaWorld-Policy 论文深度分析报告 | Part I-II: 概览、背景与方法</p>
-                <p class="mt-1">生成时间: 2026-03-26 | 基于 arXiv:2603.17240</p>
-                <div class="mt-4 flex justify-center gap-2">
-                    <span class="text-gray-400">Part I-II</span>
-                    <span>|</span>
-                    <a href="./gigaworld_policy_analysis_part3_4.html" class="text-blue-600 hover:underline">Part III-IV →</a>
-                    <span>|</span>
-                    <a href="./gigaworld_policy_analysis_part5.html" class="text-blue-600 hover:underline">Part V →</a>
-                </div>
+                <p>GigaWorld-Policy 论文深度分析报告 | Part I-II | 生成时间: 2026-03-27</p>
             </footer>
         </main>
     </div>
 
-    <!-- Dark Mode Toggle -->
-    <button onclick="document.documentElement.classList.toggle('dark')" 
-            class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">
-        🌓
-    </button>
-
-    <script>
-        // Highlight active nav item on scroll
-        const sections = document.querySelectorAll('.section-anchor');
-        const navLinks = document.querySelectorAll('aside nav a[href^="#"]');
-        
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 100) {
-                    current = section.getAttribute('id');
-                }
-            });
-            
-            navLinks.forEach(link => {
-                link.classList.remove('nav-active');
-                if (link.getAttribute('href') === '#' + current) {
-                    link.classList.add('nav-active');
-                }
-            });
-        });
-    </script>
+    <button onclick="document.documentElement.classList.toggle('dark')" class="fixed bottom-4 right-4 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-xl hover:scale-110 transition">🌓</button>
 </body>
 </html>
