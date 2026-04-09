@@ -1,0 +1,37 @@
+{
+  "arxiv_id": "2603.09465",
+  "title": "EvoDriveVLA: Evolving Autonomous Driving Vision-Language-Action Model via Collaborative Perception-Planning Distillation",
+  "authors": [
+    "Jiajun Cao",
+    "Xiaoan Zhang",
+    "Xiaobao Wei",
+    "Liyuqiu Huang",
+    "Wang Zijian",
+    "Hanzhen Zhang",
+    "Zhengyu Jia",
+    "Wei Mao",
+    "Hao Wang",
+    "Xianming Liu",
+    "Shuchang Zhou",
+    "Yang Wang",
+    "Shanghang Zhang"
+  ],
+  "abstract": "Vision-Language-Action models have shown great promise for autonomous driving, yet they suffer from degraded perception after unfreezing the visual encoder and struggle with accumulated instability in long-term planning. To address these challenges, we propose EvoDriveVLA—a novel collaborative perception-planning distillation framework that integrates self-anchored perceptual constraints and oracle-guided trajectory optimization...",
+  "published": "10 March 2026",
+  "pdf_url": "https://arxiv.org/pdf/2603.09465.pdf",
+  "html_url": "https://arxiv.org/html/2603.09465",
+  "categories": [
+    "Computer Vision and Pattern Recognition",
+    "Robotics",
+    "Artificial Intelligence"
+  ],
+  "figure_count": 10,
+  "baselines": [
+    "OpenDriveVLA",
+    "DiMA",
+    "DistillDrive",
+    "UniAD",
+    "VAD",
+    "OmniDrive"
+  ]
+}
