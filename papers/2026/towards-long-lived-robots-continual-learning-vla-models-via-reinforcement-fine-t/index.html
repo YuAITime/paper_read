@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度分析 | Towards Long-Lived Robots: Continual Learning VLA ...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+        .section-anchor { scroll-margin-top: 80px; }
+        .paper-img { border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: transform 0.2s; max-width: 100%; }
+        .paper-img:hover { transform: scale(1.02); }
+        .nav-item { transition: all 0.2s; }
+        .nav-item:hover { background: rgba(59, 130, 246, 0.1); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #2563eb; border-right: 3px solid #2563eb; }
+        .critical-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; }
+        .formula-box { background: #f8fafc; border-left: 4px solid #3b82f6; }
+        .mechanism-card { background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%); border: 1px solid #93c5fd; }
+        .comparison-table th { background: #f3f4f6; }
+        .comparison-table .highlight { background: #dcfce7; }
+        .comparison-table .dimmed { background: #fee2e2; }
+        .metric-card { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #86efac; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    
+    <nav class="fixed top-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="../../../../index.html" class="flex items-center gap-2 text-blue-600 font-bold hover:text-blue-800">
+                <i class="fas fa-arrow-left"></i>
+                <span>返回索引</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-500 hidden md:inline">arXiv: 2602.10503</span>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <aside class="fixed left-0 top-14 w-72 h-full bg-white dark:bg-gray-800 shadow-lg overflow-y-auto hidden xl:block border-r border-gray-200 dark:border-gray-700">
+        <div class="p-4">
+            <h3 class="font-semibold mb-4 text-gray-700 dark:text-gray-300"><i class="fas fa-list-ul text-blue-500 mr-2"></i>目录</h3>
+            <ul class="space-y-1 text-sm">
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part I</span>
+                </li>
+                <li><a href="#overview" class="nav-item block py-2 px-3 rounded-lg text-blue-600 font-medium">1. 论文概览</a></li>
+                <li><a href="#background" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">2. 研究背景</a></li>
+                <li><a href="#problem" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">3. 问题定义</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part II</span>
+                </li>
+                <li><a href="#architecture" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">4. 架构设计</a></li>
+                <li><a href="#implementation" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">5. 实现细节</a></li>
+                <li><a href="#mechanism" class="nav-item block py-2 px-3 rounded-lg text-purple-600 font-medium">6. 机制解析</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part III</span>
+                </li>
+                <li><a href="#experiments" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">7. 实验设置</a></li>
+                <li><a href="#results" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">8. 主要结果</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part IV</span>
+                </li>
+                <li><a href="#comparison" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">9. SOTA 对比</a></li>
+                <li><a href="#ablation" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">10. 消融实验</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part V</span>
+                </li>
+                <li><a href="#critical" class="nav-item block py-2 px-3 rounded-lg text-red-600 font-medium">11. 批判性分析</a></li>
+                <li><a href="#conclusion" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">12. 总结评价</a></li>
+            </ul>
+        </div>
+    </aside>
+    
+    <main class="xl:ml-72 pt-16 pb-12 px-4">
+        <div class="max-w-5xl mx-auto">
+            
+            <header class="mb-12 text-center py-8">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full text-sm mb-4 shadow-lg">
+                    <i class="fas fa-microscope"></i>
+                    <span>arXiv 2026</span>
+                    <span class="opacity-75">•</span>
+                    <span>深度分析</span>
+                </div>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-tight">Towards Long-Lived Robots: Continual Learning VLA Models via Reinforcement Fine-Tuning</h1>
+                <p class="text-gray-600 dark:text-gray-400 mb-2"><strong>Yuan Liu</strong>, <strong>Haoran Li</strong>, <strong>Shuai Tian</strong>, Yuxing Qin, Yuhui Chen <em>et al.</em></p>
+                <p class="text-sm text-gray-500 mb-4">[Submitted on 11 Feb 2026]</p>
+                <div class="flex justify-center gap-2 flex-wrap"><span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">Robotics (cs.RO)</span></div>
+            </header>
+            
+            <!-- Part I -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+                <span class="text-sm font-bold text-blue-600 uppercase tracking-wider"><i class="fas fa-info-circle mr-2"></i>Part I · 概览与背景</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+            </div>
+
+            <!-- 1. 论文概览 -->
+            <section id="overview" class="section-anchor mb-12">
+                <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-2xl p-8 text-white shadow-xl">
+                    <h2 class="text-2xl font-bold mb-6"><i class="fas fa-trophy mr-2"></i>核心贡献</h2>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-5">
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3"><span class="flex-shrink-0 w-6 h-6 bg-white text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">1</span><span>提出 LifeLong-RFT：首个无需环境交互的 VLA 强化微调策略，结合 chunking-level on-policy RL 与 MDPR 机制</span></li>
+                            <li class="flex items-start gap-3"><span class="flex-shrink-0 w-6 h-6 bg-white text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">2</span><span>设计 MDPR (Multi-Dimensional Process Reward)：三维奖励机制 (QACR+CTAR+FCR) 量化动作块的多维贡献</span></li>
+                            <li class="flex items-start gap-3"><span class="flex-shrink-0 w-6 h-6 bg-white text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">3</span><span>LIBERO 持续学习基准上比 SFT 提升 22% 平均成功率，仅用 20% 训练数据即可有效适应新任务</span></li>
+                        </ul>
+                    </div>
+                    <div class="mt-4 text-sm text-white/80">
+                        <i class="fas fa-quote-left mr-2"></i>摘要: Pretrained on large-scale and diverse datasets, VLA models demonstrate strong generalization... (VLA模型在大规模多样化数据集上预训练后展现出强泛化能力，但SFT需要大量任务特定数据且易灾难性遗忘。本文提出 LifeLong-RFT，通过 MDPR 三维奖励机制实现无需环境交互的强化微调，在持续学习任务上取得显著提升。)
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 研究背景 -->
+            <section id="background" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-history mr-2 text-blue-500"></i>2. 研究背景</h2>
+                <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg p-4">
+                        <p class="font-semibold text-blue-800 dark:text-blue-300 mb-2"><i class="fas fa-lightbulb mr-2"></i>领域定位</p>
+                        <p class="text-sm">本研究属于 <strong>Robotics (cs.RO)</strong> 领域，聚焦 Vision-Language-Action (VLA) 模型的后训练 (Post-Training) 与持续学习 (Continual Learning)。</p>
+                    </div>
+                    
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded-lg p-4">
+                        <p class="font-semibold text-yellow-800 dark:text-yellow-300 mb-2"><i class="fas fa-question-circle mr-2"></i>研究动机</p>
+                        <ul class="text-sm space-y-2">
+                            <li><strong>问题1 - 数据依赖</strong>：SFT 需要大量任务特定数据，限制了 VLA 在低数据/少样本场景下的快速适应能力</li>
+                            <li><strong>问题2 - 灾难性遗忘</strong>：学习新技能时会退化先前获得的知识，无法支持 VLA 进化为长寿命智能体</li>
+                            <li><strong>核心挑战</strong>：提升数据高效适应性往往会加剧遗忘，而保留先验知识又限制了从有限新数据中进行有效学习</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded-lg p-4">
+                        <p class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-route mr-2"></i>解决思路</p>
+                        <p class="text-sm">近期 LLM 研究发现 on-policy 强化学习对遗忘具有更强的鲁棒性。本文探索如何将其应用于 VLA 基础模型，核心挑战在于设计高效、可靠、可扩展的奖励信号。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 问题定义 -->
+            <section id="problem" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-bullseye mr-2 text-red-500"></i>3. 核心问题定义</h2>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5 space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">研究假设</h4>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">通过设计无需环境交互的多维过程奖励机制 (MDPR)，结合 chunking-level on-policy 强化学习，可以实现 VLA 模型的持续学习，同时解决数据依赖和灾难性遗忘问题。</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">验证思路</h4>
+                        <ol class="text-sm text-gray-700 dark:text-gray-300 list-decimal list-inside space-y-1">
+                            <li>在 multi-task 学习场景下验证 LifeLong-RFT 相比 SFT 的性能提升</li>
+                            <li>在 continual learning 场景下验证 forward transfer 和 backward transfer 指标</li>
+                            <li>通过消融实验验证 MDPR 三个维度的各自贡献</li>
+                            <li>在真实机器人环境中验证 sim-to-real 迁移能力</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part II -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+                <span class="text-sm font-bold text-purple-600 uppercase tracking-wider"><i class="fas fa-cogs mr-2"></i>Part II · 方法详解</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+            </div>
+
+            <!-- 4. 架构设计 -->
+            <section id="architecture" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-sitemap mr-2 text-purple-500"></i>4. 架构设计</h2>
+                <div class="space-y-6">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+                        <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">整体架构</h4>
+                        <div class="flex flex-wrap items-center justify-center gap-2 text-sm">
+                            <div class="px-4 py-2 bg-blue-100 dark:bg-blue-900 rounded-lg text-center">
+                                <div class="font-bold text-blue-700 dark:text-blue-300">VLA Model</div>
+                                <div class="text-xs text-gray-600">(NORA-Long)</div>
+                            </div>
+                            <i class="fas fa-arrow-right text-gray-400"></i>
+                            <div class="px-4 py-2 bg-purple-100 dark:bg-purple-900 rounded-lg text-center">
+                                <div class="font-bold text-purple-700 dark:text-purple-300">GRPO</div>
+                                <div class="text-xs text-gray-600">Group Sampling</div>
+                            </div>
+                            <i class="fas fa-arrow-right text-gray-400"></i>
+                            <div class="px-4 py-2 bg-green-100 dark:bg-green-900 rounded-lg text-center">
+                                <div class="font-bold text-green-700 dark:text-green-300">MDPR</div>
+                                <div class="text-xs text-gray-600">Three Rewards</div>
+                            </div>
+                            <i class="fas fa-arrow-right text-gray-400"></i>
+                            <div class="px-4 py-2 bg-orange-100 dark:bg-orange-900 rounded-lg text-center">
+                                <div class="font-bold text-orange-700 dark:text-orange-300">Policy Update</div>
+                                <div class="text-xs text-gray-600">Advantage</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2"><i class="fas fa-layer-group mr-2"></i>关键组件</h4>
+                            <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+                                <li><strong>Base Model</strong>: NORA-Long (离散动作 VLA)</li>
+                                <li><strong>Tokenizer</strong>: Fast+ (动作 tokenization)</li>
+                                <li><strong>RL Algorithm</strong>: GRPO (无需 Critic 网络)</li>
+                                <li><strong>Reward Mechanism</strong>: MDPR (三维奖励)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                            <h4 class="font-semibold text-purple-800 dark:text-purple-300 mb-2"><i class="fas fa-key mr-2"></i>关键设计决策</h4>
+                            <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+                                <li><strong>Chunking-level</strong>: 评估动作块而非完整轨迹</li>
+                                <li><strong>On-policy</strong>: 使用当前策略采样</li>
+                                <li><strong>Env-free</strong>: 无需环境交互</li>
+                                <li><strong>Multi-dimensional</strong>: 三维互补奖励</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 实现细节 -->
+            <section id="implementation" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-code mr-2 text-purple-500"></i>5. 实现细节</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100 dark:bg-gray-700"><tr><th class="p-3 text-left">超参数</th><th class="p-3 text-left">值</th></tr></thead>
+                            <tbody class="divide-y dark:divide-gray-700">
+                                <tr><td class="p-3 font-medium">Group Size (G)</td><td class="p-3 font-mono bg-gray-50 dark:bg-gray-700">8</td></tr>
+                                <tr><td class="p-3 font-medium">Learning Rate</td><td class="p-3 font-mono bg-gray-50 dark:bg-gray-700">1×10⁻⁶</td></tr>
+                                <tr><td class="p-3 font-medium">Optimizer</td><td class="p-3 font-mono bg-gray-50 dark:bg-gray-700">AdamW</td></tr>
+                                <tr><td class="p-3 font-medium">CTAR α</td><td class="p-3 font-mono bg-gray-50 dark:bg-gray-700">5</td></tr>
+                                <tr><td class="p-3 font-medium">CTAR β</td><td class="p-3 font-mono bg-gray-50 dark:bg-gray-700">0.8</td></tr>
+                                <tr><td class="p-3 font-medium">MDPR ω</td><td class="p-3 font-mono bg-gray-50 dark:bg-gray-700">0.7</td></tr>
+                                <tr><td class="p-3 font-medium">MDPR λ</td><td class="p-3 font-mono bg-gray-50 dark:bg-gray-700">0.1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100 dark:bg-gray-700"><tr><th class="p-3 text-left">配置</th><th class="p-3 text-left">详情</th></tr></thead>
+                            <tbody class="divide-y dark:divide-gray-700">
+                                <tr><td class="p-3 font-medium">Hardware</td><td class="p-3 bg-gray-50 dark:bg-gray-700">8× NVIDIA H20 GPUs</td></tr>
+                                <tr><td class="p-3 font-medium">Base Model</td><td class="p-3 bg-gray-50 dark:bg-gray-700">NORA-Long</td></tr>
+                                <tr><td class="p-3 font-medium">Tokenizer</td><td class="p-3 bg-gray-50 dark:bg-gray-700">Fast+</td></tr>
+                                <tr><td class="p-3 font-medium">Training</td><td class="p-3 bg-gray-50 dark:bg-gray-700">Full-parameter</td></tr>
+                                <tr><td class="p-3 font-medium">Sim Env</td><td class="p-3 bg-gray-50 dark:bg-gray-700">SimplerEnv, LIBERO</td></tr>
+                                <tr><td class="p-3 font-medium">Real Robot</td><td class="p-3 bg-gray-50 dark:bg-gray-700">Franka</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+                    <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">GRPO 目标函数</h4>
+                    <div class="formula-box rounded-lg p-4 bg-white dark:bg-gray-800">
+                        <p class="text-sm font-mono text-center">J_GRPO(θ) = E[(q,o)~D, {a_i}~π_θ_old] [1/G Σ_i min(π_θ/π_θ_old · A_i, clip(π_θ/π_θ_old) · A_i) - β·D_KL(π_θ||π_ref)]</p>
+                        <p class="text-xs text-gray-500 mt-2">其中 A_i = (r_i - mean({r_j})) / std({r_j})</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 机制解析 (三层解释) -->
+            <section id="mechanism" class="section-anchor mb-12">
+                <h2 class="text-2xl font-bold mb-6"><i class="fas fa-microscope mr-2 text-purple-600"></i>6. 关键创新深入解析：MDPR 三维奖励机制</h2>
+                
+                <div class="grid md:grid-cols-3 gap-4 mb-8">
+                    <div class="mechanism-card rounded-xl p-5">
+                        <div class="text-3xl mb-3">🎯</div>
+                        <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2">L1 · 直观理解</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">MDPR 像一位"三维裁判"：QACR 检查动作 token 是否猜对，CTAR 检查实际运动轨迹是否准，FCR 检查输出格式是否正确。三者共同确保 VLA 既能准确预测又能正确执行。</p>
+                    </div>
+                    <div class="mechanism-card rounded-xl p-5">
+                        <div class="text-3xl mb-3">🔄</div>
+                        <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2">L2 · 机制流程</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            1. VLA 采样动作块 → 2. QACR 比对 token 一致性 → 3. CTAR 解码后比对轨迹偏差 → 4. FCR 检查格式有效性 → 5. 加权合成 MDPR → 6. GRPO 计算优势并更新策略
+                        </p>
+                    </div>
+                    <div class="mechanism-card rounded-xl p-5">
+                        <div class="text-3xl mb-3">🔬</div>
+                        <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2">L3 · 技术细节</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            <strong>QACR</strong>: Σ_i I(â_i = a_i) / |valid|<br>
+                            <strong>CTAR</strong>: (1/T)Σ_t[α·exp(-β||p̂_t-p_t||) + I(ĝ_t=g_t)]<br>
+                            <strong>FCR</strong>: I(valid format)<br>
+                            <strong>MDPR</strong>: ω·QACR + (1-ω)·CTAR + λ·FCR
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <h4 class="font-bold text-blue-700 dark:text-blue-300">QACR - 量化动作一致性奖励</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">逐位置匹配预测动作 token 与 ground truth，确保离散动作空间中的准确预测。关键：只有格式验证通过的序列才参与计算。</p>
+                    </div>
+                    <div class="border-l-4 border-green-500 pl-4">
+                        <h4 class="font-bold text-green-700 dark:text-green-300">CTAR - 连续轨迹对齐奖励</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">将 token 解码为连续动作块后，计算与参考轨迹的空间偏差。pose 部分用指数衰减函数，gripper 用二元奖励，加权平均。</p>
+                    </div>
+                    <div class="border-l-4 border-orange-500 pl-4">
+                        <h4 class="font-bold text-orange-700 dark:text-orange-300">FCR - 格式合规奖励</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">二进制奖励验证输出是否符合 Fast+ tokenizer 的格式要求（动作维度、预测范围等），确保动作可执行。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part III -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-green-400 to-transparent"></div>
+                <span class="text-sm font-bold text-green-600 uppercase tracking-wider"><i class="fas fa-flask mr-2"></i>Part III · 实验评估</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-green-400 to-transparent"></div>
+            </div>
+
+            <!-- 7. 实验设置 -->
+            <section id="experiments" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-sliders-h mr-2 text-green-500"></i>7. 实验设置</h2>
+                <div class="space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2"><i class="fas fa-server mr-2"></i>硬件环境</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">8× NVIDIA H20 GPUs，Full-parameter optimization</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2"><i class="fas fa-database mr-2"></i>数据集</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <strong>SimplerEnv</strong>: BridgeData V2 (WidowX), Fractal (Google Robot)<br>
+                                <strong>LIBERO</strong>: Object/Spatial/Goal/Long 四个任务套件<br>
+                                <strong>Real-world</strong>: Franka 机器人，4个任务
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2"><i class="fas fa-tasks mr-2"></i>评估指标</h4>
+                        <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+                            <li><strong>SR (Success Rate)</strong>: 多任务学习的主要指标</li>
+                            <li><strong>FWT (Forward Transfer)</strong>: 新任务适应能力，越高越好</li>
+                            <li><strong>NBT (Negative Backward Transfer)</strong>: 遗忘程度，越低越好</li>
+                            <li><strong>AUC</strong>: 任务成功率曲线下面积，综合表现</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. 主要结果 -->
+            <section id="results" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-chart-line mr-2 text-green-500"></i>8. 主要结果</h2>
+                
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="metric-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold text-green-600">+22%</div>
+                        <div class="text-sm text-gray-600">LIBERO 持续学习<br>平均成功率提升</div>
+                    </div>
+                    <div class="metric-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold text-blue-600">20%</div>
+                        <div class="text-sm text-gray-600">训练数据<br>即可有效适应</div>
+                    </div>
+                    <div class="metric-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold text-purple-600">95.6%</div>
+                        <div class="text-sm text-gray-600">LIBERO 多任务<br>平均成功率</div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 mb-4">
+                    <table class="w-full text-sm comparison-table">
+                        <thead><tr><th class="p-3 text-left">Method</th><th class="p-3 text-center">LIBERO-Object</th><th class="p-3 text-center">Spatial</th><th class="p-3 text-center">Goal</th><th class="p-3 text-center">Long</th><th class="p-3 text-center">Avg</th></tr></thead>
+                        <tbody class="divide-y dark:divide-gray-700">
+                            <tr><td class="p-3">NORA-Long (SFT)</td><td class="p-3 text-center">97.5</td><td class="p-3 text-center">96.4</td><td class="p-3 text-center">91.0</td><td class="p-3 text-center">82.4</td><td class="p-3 text-center">91.8</td></tr>
+                            <tr class="highlight font-bold"><td class="p-3">LifeLong-RFT (Ours)</td><td class="p-3 text-center">99.2</td><td class="p-3 text-center">98.2</td><td class="p-3 text-center">95.8</td><td class="p-3 text-center">89.0</td><td class="p-3 text-center">95.6</td></tr>
+                            <tr class="text-green-600"><td class="p-3">Improvement</td><td class="p-3 text-center">+1.7</td><td class="p-3 text-center">+1.8</td><td class="p-3 text-center">+4.8</td><td class="p-3 text-center">+6.6</td><td class="p-3 text-center">+3.8</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-500 text-center">Table: Multi-task learning results on LIBERO benchmark</p>
+            </section>
+
+            <!-- Part IV -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-orange-400 to-transparent"></div>
+                <span class="text-sm font-bold text-orange-600 uppercase tracking-wider"><i class="fas fa-balance-scale mr-2"></i>Part IV · 消融与对比</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-orange-400 to-transparent"></div>
+            </div>
+
+            <!-- 9. SOTA 对比 -->
+            <section id="comparison" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-trophy mr-2 text-orange-500"></i>9. 与 SOTA 方法对比</h2>
+                
+                <div class="overflow-x-auto mt-6">
+                    <table class="comparison-table w-full text-sm border-collapse">
+                        <thead>
+                            <tr><th class="p-3 text-left rounded-tl-lg">Method</th><th class="p-3 text-center">Type</th><th class="p-3 text-center">Avg SR</th><th class="p-3 text-center">vs SFT</th><th class="p-3 text-center rounded-tr-lg">Note</th></tr>
+                        </thead>
+                        <tbody class="divide-y dark:divide-gray-700">
+                            <tr><td class="p-3">Octo-Base</td><td class="p-3 text-center">Continuous</td><td class="p-3 text-center">75.1</td><td class="p-3 text-center">-</td><td class="p-3 text-center text-xs">Baseline</td></tr>
+                            <tr><td class="p-3">GR00T N1</td><td class="p-3 text-center">Continuous</td><td class="p-3 text-center">93.9</td><td class="p-3 text-center">-</td><td class="p-3 text-center text-xs">NVIDIA</td></tr>
+                            <tr><td class="p-3">OpenVLA</td><td class="p-3 text-center">Discrete</td><td class="p-3 text-center">76.5</td><td class="p-3 text-center">-</td><td class="p-3 text-center text-xs">Open-source</td></tr>
+                            <tr><td class="p-3">SpatialVLA</td><td class="p-3 text-center">Discrete</td><td class="p-3 text-center">78.1</td><td class="p-3 text-center">-</td><td class="p-3 text-center text-xs">Spatial</td></tr>
+                            <tr><td class="p-3">NORA-Long (Baseline)</td><td class="p-3 text-center">Discrete</td><td class="p-3 text-center">91.8</td><td class="p-3 text-center">-</td><td class="p-3 text-center text-xs">SFT</td></tr>
+                            <tr class="highlight font-bold"><td class="p-3">LifeLong-RFT (Ours)</td><td class="p-3 text-center">Discrete</td><td class="p-3 text-center text-green-600 font-bold">95.6</td><td class="p-3 text-center text-green-600">+3.8</td><td class="p-3 text-center text-xs">RFT</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">公平性分析</h4>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                        <li>✓ 相同 backbone (NORA-Long) 对比，排除模型容量差异</li>
+                        <li>✓ 相同训练数据，排除数据量差异</li>
+                        <li>✓ 相同 evaluation protocol (50 episodes per task)</li>
+                        <li>✓ 在 SimplerEnv, LIBERO, 真实环境一致提升</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 10. 消融实验 -->
+            <section id="ablation" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-puzzle-piece mr-2 text-orange-500"></i>10. 消融实验：MDPR 各组件贡献</h2>
+                
+                <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 mb-4">
+                    <table class="w-full text-sm comparison-table">
+                        <thead><tr><th class="p-3 text-left">Setting</th><th class="p-3 text-center">Object</th><th class="p-3 text-center">Spatial</th><th class="p-3 text-center">Goal</th><th class="p-3 text-center">Long</th><th class="p-3 text-center">Avg</th><th class="p-3 text-center">Δ</th></tr></thead>
+                        <tbody class="divide-y dark:divide-gray-700">
+                            <tr class="dimmed"><td class="p-3">w/o QACR</td><td class="p-3 text-center">97.0</td><td class="p-3 text-center">96.4</td><td class="p-3 text-center">92.2</td><td class="p-3 text-center">85.6</td><td class="p-3 text-center">92.8</td><td class="p-3 text-center text-red-500">-2.8</td></tr>
+                            <tr class="dimmed"><td class="p-3">w/o CTAR</td><td class="p-3 text-center">8.0</td><td class="p-3 text-center">6.2</td><td class="p-3 text-center">2.4</td><td class="p-3 text-center">2.0</td><td class="p-3 text-center">4.7</td><td class="p-3 text-center text-red-500">-90.9</td></tr>
+                            <tr class="dimmed"><td class="p-3">w/o FCR</td><td class="p-3 text-center">98.0</td><td class="p-3 text-center">96.2</td><td class="p-3 text-center">93.2</td><td class="p-3 text-center">84.6</td><td class="p-3 text-center">93.0</td><td class="p-3 text-center text-red-500">-2.6</td></tr>
+                            <tr class="highlight font-bold"><td class="p-3">Full (Ours)</td><td class="p-3 text-center">99.2</td><td class="p-3 text-center">98.2</td><td class="p-3 text-center">95.8</td><td class="p-3 text-center">89.0</td><td class="p-3 text-center">95.6</td><td class="p-3 text-center">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg p-4">
+                        <h4 class="font-semibold text-red-800 dark:text-red-300">关键发现</h4>
+                        <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1 mt-2">
+                            <li><strong>CTAR 最关键</strong>：移除后性能下降 90.9%，说明连续轨迹对齐是物理执行的核心</li>
+                            <li><strong>QACR 和 FCR 互补</strong>：分别确保离散预测准确性和输出格式有效性</li>
+                            <li><strong>三者缺一不可</strong>：共同构成完整的奖励信号</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part V -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
+                <span class="text-sm font-bold text-red-600 uppercase tracking-wider"><i class="fas fa-search mr-2"></i>Part V · 批判性分析</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
+            </div>
+
+            <!-- 11. 批判性分析 -->
+            <section id="critical" class="section-anchor mb-12 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6 text-red-800 dark:text-red-300"><i class="fas fa-microscope mr-2"></i>11. 深度批判</h2>
+                
+                <div class="critical-box rounded-lg p-5 mb-6">
+                    <h3 class="font-bold text-amber-800 dark:text-amber-300 mb-2"><i class="fas fa-lightbulb mr-2"></i>深入剖析：为什么有效？</h3>
+                    <ul class="text-amber-900 dark:text-amber-200 text-sm space-y-2">
+                        <li><strong>On-policy 的优势</strong>：使用当前策略采样，数据分布与策略一致，避免离线数据分布偏移；GRPO 的组内相对优势估计减少了方差</li>
+                        <li><strong>MDPR 的多维互补</strong>：QACR 解决离散空间准确性，CTAR 解决连续执行精度，FCR 解决格式稳定性；三者从语义到物理到结构全面覆盖</li>
+                        <li><strong>Env-free 的可扩展性</strong>：无需环境交互意味着可以大规模并行，不受 sim-to-real gap 限制</li>
+                        <li><strong>Plasticity-Stability 平衡</strong>：On-policy RL 天然比 SFT 更抗遗忘，结合 ER (Experience Replay) 实现持续学习</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 text-red-700 dark:text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>局限性质疑</h3>
+                <ul class="space-y-1 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg p-4 mb-6">
+                    <li class="py-2 border-b dark:border-gray-700"><i class="fas fa-question-circle text-amber-500 mr-2"></i><strong>局限1 - 仅限于离散动作</strong>：论文明确承认只针对离散动作模型，连续动作模型性能仍有差距</li>
+                    <li class="py-2 border-b dark:border-gray-700"><i class="fas fa-question-circle text-amber-500 mr-2"></i><strong>局限2 - 依赖参考轨迹</strong>：CTAR 需要 ground-truth 轨迹计算奖励，在真实场景中可能难以获得</li>
+                    <li class="py-2 border-b dark:border-gray-700"><i class="fas fa-question-circle text-amber-500 mr-2"></i><strong>局限3 - 超参数敏感</strong>：MDPR 的 ω 和 λ 需要调优，不同任务可能需要不同配置</li>
+                    <li class="py-2"><i class="fas fa-question-circle text-amber-500 mr-2"></i><strong>局限4 - 未与其他 RL 方法充分对比</strong>：如 DPO、PPO 等在线 RL 方法的直接对比有限</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold mb-3 text-red-700 dark:text-red-400"><i class="fas fa-times-circle mr-2"></i>常见误区澄清</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+                    <table class="w-full text-sm">
+                        <thead><tr class="border-b dark:border-gray-700"><th class="p-2 text-left">误区</th><th class="p-2 text-left">澄清</th></tr></thead>
+                        <tbody>
+                            <tr><td class="p-2 text-gray-600 font-medium">RFT 需要环境交互？</td><td class="p-2">LifeLong-RFT 完全不需要环境交互，仅依赖演示数据计算奖励</td></tr>
+                            <tr><td class="p-2 text-gray-600 font-medium">GRPO = PPO？</td><td class="p-2">GRPO 不需要 Critic 网络，通过组内比较估计优势，计算效率更高</td></tr>
+                            <tr><td class="p-2 text-gray-600 font-medium">QACR 就够了？</td><td class="p-2">消融实验证明仅 QACR 不够，CTAR 对物理执行至关重要 (-90.9%)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 12. 总结评价 -->
+            <section id="conclusion" class="section-anchor mb-12 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6"><i class="fas fa-clipboard-check mr-2"></i>12. 总结与评价</h2>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600">A</div>
+                            <div class="text-sm text-gray-600">贡献度</div>
+                            <div class="text-xs text-gray-500 mt-1">首个无需环境的 VLA 持续学习 RFT</div>
+                        </div>
+                        <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                            <div class="text-2xl font-bold text-purple-600">A</div>
+                            <div class="text-sm text-gray-600">创新度</div>
+                            <div class="text-xs text-gray-500 mt-1">MDPR 三维奖励机制设计精巧</div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600">B+</div>
+                            <div class="text-sm text-gray-600">可复现性</div>
+                            <div class="text-xs text-gray-500 mt-1">详细超参数，但未开源代码</div>
+                        </div>
+                    </div>
+                    <div class="border-t pt-4">
+                        <h4 class="font-semibold mb-2">综合评价</h4>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">LifeLong-RFT 是 VLA 持续学习领域的重要进展，通过 MDPR 三维奖励机制巧妙解决了无需环境交互的强化微调难题。实验结果扎实，在 multi-task 和 continual learning 上均有显著提升。主要局限在于仅支持离散动作模型，且依赖参考轨迹。未来如能扩展到连续动作空间并开源代码，将更具影响力。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 资源链接 -->
+            <section class="mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6"><i class="fas fa-external-link-alt mr-2"></i>相关资源</h2>
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://arxiv.org/pdf/2602.10503.pdf" target="_blank" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition shadow-md">
+                        <i class="fas fa-file-pdf mr-2"></i>PDF
+                    </a>
+                    <a href="https://arxiv.org/html/2602.10503" target="_blank" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition shadow-md">
+                        <i class="fas fa-globe mr-2"></i>HTML
+                    </a>
+                    <a href="https://arxiv.org/abs/2602.10503" target="_blank" class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition shadow-md">
+                        <i class="fas fa-info-circle mr-2"></i>Abstract
+                    </a>
+                </div>
+            </section>
+
+            <footer class="text-center text-sm text-gray-500 border-t border-gray-200 dark:border-gray-700 pt-8">
+                <p class="mb-2">Generated by Paper Analyzer v3.0 • 2025-04-11</p>
+                <p class="text-xs">遵循 5-Part 分析标准 • A+ 级深度分析</p>
+            </footer>
+        </div>
+    </main>
+    
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+        
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        const sections = document.querySelectorAll('.section-anchor');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                if (scrollY >= section.offsetTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveNav);
+        updateActiveNav();
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>

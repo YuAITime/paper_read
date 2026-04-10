@@ -1,0 +1,32 @@
+{
+  "arxiv_id": "2602.10503",
+  "title": "Towards Long-Lived Robots: Continual Learning VLA Models via Reinforcement Fine-Tuning",
+  "authors": [
+    "Yuan Liu",
+    "Haoran Li",
+    "Shuai Tian",
+    "Yuxing Qin",
+    "Yuhui Chen",
+    "Yupeng Zheng",
+    "Yongzhen Huang",
+    "Dongbin Zhao"
+  ],
+  "abstract": "Pretrained on large-scale and diverse datasets, VLA models demonstrate strong generalization and adaptability as general-purpose robotic policies. However, Supervised Fine-Tuning (SFT), which serves as the primary mechanism for adapting VLAs to downstream domains, requires substantial amounts of task-specific data and is prone to catastrophic forgetting. To address these limitations, we propose LifeLong-RFT, a simple yet effective Reinforcement Fine-Tuning (RFT) strategy for VLA models independe...",
+  "published": "[Submitted on 11 Feb 2026]",
+  "pdf_url": "https://arxiv.org/pdf/2602.10503.pdf",
+  "html_url": "https://arxiv.org/html/2602.10503",
+  "categories": [
+    "Robotics (cs.RO)"
+  ],
+  "figure_count": 10,
+  "baselines": [
+    "LIBERO",
+    "RFT",
+    "III",
+    "AUC",
+    "NBT",
+    "NORA",
+    "FWT",
+    "SFT"
+  ]
+}
