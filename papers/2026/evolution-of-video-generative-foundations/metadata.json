@@ -1,0 +1,36 @@
+{
+  "arxiv_id": "2604.06339",
+  "title": "Evolution of Video Generative Foundations",
+  "authors": [
+    "Teng Hu",
+    "Jiangning Zhang",
+    "Hongrui Huang",
+    "Ran Yi",
+    "Zihan Su",
+    "Jieyu Weng",
+    "Zhucun Xue",
+    "Lizhuang Ma",
+    "Ming-Hsuan Yang",
+    "Dacheng Tao"
+  ],
+  "abstract": "The rapid advancement of Artificial Intelligence Generated Content (AIGC) has revolutionized video generation, enabling systems ranging from proprietary pioneers like OpenAI's Sora, Google's Veo3, and Bytedance's Seedance to powerful open-source contenders like Wan and HunyuanVideo to synthesize temporally coherent and semantically rich videos. These advancements pave the way for building \"world models\" that simulate real-world dynamics, with applications spanning entertainment, education, and v...",
+  "published": "[Submitted on 7 Apr 2026]",
+  "pdf_url": "https://arxiv.org/pdf/2604.06339.pdf",
+  "html_url": "https://arxiv.org/html/2604.06339",
+  "categories": [
+    "Computer Vision and Pattern Recognition (cs.CV)"
+  ],
+  "figure_count": 7,
+  "baselines": [
+    "AGI",
+    "WAN-VAE",
+    "LTX",
+    "DPO",
+    "CMCM",
+    "EDM",
+    "VAE",
+    "GAN",
+    "NLP",
+    "CVD"
+  ]
+}
