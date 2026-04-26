@@ -3,390 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paper Reading Notes | AI Research Collection</title>
+    <title>📚 Paper Reading Notes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
-        .paper-card { transition: all 0.3s ease; }
-        .paper-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15); }
-        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    </style>
-</head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors min-h-screen">
-    <!-- Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold gradient-text">Paper Reading Notes</h1>
-                        <p class="text-xs text-gray-500">AI Research Collection</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden md:flex items-center gap-2 text-sm text-gray-500">
-                        <i class="fas fa-database"></i>
-                        <span>7 papers</span>
-                    </div>
-                    <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 transition">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-                <div class="text-2xl font-bold text-blue-600">7</div>
-                <div class="text-sm text-gray-500">Total Papers</div>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-                <div class="text-2xl font-bold text-purple-600">2026</div>
-                <div class="text-sm text-gray-500">Latest Year</div>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-                <div class="text-2xl font-bold text-green-600">VLA/AD</div>
-                <div class="text-sm text-gray-500">Focus Area</div>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-                <div class="text-2xl font-bold text-orange-600">5-Part</div>
-                <div class="text-sm text-gray-500">Analysis Standard</div>
-            </div>
-        </div>
-
-        <!-- Filter/Search -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm mb-8">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1 relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search papers..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="flex gap-2">
-                    <select class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                        <option>All Years</option>
-                        <option>2026</option>
-                    </select>
-                    <select class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                        <option>All Categories</option>
-                        <option>World Model</option>
-                        <option>JEPA</option>
-                        <option>WAM</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Papers by Year -->
-        <div class="space-y-8">
-            <!-- 2025 -->
-            <section>
-                <div class="flex items-center gap-3 mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">2025</h2>
-                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm">1 paper</span>
-                </div>
-                
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <!-- ELVA -->
-                    <a href="papers/2025/elva-encoder-free-video-llm/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">🎬</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">ICCV</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2501.15586</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Jan 2025</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">ELVA: Breaking the Encoder Barrier for Video-Language Understanding</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-gray-700">Handong Li</span> et al.
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded text-xs">Video-LLM</span>
-                                <span class="px-2 py-0.5 bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 rounded text-xs">Encoder-free</span>
-                                <span class="px-2 py-0.5 bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300 rounded text-xs">Efficiency</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 5 parts</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </section>
-
-            <!-- 2026 -->
-            <section>
-                <div class="flex items-center gap-3 mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">2026</h2>
-                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm">7 papers</span>
-                </div>
-                
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Evolution of Video Generative Foundations -->
-                    <a href="papers/2026/evolution-of-video-generative-foundations/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-pink-500 via-rose-500 to-orange-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">🎬</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">Survey</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2604.06339</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Apr 2026</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">Evolution of Video Generative Foundations: A Survey</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-gray-700">Teng Hu</span> et al.
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 rounded text-xs">Video Generation</span>
-                                <span class="px-2 py-0.5 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded text-xs">Survey</span>
-                                <span class="px-2 py-0.5 bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300 rounded text-xs">AIGC</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 7 figures</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Fast-WAM -->
-                    <a href="papers/2026/fast-wam-test-time-imagination/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-green-500 via-teal-500 to-blue-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">⚡</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">arXiv</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2603.16666</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Mar 2026</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">Fast-WAM: Do World Action Models Need Test-time Future Imagination?</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-gray-700">Tianyuan Yuan</span> et al. (Tsinghua)
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-xs">WAM</span>
-                                <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs">Embodied AI</span>
-                                <span class="px-2 py-0.5 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded text-xs">Video Generation</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 9 figures</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- EvoDriveVLA -->
-                    <a href="papers/2026/evodrivevla/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">🚗</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">arXiv</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2603.09465</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Mar 2026</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">EvoDriveVLA: Evolving Autonomous Driving Vision-Language-Action Model via Collaborative Perception-Planning Distillation</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-gray-700">Jiajun Cao</span> et al.
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded text-xs">Autonomous Driving</span>
-                                <span class="px-2 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-xs">VLA</span>
-                                <span class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-xs">Distillation</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 10 figures</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- LeWorldModel -->
-                    <a href="papers/2026/leworldmodel-stable-end-to-end-jepa/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">🧠</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">arXiv</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2603.19312</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Mar 2026</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-blue-600 font-medium">Yann LeCun</span> et al.
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded text-xs">World Model</span>
-                                <span class="px-2 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-xs">JEPA</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 19 figures</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- GigaWorld-Policy -->
-                    <a href="papers/2026/gigaworld-policy-efficient-action-centered-world-action-model/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">🤖</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">arXiv</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2603.17240</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Mar 2026</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">GigaWorld-Policy: An Efficient Action-Centered World-Action Model</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-gray-700">Open Giga AI</span> et al.
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded text-xs">WAM</span>
-                                <span class="px-2 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-xs">Robotics</span>
-                                <span class="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-xs">9× Speedup</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 3 parts</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- LifeLong-RFT -->
-                    <a href="papers/2026/towards-long-lived-robots-continual-learning-vla-models-via-reinforcement-fine-t/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">🔄</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">arXiv</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2602.10503</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Feb 2026</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">LifeLong-RFT: Continual Learning VLA Models via Reinforcement Fine-Tuning</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-gray-700">Yuan Liu</span> et al.
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded text-xs">VLA</span>
-                                <span class="px-2 py-0.5 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded text-xs">Continual Learning</span>
-                                <span class="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded text-xs">RL</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 10 figures</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- StreetForward -->
-                    <a href="papers/2026/streetforward-perceiving-dynamic-street-feedforward-causal-attention/index.html" class="paper-card block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="h-32 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 relative">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-4xl">🛣️</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="px-2 py-1 bg-white/90 dark:bg-black/50 rounded text-xs font-medium">arXiv</span>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs text-gray-500">2603.19552</span>
-                                <span class="text-gray-300">•</span>
-                                <span class="text-xs text-gray-500">Mar 2026</span>
-                            </div>
-                            <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">StreetForward: Perceiving Dynamic Street with Feedforward Causal Attention</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <span class="text-gray-700">Authors</span> et al.
-                            </p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="px-2 py-0.5 bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-300 rounded text-xs">4D Reconstruction</span>
-                                <span class="px-2 py-0.5 bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 rounded text-xs">Causal Attention</span>
-                                <span class="px-2 py-0.5 bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 rounded text-xs">Autonomous Driving</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-gray-500">
-                                <span><i class="far fa-image mr-1"></i> 3 parts</span>
-                                <span class="text-blue-600 font-medium">Read →</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-sm text-gray-500">
-                    Generated by <span class="font-medium">Paper Analyzer v2.0</span> 
-                    <span class="text-gray-300 mx-2">|</span> 
-                    5-Part Analysis Standard
-                </p>
-                <div class="flex items-center gap-4">
-                    <a href="https://github.com/YuAITime/paper_read" target="_blank" class="text-gray-400 hover:text-gray-600 transition">
-                        <i class="fab fa-github text-xl"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <script>
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         }
     </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <nav class="fixed top-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-600">📚 Paper Reading Notes</h1>
+            <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+                <span class="dark:hidden">🌙</span>
+                <span class="hidden dark:block">☀️</span>
+            </button>
+        </div>
+    </nav>
+    <main class="pt-20 pb-12 px-4 max-w-5xl mx-auto">
+        <div class="mb-8 text-center">
+            <p class="text-gray-600 dark:text-gray-400">Total: 6 papers</p>
+        </div>
+        <div class="mb-8"><h2 class="text-2xl font-bold mb-4">[Sub</h2><div class="grid md:grid-cols-2 gap-4">
+            <a href="papers/2026/evolution-of-video-generative-foundations/index.html" class="block bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700">
+                <div class="text-xs text-gray-500 mb-1">2604.06339</div>
+                <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">Evolution of Video Generative Foundations</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Teng Hu, Jiangning Zhang...</p>
+            </a>
+            
+            <a href="papers/2026/towards-long-lived-robots-continual-learning-vla-models-via-reinforcement-fine-t/index.html" class="block bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700">
+                <div class="text-xs text-gray-500 mb-1">2602.10503</div>
+                <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">Towards Long-Lived Robots: Continual Learning VLA Models via Reinforcement Fine-Tuning</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Yuan Liu, Haoran Li...</p>
+            </a>
+            
+            <a href="papers/2025/deepseek-ocr-contexts-optical-compression/index.html" class="block bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700">
+                <div class="text-xs text-gray-500 mb-1">2510.18234</div>
+                <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">DeepSeek-OCR: Contexts Optical Compression</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Haoran Wei, Yaofeng Sun...</p>
+            </a>
+            
+            <a href="papers/2025/multi-period-asset-liability-management-with-reinforcement-learning-in-a-regime-/index.html" class="block bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700">
+                <div class="text-xs text-gray-500 mb-1">2509.03251</div>
+                <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">Multi-period Asset-liability Management with Reinforcement Learning in a Regime-Switching Market</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Zhongqin Gao, Ping Chen...</p>
+            </a>
+            
+            <a href="papers/2025/novel-simex-algorithm-for-autoregressive-models-to-estimate-agn-variability/index.html" class="block bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700">
+                <div class="text-xs text-gray-500 mb-1">2501.15586</div>
+                <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">Novel SIMEX algorithm for autoregressive models to estimate AGN variability</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Felipe Elorrieta, Wilfredo Palma...</p>
+            </a>
+            </div></div><div class="mb-8"><h2 class="text-2xl font-bold mb-4">10 M</h2><div class="grid md:grid-cols-2 gap-4">
+            <a href="papers/2026/evodrivevla/index.html" class="block bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700">
+                <div class="text-xs text-gray-500 mb-1">2603.09465</div>
+                <h3 class="font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">EvoDriveVLA: Evolving Autonomous Driving Vision-Language-Action Model via Collaborative Perception-Planning Distillation</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Jiajun Cao, Xiaoan Zhang...</p>
+            </a>
+            </div></div>
+    </main>
 </body>
 </html>
