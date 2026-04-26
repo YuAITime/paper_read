@@ -1,0 +1,23 @@
+{
+  "arxiv_id": "2509.03251",
+  "title": "Multi-period Asset-liability Management with Reinforcement Learning in a Regime-Switching Market",
+  "authors": [
+    "Zhongqin Gao",
+    "Ping Chen",
+    "Xun Li",
+    "Yan Lv",
+    "Wenhao Zhang"
+  ],
+  "abstract": "This paper explores the mean-variance portfolio selection problem in a multi-period financial market characterized by regime-switching dynamics and uncontrollable liabilities. To address the uncertainty in the decision-making process within the financial market, we incorporate reinforcement learning (RL) techniques. Specifically, the study examines an exploratory mean-variance (EMV) framework where investors aim to minimize risk while maximizing returns under incomplete market information, influ...",
+  "published": "[Submitted on 3 Sep 2025]",
+  "pdf_url": "https://arxiv.org/pdf/2509.03251.pdf",
+  "html_url": "https://arxiv.org/html/2509.03251",
+  "categories": [
+    "Optimization and Control (math.OC)",
+    "Probability (math.PR)"
+  ],
+  "figure_count": 5,
+  "baselines": [
+    "EMV"
+  ]
+}

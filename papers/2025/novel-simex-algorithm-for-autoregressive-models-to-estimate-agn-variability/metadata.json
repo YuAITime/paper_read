@@ -1,0 +1,27 @@
+{
+  "arxiv_id": "2501.15586",
+  "title": "Novel SIMEX algorithm for autoregressive models to estimate AGN variability",
+  "authors": [
+    "Felipe Elorrieta",
+    "Wilfredo Palma",
+    "Susana Eyheramendy",
+    "Franz E. Bauer",
+    "Ernesto Camacho"
+  ],
+  "abstract": "The origin of the variability in accretion disks of active galactic nuclei (AGN) is still unknown, but its behavior can be characterized by modeling the time series of optical wavelength fluxes coming from the accretion disks with damped random walk (DRW) being the most popular model for this purpose. The DRW is modeled by a characteristic fluctuation amplitude and damping timescale {\\tau}, with the latter being potentially related to the mass and accretion rate onto the massive black hole. The ...",
+  "published": "[Submitted on 26 Jan 2025]",
+  "pdf_url": "https://arxiv.org/pdf/2501.15586.pdf",
+  "html_url": "https://arxiv.org/html/2501.15586",
+  "categories": [
+    "Instrumentation and Methods for Astrophysics (astro-ph.IM)"
+  ],
+  "figure_count": 3,
+  "baselines": [
+    "RMSE",
+    "DRW",
+    "SIMEX",
+    "MLE",
+    "LSE",
+    "AGN"
+  ]
+}

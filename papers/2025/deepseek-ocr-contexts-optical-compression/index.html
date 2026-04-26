@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度分析 | DeepSeek-OCR: Contexts Optical Compression...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/polyfill/3.52.1/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+        .section-anchor { scroll-margin-top: 80px; }
+        .paper-img { border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: transform 0.2s; max-width: 100%; }
+        .paper-img:hover { transform: scale(1.02); }
+        .nav-item { transition: all 0.2s; }
+        .nav-item:hover { background: rgba(59, 130, 246, 0.1); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #2563eb; border-right: 3px solid #2563eb; }
+        .critical-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; }
+        .formula-box { background: #f8fafc; border-left: 4px solid #3b82f6; }
+        .mechanism-card { background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%); border: 1px solid #93c5fd; }
+        .comparison-table th { background: #f3f4f6; }
+        .comparison-table .highlight { background: #dcfce7; }
+        .comparison-table .dimmed { background: #fee2e2; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    
+    <nav class="fixed top-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="../../../../index.html" class="flex items-center gap-2 text-blue-600 font-bold hover:text-blue-800">
+                <i class="fas fa-arrow-left"></i>
+                <span>返回索引</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-500 hidden md:inline">arXiv: 2510.18234</span>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <aside class="fixed left-0 top-14 w-72 h-full bg-white dark:bg-gray-800 shadow-lg overflow-y-auto hidden xl:block border-r border-gray-200 dark:border-gray-700">
+        <div class="p-4">
+            <h3 class="font-semibold mb-4 text-gray-700 dark:text-gray-300"><i class="fas fa-list-ul text-blue-500 mr-2"></i>目录</h3>
+            <ul class="space-y-1 text-sm">
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part I</span>
+                </li>
+                <li><a href="#overview" class="nav-item block py-2 px-3 rounded-lg text-blue-600 font-medium">1. 论文概览</a></li>
+                <li><a href="#background" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">2. 研究背景</a></li>
+                <li><a href="#problem" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">3. 问题定义</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part II</span>
+                </li>
+                <li><a href="#architecture" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">4. 架构设计</a></li>
+                <li><a href="#implementation" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">5. 实现细节</a></li>
+                <li><a href="#mechanism" class="nav-item block py-2 px-3 rounded-lg text-purple-600 font-medium">6. 机制解析</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part III</span>
+                </li>
+                <li><a href="#experiments" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">7. 实验设置</a></li>
+                <li><a href="#results" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">8. 主要结果</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part IV</span>
+                </li>
+                <li><a href="#comparison" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">9. SOTA 对比</a></li>
+                <li><a href="#ablation" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">10. 消融实验</a></li>
+                
+                <li class="pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Part V</span>
+                </li>
+                <li><a href="#critical" class="nav-item block py-2 px-3 rounded-lg text-red-600 font-medium">11. 批判性分析</a></li>
+                <li><a href="#conclusion" class="nav-item block py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400">12. 总结评价</a></li>
+            </ul>
+        </div>
+    </aside>
+    
+    <main class="xl:ml-72 pt-16 pb-12 px-4">
+        <div class="max-w-5xl mx-auto">
+            
+            <header class="mb-12 text-center py-8">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full text-sm mb-4 shadow-lg">
+                    <i class="fas fa-microscope"></i>
+                    <span>arXiv 2025</span>
+                    <span class="opacity-75">•</span>
+                    <span>深度分析</span>
+                </div>
+                <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-tight">DeepSeek-OCR: Contexts Optical Compression</h1>
+                <p class="text-gray-600 dark:text-gray-400 mb-2"><strong>Haoran Wei</strong>, <strong>Yaofeng Sun</strong>, <strong>Yukun Li</strong></p>
+                <p class="text-sm text-gray-500 mb-4">[Submitted on 21 Oct 2025]</p>
+                <div class="flex justify-center gap-2 flex-wrap"><span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">Computer Vision and Pattern Recognition (cs.CV)</span></div>
+            </header>
+            
+            <!-- Part I -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+                <span class="text-sm font-bold text-blue-600 uppercase tracking-wider"><i class="fas fa-info-circle mr-2"></i>Part I · 概览与背景</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+            </div>
+
+            <!-- 1. 论文概览 -->
+            <section id="overview" class="section-anchor mb-12">
+                <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-2xl p-8 text-white shadow-xl">
+                    <h2 class="text-2xl font-bold mb-6"><i class="fas fa-trophy mr-2"></i>核心贡献</h2>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-5">
+                        <ul class="space-y-3"><li class="flex items-start gap-3"><span class="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span><span>We present DeepSeek-OCR as an initial investigation into the feasibility of compressing long contexts via optical 2D mapping</span></li><li class="flex items-start gap-3"><span class="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span><span>Specifically, DeepEncoder serves as the core engine, designed to maintain low activations under high-resolution input while achieving high compression ratios to ensure an optimal and manageable number of vision tokens</span></li><li class="flex items-start gap-3"><span class="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span><span>提出 Methodology 方法</span></li></ul>
+                    </div>
+                    <div class="mt-4 text-sm text-white/80">
+                        <i class="fas fa-quote-left mr-2"></i>摘要: We present DeepSeek-OCR as an initial investigation into the feasibility of compressing long contexts via optical 2D mapping. DeepSeek-OCR consists of two components: DeepEncoder and DeepSeek3B-MoE-A570M as the decoder. Specifically, DeepEncoder serves as the core engine, designed to maintain low activations under high-resolution input while achieving high compression ratios to ensure an optimal a...
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 研究背景 -->
+            <section id="background" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-history mr-2 text-blue-500"></i>2. 研究背景</h2>
+                <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg p-4">
+                        <p class="font-semibold text-blue-800 dark:text-blue-300 mb-2"><i class="fas fa-lightbulb mr-2"></i>领域定位</p>
+                        <p class="text-sm">本研究属于 <strong>Computer Vision and Pattern Recognition (cs.CV)</strong> 与 <strong>Document Understanding</strong> 交叉领域。核心是解决LLM处理长文档时的视觉token爆炸问题。</p>
+                    </div>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded-lg p-4">
+                        <p class="font-semibold text-yellow-800 dark:text-yellow-300 mb-2"><i class="fas fa-question-circle mr-2"></i>核心动机</p>
+                        <p class="text-sm">传统OCR（如MinerU）生成6000+ tokens/页，GOT-OCR2.0用256 tokens/页但精度有限。<strong>能否在100-800 tokens内实现高精度文档理解？</strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 问题定义 -->
+            <section id="problem" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-bullseye mr-2 text-red-500"></i>3. 核心问题定义</h2>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+                    <p class="text-gray-700 dark:text-gray-300">当前LLM处理长文档（如书籍、论文、报告）时，视觉token数量爆炸是核心瓶颈。例如一页PDF可能产生6000+ tokens，导致：</p>
+                    <ul class="list-disc pl-5 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        <li>上下文窗口快速耗尽</li>
+                        <li>推理成本指数级增长</li>
+                        <li>长距离依赖建模困难</li>
+                    </ul>
+                    <p class="mt-3 text-gray-700 dark:text-gray-300">DeepSeek-OCR提出<strong>光学2D映射压缩</strong>：将文档图像通过编码器压缩为少量视觉token（100-800个），再由解码器恢复文本，实现10-20倍压缩比。</p>
+                </div>
+            </section>
+            
+            <!-- Part II -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+                <span class="text-sm font-bold text-purple-600 uppercase tracking-wider"><i class="fas fa-cogs mr-2"></i>Part II · 方法详解</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+            </div>
+
+            <!-- 4. 架构设计 -->
+            <section id="architecture" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-sitemap mr-2 text-purple-500"></i>4. 架构设计</h2>
+                
+                <div class="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-6 mb-6">
+                    <h3 class="font-bold text-lg mb-4 text-purple-800 dark:text-purple-300">整体架构：编码器-解码器</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-4 shadow-sm">
+                            <h4 class="font-semibold text-blue-600 mb-2"><i class="fas fa-compress-arrows-alt mr-2"></i>DeepEncoder</h4>
+                            <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                                <li>• 输入：高分辨率文档图像</li>
+                                <li>• 核心目标：低激活 + 高压缩比</li>
+                                <li>• 输出：压缩后的视觉token（100-800个）</li>
+                                <li>• 关键技术：光学2D映射</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-4 shadow-sm">
+                            <h4 class="font-semibold text-green-600 mb-2"><i class="fas fa-expand-arrows-alt mr-2"></i>DeepSeek3B-MoE-A570M</h4>
+                            <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                                <li>• 3B参数 MoE 解码器</li>
+                                <li>• 激活参数570M</li>
+                                <li>• 从视觉token恢复文本</li>
+                                <li>• 支持OCR精度97%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+                    <h4 class="font-semibold mb-3">数据流</h4>
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-file-image text-2xl text-blue-600"></i>
+                            </div>
+                            <p>文档图像</p>
+                            <p class="text-xs text-gray-500">高分辨率</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-gray-400"></i>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-compress text-2xl text-purple-600"></i>
+                            </div>
+                            <p>DeepEncoder</p>
+                            <p class="text-xs text-gray-500">光学2D映射</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-gray-400"></i>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-cubes text-2xl text-green-600"></i>
+                            </div>
+                            <p>视觉Token</p>
+                            <p class="text-xs text-gray-500">100-800个</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-gray-400"></i>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-file-alt text-2xl text-orange-600"></i>
+                            </div>
+                            <p>解码器</p>
+                            <p class="text-xs text-gray-500">MoE 3B</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-gray-400"></i>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-font text-2xl text-red-600"></i>
+                            </div>
+                            <p>OCR文本</p>
+                            <p class="text-xs text-gray-500">97%精度</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="mt-4 text-gray-600 dark:text-gray-400 text-sm">整体架构、组件关系、关键设计决策详见论文 Methodology 章节。</p>
+            </section>
+
+            <!-- 5. 实现细节 -->
+            <section id="implementation" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-code mr-2 text-purple-500"></i>5. 实现细节</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-800 dark:text-purple-300 mb-2">DeepEncoder</h4>
+                        <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+                            <li>• 核心设计：低激活 + 高压缩比</li>
+                            <li>• 输入：高分辨率文档图像</li>
+                            <li>• 输出：100-800 视觉token</li>
+                            <li>• 关键技术：光学2D映射</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2">DeepSeek3B-MoE-A570M</h4>
+                        <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+                            <li>• 总参数量：3B</li>
+                            <li>• 激活参数：570M</li>
+                            <li>• 架构：Mixture of Experts (MoE)</li>
+                            <li>• 功能：从视觉token解码文本</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <p class="text-gray-500">论文未明确列出超参数配置，详见论文 Implementation Details 章节。</p>
+                <p class="mt-4 text-gray-600 dark:text-gray-400 text-sm">模型参数、训练配置、数据集详情详见论文 Implementation Details 和 Experiment 章节。</p>
+            </section>
+
+            <!-- 6. 机制解析 (三层解释) -->
+            <section id="mechanism" class="section-anchor mb-12">
+                <h2 class="text-2xl font-bold mb-6"><i class="fas fa-microscope mr-2 text-purple-600"></i>6. 关键创新深入解析</h2>
+                
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="mechanism-card rounded-xl p-5">
+                        <div class="text-3xl mb-3">🎯</div>
+                        <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2">L1 · 直观理解</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">像把一本厚书拍成一张缩略图，但还能读出所有文字。传统OCR是"逐字拍照"（6000+ tokens），DeepSeek-OCR是"拍全景照"（100-800 tokens），但通过特殊的"光学镜头"（2D映射）保留全部信息。</p>
+                    </div>
+                    <div class="mechanism-card rounded-xl p-5">
+                        <div class="text-3xl mb-3">🔄</div>
+                        <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2">L2 · 机制流程</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300"><strong>训练阶段</strong>：文档图像→DeepEncoder压缩→Decoder尝试恢复原始文本→对比损失优化<br><br><strong>推理阶段</strong>：新文档→Encoder生成视觉token→Decoder输出OCR结果<br><br>关键：视觉token数量是文本token的1/10到1/20</p>
+                    </div>
+                    <div class="mechanism-card rounded-xl p-5">
+                        <div class="text-3xl mb-3">🔬</div>
+                        <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2">L3 · 技术细节</h3>
+                        <p class="text-sm text-gray-700 dark:text-gray-300"><strong>光学2D映射</strong>：将文档的空间结构（文字位置、段落布局）编码为2D特征图，而非1D序列<br><br><strong>低激活设计</strong>：控制Encoder的参数量，避免高分辨率输入导致计算爆炸<br><br><strong>MoE解码器</strong>：3B总参数/570M激活参数，平衡容量与效率</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Part III -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-green-400 to-transparent"></div>
+                <span class="text-sm font-bold text-green-600 uppercase tracking-wider"><i class="fas fa-flask mr-2"></i>Part III · 实验评估</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-green-400 to-transparent"></div>
+            </div>
+
+            <!-- 7. 实验设置 -->
+            <section id="experiments" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-sliders-h mr-2 text-green-500"></i>7. 实验设置</h2>
+                <div class="space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2"><i class="fas fa-server mr-2"></i>硬件环境</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">单卡 A100-40G，生产环境可达 200k+ 页/天处理能力</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2"><i class="fas fa-database mr-2"></i>数据集</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">OmniDocBench 评测基准，覆盖多种文档类型</p>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                        <h4 class="font-semibold mb-2 text-blue-800 dark:text-blue-300"><i class="fas fa-chart-line mr-2"></i>关键实验发现</h4>
+                        <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+                            <li>• <strong>压缩比 < 10x</strong>（视觉token为文本token的1/10）：OCR精度达 <strong>97%</strong></li>
+                            <li>• <strong>压缩比 20x</strong>：OCR精度仍保持约 <strong>60%</strong></li>
+                            <li>• 在OmniDocBench上，100 tokens超越GOT-OCR2.0（256 tokens）</li>
+                            <li>• 在OmniDocBench上，<800 tokens超越MinerU 2.0（6000+ tokens）</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. 主要结果 -->
+            <section id="results" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-chart-line mr-2 text-green-500"></i>8. 主要结果</h2>
+                
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x1.png" alt="Figure 1" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 1:</strong> (a)Figure (a) shows the compression ratio (number of text tokens in ground truth/number of vision tokens model used) testing on Fox[21]benchmark; Figure (b) shows performance comparisons on OmniDocBen...
+                </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x1.png" alt="Figure 3" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 3:</strong> Typical vision encoders in popular VLMs. Here are three types of encoders commonly used in current open-source VLMs, all of which suffer from their respective deficiencies.
+                </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x2.png" alt="Figure 4" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 4:</strong> The architecture of DeepSeek-OCR. DeepSeek-OCR consists of a DeepEncoder and a DeepSeek-3B-MoE decoder. DeepEncoder is the core of DeepSeek-OCR, comprising three components: a SAM[17]for perception do...
+                </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x3.png" alt="Figure 5" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 5:</strong> To test model performance under different compression ratios (requiring different numbers of vision tokens) and enhance the practicality of DeepSeek-OCR, we configure it with multiple resolution modes...
+                </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x4.png" alt="Figure 7" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 7:</strong> (a)OCR 1.0 fine annotations display. We format the ground truth into an interleaved layout and text format, where each paragraph of text is preceded by the coordinates and label of it in the original ...
+                </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x4.png" alt="Figure 9" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 9:</strong> (b)For charts, we do not use OneChart’s[7]dictionary format, but instead use HTML table format as labels, which can save a certain amount of tokens. For plane geometry, we convert the ground truth to ...
+                </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x4.png" alt="Figure 14" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 14:</strong> In the field of financial research reports, the deep parsing mode of DeepSeek-OCR can be used to obtain structured results of charts within documents. Charts are a crucial form of data representation ...
+                </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-4">
+                <img src="https://arxiv.org/html/2510.18234/x5.png" alt="Figure 15" class="paper-img w-full max-w-3xl mx-auto" loading="lazy">
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <strong>Figure 15:</strong> For books and articles, the deep parsing mode can output dense captions for natural images in the documents. With just a prompt, the model can automatically identify what type of image it is and outpu...
+                </p>
+            </div>
+            </section>
+            
+            <!-- Part IV -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-orange-400 to-transparent"></div>
+                <span class="text-sm font-bold text-orange-600 uppercase tracking-wider"><i class="fas fa-balance-scale mr-2"></i>Part IV · 消融与对比</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-orange-400 to-transparent"></div>
+            </div>
+
+            <!-- 9. SOTA 对比 -->
+            <section id="comparison" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-trophy mr-2 text-orange-500"></i>9. 与 SOTA 方法对比</h2>
+                
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5 mb-6">
+                    <h3 class="font-semibold text-blue-800 dark:text-blue-300 mb-3">核心对比维度</h3>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-3">
+                            <p class="font-semibold text-gray-700 dark:text-gray-300">MinerU 2.0</p>
+                            <p class="text-gray-500">6000+ tokens/页</p>
+                            <p class="text-green-600">高精度但token爆炸</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-3">
+                            <p class="font-semibold text-gray-700 dark:text-gray-300">GOT-OCR2.0</p>
+                            <p class="text-gray-500">256 tokens/页</p>
+                            <p class="text-yellow-600">压缩率高但精度有限</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-3 border-2 border-purple-500">
+                            <p class="font-semibold text-purple-700 dark:text-purple-300">DeepSeek-OCR</p>
+                            <p class="text-gray-500">100-800 tokens/页</p>
+                            <p class="text-green-600">✓ 精度97% + 可控压缩</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto mt-6">
+                    <table class="comparison-table w-full text-sm border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="p-3 text-left rounded-tl-lg">方法</th>
+                                <th class="p-3 text-center">Tokens/页</th>
+                                <th class="p-3 text-center">OCR精度</th>
+                                <th class="p-3 text-center">压缩比</th>
+                                <th class="p-3 text-center rounded-tr-lg">特点</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y dark:divide-gray-700">
+                            <tr class="highlight">
+                                <td class="p-3 font-bold">DeepSeek-OCR</td>
+                                <td class="p-3 text-center">100-800</td>
+                                <td class="p-3 text-center text-green-600 font-bold">97%</td>
+                                <td class="p-3 text-center">10-20x</td>
+                                <td class="p-3 text-center">光学2D映射</td>
+                            </tr>
+                            <tr class="dimmed">
+                                <td class="p-3">GOT-OCR2.0</td>
+                                <td class="p-3 text-center">256</td>
+                                <td class="p-3 text-center">-</td>
+                                <td class="p-3 text-center">~23x</td>
+                                <td class="p-3 text-center">端到端OCR</td>
+                            </tr>
+                            <tr class="dimmed">
+                                <td class="p-3">MinerU 2.0</td>
+                                <td class="p-3 text-center">6000+</td>
+                                <td class="p-3 text-center">高</td>
+                                <td class="p-3 text-center">1x</td>
+                                <td class="p-3 text-center">传统OCR流程</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+                    <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                        <i class="fas fa-lightbulb mr-2"></i><strong>关键洞察</strong>：DeepSeek-OCR在OmniDocBench上仅用100 tokens就超越GOT-OCR2.0（256 tokens），用不到800 tokens超越MinerU 2.0（6000+ tokens），证明了压缩+精度的双赢。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 10. 消融实验 -->
+            <section id="ablation" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-puzzle-piece mr-2 text-orange-500"></i>10. 消融实验</h2>
+                <p class="text-gray-600 dark:text-gray-400">消融实验设计、各组件贡献度分析详见论文 Ablation Study 章节。</p>
+            </section>
+            
+            <!-- Part V -->
+            <div class="mb-8 flex items-center gap-3">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
+                <span class="text-sm font-bold text-red-600 uppercase tracking-wider"><i class="fas fa-search mr-2"></i>Part V · 批判性分析</span>
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-red-400 to-transparent"></div>
+            </div>
+
+            <!-- 11. 批判性分析 -->
+            <section id="critical" class="section-anchor mb-12 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6 text-red-800 dark:text-red-300"><i class="fas fa-microscope mr-2"></i>11. 深度批判</h2>
+                
+                <div class="critical-box rounded-lg p-5 mb-6">
+                    <h3 class="font-bold text-amber-800 dark:text-amber-300 mb-2"><i class="fas fa-lightbulb mr-2"></i>核心创新点分析</h3>
+                    <p class="text-amber-900 dark:text-amber-200 text-sm">
+                        <strong>光学2D映射</strong>是最大创新：不同于传统OCR将文档视为1D序列，DeepSeek-OCR保留了文档的2D空间结构信息（段落布局、表格结构、图文关系）。这使得压缩后的视觉token仍包含丰富的空间语义。
+                    </p>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3 text-red-700 dark:text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>局限性质疑</h3>
+                <ul class="space-y-3 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg p-4">
+                    <li class='py-2 border-b dark:border-gray-700'>
+                        <i class='fas fa-question-circle text-amber-500 mr-2'></i>
+                        <strong>压缩比边界</strong>：20x压缩时精度降至60%，什么类型的文档/文字在此边界下失效？手写体？复杂公式？低质量扫描件？
+                    </li>
+                    <li class='py-2 border-b dark:border-gray-700'>
+                        <i class='fas fa-question-circle text-amber-500 mr-2'></i>
+                        <strong>泛化能力</strong>：仅在OmniDocBench测试，是否覆盖多语言（中文/日文/阿拉伯文）、多字体、历史文档？
+                    </li>
+                    <li class='py-2 border-b dark:border-gray-700'>
+                        <i class='fas fa-question-circle text-amber-500 mr-2'></i>
+                        <strong>与LLM的兼容性</strong>：压缩后的视觉token是否能被通用VLM（如GPT-4V）理解，还是只能配合专用解码器？
+                    </li>
+                    <li class='py-2'>
+                        <i class='fas fa-question-circle text-amber-500 mr-2'></i>
+                        <strong>训练数据规模</strong>：200k+页/天的生产数据是如何构建的？清洗流程？版权合规？
+                    </li>
+                </ul>
+
+                <h3 class="text-lg font-semibold mt-6 mb-3 text-red-700 dark:text-red-400"><i class="fas fa-times-circle mr-2"></i>常见误区澄清</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+                    <table class="w-full text-sm">
+                        <thead><tr class="border-b dark:border-gray-700"><th class="p-2 text-left">误区</th><th class="p-2 text-left">澄清</th></tr></thead>
+                        <tbody>
+                            <tr><td class="p-2 text-gray-600">"压缩=信息丢失"</td><td class="p-2">DeepSeek-OCR通过<strong>光学2D映射</strong>保留空间结构，是有损压缩但保留了关键语义</td></tr>
+                            <tr><td class="p-2 text-gray-600">"只能做OCR"</td><td class="p-2">实际可用于任何需要文档理解的场景：RAG、知识库构建、长文档问答</td></tr>
+                            <tr><td class="p-2 text-gray-600">"替代传统OCR"</td><td class="p-2">当前是互补关系：传统OCR精度更高，DeepSeek-OCR在<strong>长文档/大数据量</strong>场景更优</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 12. 总结评价 -->
+            <section id="conclusion" class="section-anchor mb-12 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8">
+                <h2 class="text-2xl font-bold mb-6"><i class="fas fa-clipboard-check mr-2"></i>12. 总结与评价</h2>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-5">
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600">A-</div>
+                            <div class="text-sm text-gray-600">贡献度</div>
+                            <p class="text-xs text-gray-500 mt-1">光学2D映射有新意，但实验覆盖度有限</p>
+                        </div>
+                        <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                            <div class="text-2xl font-bold text-purple-600">B+</div>
+                            <div class="text-sm text-gray-600">创新度</div>
+                            <p class="text-xs text-gray-500 mt-1">Encoder-Decoder架构常见，2D映射是关键差异</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600">A</div>
+                            <div class="text-sm text-gray-600">实用价值</div>
+                            <p class="text-xs text-gray-500 mt-1">200k+页/天生产力，开源模型权重</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                        <p><strong>核心贡献</strong>：证明了<strong>光学2D映射压缩</strong>在长文档OCR中的可行性，10x压缩下保持97%精度，为LLM处理长上下文提供了新思路。</p>
+                        
+                        <p><strong>适用场景</strong>：</p>
+                        <ul class="list-disc pl-5">
+                            <li>大规模文档数字化（图书馆、档案馆）</li>
+                            <li>LLM训练数据构建（200k+页/天产能）</li>
+                            <li>RAG系统文档预处理（降低token成本）</li>
+                            <li>移动端/边缘设备文档理解（低带宽场景）</li>
+                        </ul>
+                        
+                        <p><strong>风险提示</strong>：</p>
+                        <ul class="list-disc pl-5">
+                            <li>20x压缩时精度降至60%，高压缩比场景需谨慎</li>
+                            <li>仅在OmniDocBench验证，多语言/多字体覆盖度不明</li>
+                            <li>与通用VLM的兼容性未充分验证</li>
+                        </ul>
+                        
+                        <p class="mt-4 pt-4 border-t dark:border-gray-700"><strong>总体评价</strong>：这是一篇<strong>实用导向</strong>的工作，虽然理论创新有限，但在工程落地和开源贡献方面价值显著。对于需要处理大规模文档的工业界应用，具有重要的参考价值。</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 资源链接 -->
+            <section class="mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold mb-6"><i class="fas fa-external-link-alt mr-2"></i>相关资源</h2>
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://arxiv.org/pdf/2510.18234.pdf" target="_blank" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition shadow-md">
+                        <i class="fas fa-file-pdf mr-2"></i>PDF
+                    </a>
+                    <a href="https://arxiv.org/html/2510.18234" target="_blank" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition shadow-md">
+                        <i class="fas fa-globe mr-2"></i>HTML
+                    </a>
+                    <a href="https://arxiv.org/abs/2510.18234" target="_blank" class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition shadow-md">
+                        <i class="fas fa-info-circle mr-2"></i>Abstract
+                    </a>
+                </div>
+            </section>
+            
+            <footer class="text-center text-sm text-gray-500 border-t border-gray-200 dark:border-gray-700 pt-8">
+                <p class="mb-2">Generated by Paper Analyzer v3.0 • 2026-04-26</p>
+                <p class="text-xs">遵循 5-Part 分析标准 • <a href="#" class="text-blue-500 hover:underline">查看质量检查清单</a></p>
+            </footer>
+        </div>
+    </main>
+    
+    
+    <script>
+        // 暗黑模式切换
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+        
+        // 初始化主题
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // 导航高亮
+        const sections = document.querySelectorAll('.section-anchor');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveNav);
+        updateActiveNav();
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
