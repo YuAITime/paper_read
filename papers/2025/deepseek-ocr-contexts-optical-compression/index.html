@@ -741,7 +741,303 @@
 </section>
 
 <!-- 关键图表分析 -->
-<section class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+<!-- 关键图表分析章节 -->
+<section id="figures" class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+    <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-images mr-2 text-blue-500"></i>15. 关键图表深度分析</h2>
+    
+    <div class="space-y-8">
+        
+        <!-- Figure 1 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 1: 核心性能概览</h3>
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">(a) Compression on Fox benchmark</p>
+                    <img src="figures/page_1.png" alt="Figure 1a" class="w-full rounded-lg border">
+                </div>
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">(b) Performance on OmniDocBench</p>
+                    <img src="figures/page_1.png" alt="Figure 1b" class="w-full rounded-lg border">
+                </div>
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>Figure 1作为论文的"封面图"，直观展示两大核心贡献：(a)压缩比-精度曲线证明光学压缩可行性；(b)OmniDocBench性能证明实用价值。</p>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>关键数据点：</strong></p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• 图(a)展示了不同压缩比下的OCR精度：10×压缩时~97%，20×压缩时~60%</li>
+                    <li>• 图(b)展示了在OmniDocBench上，100 tokens即可超越GOT-OCR2.0(256 tokens)</li>
+                    <li>• 两条曲线都表明：视觉token数与OCR精度呈正相关，但边际递减</li>
+                </ul>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mt-2"><strong>为什么重要：</strong>这张图回答了论文的核心问题——"光学压缩是否可行？"10×压缩97%精度证明：可行，且接近无损。</p>
+            </div>
+        </div>
+        
+        <!-- Figure 2 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 2: 现有视觉编码器架构对比</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_4.png" alt="Figure 2" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>通过对比三种主流架构，论证为什么需要设计新的DeepEncoder。每种架构都有明确的优缺点标注。</p>
+                <div class="grid md:grid-cols-3 gap-3 text-sm">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded p-2">
+                        <p class="font-semibold text-blue-700">双塔架构 (Vary)</p>
+                        <p class="text-gray-600">并行SAM+CLIP</p>
+                        <p class="text-red-600 text-xs">缺点：部署复杂，难以pipeline并行</p>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded p-2">
+                        <p class="font-semibold text-purple-700">单塔架构 (Qwen2-VL)</p>
+                        <p class="text-gray-600">统一处理</p>
+                        <p class="text-red-600 text-xs">缺点：高分辨率激活内存爆炸</p>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded p-2">
+                        <p class="font-semibold text-green-700">DeepEncoder (本文)</p>
+                        <p class="text-gray-600">串行SAM→压缩→CLIP</p>
+                        <p class="text-green-600 text-xs">优点：低激活+可控压缩</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Figure 3 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 3: DeepSeek-OCR整体架构</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_5.png" alt="Figure 3" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>展示端到端的编码-解码流程，突出三个关键设计决策：</p>
+                <ul class="text-sm space-y-2 text-gray-600 dark:text-gray-400">
+                    <li><strong>1. 串行而非并行：</strong>SAM→Conv压缩器→CLIP串联，而非Vary的双塔并行。这样激活内存更低（每次只有一个组件活跃）。</li>
+                    <li><strong>2. 16×卷积压缩器：</strong>在SAM和CLIP之间插入2层卷积（kernel=3, stride=2, padding=1），将token数从4096降至256。</li>
+                    <li><strong>3. MoE解码器：</strong>DeepSeek3B-MoE只激活570M参数，获得3B模型的表达能力+500M模型的推理效率。</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Figure 4 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 4: 多分辨率模式设计</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_6.png" alt="Figure 4" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>展示6种分辨率模式的配置，证明DeepSeek-OCR可以灵活适应不同文档密度。</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-blue-100 dark:bg-blue-800">
+                                <th class="p-2">模式</th>
+                                <th class="p-2">分辨率</th>
+                                <th class="p-2">Token数</th>
+                                <th class="p-2">处理方式</th>
+                                <th class="p-2">适用场景</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y dark:divide-gray-700">
+                            <tr><td class="p-2">Tiny</td><td class="p-2">512×512</td><td class="p-2">64</td><td class="p-2">resize</td><td class="p-2">Slides</td></tr>
+                            <tr><td class="p-2">Small</td><td class="p-2">640×640</td><td class="p-2">100</td><td class="p-2">resize</td><td class="p-2">书籍/报告</td></tr>
+                            <tr><td class="p-2">Base</td><td class="p-2">1024×1024</td><td class="p-2">256</td><td class="p-2">padding</td><td class="p-2">论文/表格</td></tr>
+                            <tr><td class="p-2">Large</td><td class="p-2">1280×1280</td><td class="p-2">400</td><td class="p-2">padding</td><td class="p-2">复杂文档</td></tr>
+                            <tr><td class="p-2">Gundam</td><td class="p-2">n×640+1024</td><td class="p-2">~600</td><td class="p-2">tiling</td><td class="p-2">报纸/大图</td></tr>
+                            <tr><td class="p-2">Gundam-M</td><td class="p-2">n×1024+1280</td><td class="p-2">~800</td><td class="p-2">tiling</td><td class="p-2">极端复杂</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mt-2"><strong>关键洞察：</strong>Tiny/Small用resize（避免浪费token），Base/Large用padding（保持宽高比），Gundam用tiling（处理超大图）。这种分层设计确保每种场景都有最优解。</p>
+            </div>
+        </div>
+        
+        <!-- Figure 5 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 5: OCR 1.0 标注格式</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_8.png" alt="Figure 5" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>展示两种标注格式——粗标注（直接提取文本）和细标注（包含布局坐标）。</p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• <strong>粗标注：</strong>用于训练模型识别光学文本，特别是少数民族语言</li>
+                    <li>• <strong>细标注：</strong>包含2M页中文/英文，使用PP-DocLayout和MinerU/GOT-OCR2.0生成，包含坐标和标签</li>
+                    <li>• <strong>坐标归一化：</strong>所有坐标归一化到1000 bins，统一不同分辨率下的表示</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Figure 6 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 6: OCR 2.0 数据格式</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_9.png" alt="Figure 6" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>展示图表和几何数据的标注格式，说明OCR 2.0的复杂性。</p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• <strong>图表：</strong>不使用OneChart的字典格式，改用HTML表格格式（节省token）</li>
+                    <li>• <strong>几何：</strong>使用字典格式，包含线段、端点坐标、线段类型等，采用Slow Perception方式编码</li>
+                    <li>• <strong>数据量：</strong>图表10M，化学公式5M，几何1M</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Table 2 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Table 2: Fox基准压缩比测试</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_10.png" alt="Table 2" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>系统量化不同文本长度和视觉token数下的OCR精度。</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-blue-100 dark:bg-blue-800">
+                                <th class="p-2">文本Tokens</th>
+                                <th class="p-2">Vision=64 精度</th>
+                                <th class="p-2">Vision=64 压缩比</th>
+                                <th class="p-2">Vision=100 精度</th>
+                                <th class="p-2">Vision=100 压缩比</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y dark:divide-gray-700">
+                            <tr><td class="p-2">600-700</td><td class="p-2 text-green-600">96.5%</td><td class="p-2">10.5×</td><td class="p-2 text-green-600">98.5%</td><td class="p-2">6.7×</td></tr>
+                            <tr><td class="p-2">700-800</td><td class="p-2 text-green-600">93.8%</td><td class="p-2">11.8×</td><td class="p-2 text-green-600">97.3%</td><td class="p-2">7.5×</td></tr>
+                            <tr><td class="p-2">800-900</td><td class="p-2">83.8%</td><td class="p-2">13.2×</td><td class="p-2 text-green-600">96.8%</td><td class="p-2">8.5×</td></tr>
+                            <tr><td class="p-2">900-1000</td><td class="p-2">85.9%</td><td class="p-2">15.1×</td><td class="p-2 text-green-600">96.8%</td><td class="p-2">9.7×</td></tr>
+                            <tr><td class="p-2">1000-1100</td><td class="p-2">79.3%</td><td class="p-2">16.5×</td><td class="p-2">91.5%</td><td class="p-2">10.6×</td></tr>
+                            <tr><td class="p-2">1100-1200</td><td class="p-2">76.4%</td><td class="p-2">17.7×</td><td class="p-2">89.8%</td><td class="p-2">11.3×</td></tr>
+                            <tr><td class="p-2">1200-1300</td><td class="p-2 text-yellow-600">59.1%</td><td class="p-2">19.7×</td><td class="p-2">87.1%</td><td class="p-2">12.6×</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mt-2"><strong>关键发现：</strong>100 tokens在10×压缩比内保持96%+精度，而64 tokens在>15×压缩比时精度显著下降。这验证了论文假设：10×压缩是"近无损"的边界。</p>
+            </div>
+        </div>
+        
+        <!-- Table 3 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Table 3: OmniDocBench性能对比</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_11.png" alt="Table 3" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>在真实文档解析任务上对比SOTA方法，证明DeepSeek-OCR的实用价值。</p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• <strong>评估指标：</strong>Edit Distance（编辑距离），越小越好</li>
+                    <li>• <strong>DeepSeek-OCR Tiny (64 tokens)：</strong>overall 0.386，超越GOT-OCR2.0 (256 tokens, 0.287)</li>
+                    <li>• <strong>DeepSeek-OCR Small (100 tokens)：</strong>overall 0.221，显著超越所有端到端模型</li>
+                    <li>• <strong>DeepSeek-OCR Base (256 tokens)：</strong>overall 0.137，达到SOTA水平</li>
+                    <li>• <strong>关键对比：</strong>MinerU2.0需要6790 tokens，DeepSeek-OCR只需<800 tokens即可超越</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Table 4 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Table 4: 文档类型敏感性分析</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_12.png" alt="Table 4" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>分析不同文档类型对token数的需求差异，指导实际应用中的分辨率选择。</p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• <strong>Slides：</strong>64 tokens即可（0.116 edit distance），因为布局规则、内容稀疏</li>
+                    <li>• <strong>书籍/报告：</strong>100 tokens足够（0.085/0.079），文本密度适中</li>
+                    <li>• <strong>学术论文：</strong>需要256+ tokens（0.037），因为复杂公式和密集表格</li>
+                    <li>• <strong>报纸：</strong>需要Gundam模式（0.035），因为文本密度极高且布局复杂</li>
+                </ul>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mt-2"><strong>实用指导：</strong>根据文档类型选择分辨率模式，可以在保证精度的前提下最小化token消耗。</p>
+            </div>
+        </div>
+        
+        <!-- Figure 7-10: Deep Parsing -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 7-10: Deep Parsing可视化</h3>
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">Figure 7: 图表解析</p>
+                    <img src="figures/page_13.png" alt="Figure 7" class="w-full rounded-lg border">
+                </div>
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">Figure 8: 自然图像caption</p>
+                    <img src="figures/page_14.png" alt="Figure 8" class="w-full rounded-lg border">
+                </div>
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">Figure 9: 化学公式识别</p>
+                    <img src="figures/page_15.png" alt="Figure 9" class="w-full rounded-lg border">
+                </div>
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">Figure 10: 几何图形解析</p>
+                    <img src="figures/page_16.png" alt="Figure 10" class="w-full rounded-lg border">
+                </div>
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>展示DeepSeek-OCR的"二次调用"能力——不仅能OCR文本，还能深度解析文档中的图像内容。</p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• <strong>图表→HTML表格：</strong>将柱状图/折线图转换为结构化数据，保留数值精度</li>
+                    <li>• <strong>自然图像→密集caption：</strong>为文档中的照片生成详细描述</li>
+                    <li>• <strong>化学公式→SMILES：</strong>识别分子结构，转换为机器可读格式</li>
+                    <li>• <strong>几何图形→结构化描述：</strong>提取点、线、圆、角度关系</li>
+                </ul>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mt-2"><strong>技术实现：</strong>通过统一的prompt触发不同解析模式，模型自动识别图像类型并选择对应输出格式。</p>
+            </div>
+        </div>
+        
+        <!-- Figure 11-12: 多语言与通用视觉 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 11-12: 多语言与通用视觉能力</h3>
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">Figure 11: 多语言OCR</p>
+                    <img src="figures/page_17.png" alt="Figure 11" class="w-full rounded-lg border">
+                </div>
+                <div class="bg-white dark:bg-gray-600 rounded-lg p-3">
+                    <p class="font-semibold text-sm mb-2">Figure 12: 通用视觉理解</p>
+                    <img src="figures/page_18.png" alt="Figure 12" class="w-full rounded-lg border">
+                </div>
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>证明DeepSeek-OCR不仅是OCR工具，还具备多语言和通用视觉理解能力。</p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• <strong>多语言：</strong>支持阿拉伯语、僧伽罗语等非拉丁文字，100种语言覆盖</li>
+                    <li>• <strong>通用视觉：</strong>保留图像描述、目标检测、grounding等能力（占训练数据20%）</li>
+                    <li>• <strong>语言保留：</strong>10%纯文本数据确保模型语言能力的保持</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Figure 13: 遗忘机制 -->
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5">
+            <h3 class="font-bold text-lg mb-3">Figure 13: 渐进式压缩与遗忘机制</h3>
+            <div class="bg-white dark:bg-gray-600 rounded-lg p-3 mb-4">
+                <img src="figures/page_19.png" alt="Figure 13" class="w-full rounded-lg border">
+            </div>
+            <div class="deep-analysis rounded-lg p-4">
+                <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2"><i class="fas fa-microscope mr-2"></i>深度解读</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2"><strong>设计意图：</strong>提出一个类比——人类记忆随时间衰退，视觉感知随空间距离退化，两者都表现出渐进的信息损失模式。</p>
+                <ul class="text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                    <li>• <strong>近期上下文：</strong>保持高分辨率，信息完整</li>
+                    <li>• <strong>远期上下文：</strong>逐步降低分辨率，token数减少，信息逐渐模糊</li>
+                    <li>• <strong>生物学类比：</strong>模拟生物遗忘曲线，为LLM长上下文压缩提供新思路</li>
+                </ul>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mt-2"><strong>未来方向：</strong>这种渐进式压缩可以实现"理论上无限的上下文架构"，在信息保留和计算约束之间取得平衡。</p>
+            </div>
+        </div>
+        
+    </div>
+</section><section class="section-anchor mb-12 bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
     <h2 class="text-2xl font-bold mb-6 border-b pb-3"><i class="fas fa-image mr-2 text-blue-500"></i>关键图表分析</h2>
     
     <div class="space-y-6">
